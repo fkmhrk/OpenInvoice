@@ -1,0 +1,4 @@
+OpenInvoice
+===========
+
+Invoice system
