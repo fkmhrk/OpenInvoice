@@ -1,0 +1,23 @@
+bookname: book
+# 書名
+booktitle: OpenInvoice
+# 著者
+aut: fkm
+prt: empty
+prt_url: empty
+edt: fkm
+dsr: empty
+date: 2015-01-04
+rights: |
+  empty
+description: OpenInvoiceのドキュメント 
+toclevel: 3
+secnolevel: 3
+params: --stylesheet=main.css --chapterlink
+mytoc: true
+colophon: true
+texstyle: techbooster-doujin
+texdocumentclass: ["jsbook", "b5j,twoside,openany"]
+pubhistory: |
+  2015年 1月4日 初版
+debug: true
