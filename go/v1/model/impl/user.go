@@ -2,7 +2,7 @@ package impl
 
 import (
 	m "../"
-	"errors"
+	_ "errors"
 )
 
 type userDAO struct {
@@ -40,7 +40,8 @@ func (d *userDAO) GetByNamePassword(name, password string) (*m.User, error) {
 	rows.Scan(&idDB, &nameDB, &passwordDB, &createDB, &modifiedDB)
 
 	if hashPassword(password) != passwordDB {
-		return nil, errors.New("Invalid Name / Password")
+		return nil, nil
+		// return nil, errors.New("Invalid Name / Password")
 	}
 
 	return &m.User{
