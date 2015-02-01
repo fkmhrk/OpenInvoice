@@ -67,6 +67,7 @@ create table if not exists settings(
 create table if not exists session(
   access_token varchar(48),
   user_id varchar(32),
+  scope text,
   expire_time bigint,
   created_time bigint,
   modified_time bigint,
