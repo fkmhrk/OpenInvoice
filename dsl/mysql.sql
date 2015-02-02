@@ -75,3 +75,8 @@ create table if not exists session(
   primary key(access_token)
 ) engine=InnoDB;
 
+create table if not exists trading_id(
+  date varchar(32),
+  num int,
+  primary key(date)
+) engine=InnoDB;

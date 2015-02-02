@@ -17,6 +17,12 @@ func deleteTradingByUser(db *sql.DB, userId string) {
 	s.Exec(userId)
 }
 
+func deleteTradingId(db *sql.DB, date string) {
+	s, _ := db.Prepare("DELETE FROM trading_id WHERE date=?")
+	defer s.Close()
+	s.Exec(date)
+}
+
 func insertTrading(db *sql.DB, id, user, subject, product string) {
 	s, _ := db.Prepare("INSERT INTO trading(" +
 		"id,company_id,subject," +
@@ -82,5 +88,84 @@ func TestTrading0001_GetListByUser_0(t *testing.T) {
 	if len(list) != 0 {
 		t.Errorf("Wrong list length : %d", len(list))
 		return
+	}
+}
+
+func TestTrading0100_Create(t *testing.T) {
+	db, err := connect()
+	if err != nil {
+		t.Errorf("Failed to connect")
+		return
+	}
+	defer db.Close()
+	// prepare
+	date := "20150203"
+	userId := "user1122"
+	deleteTradingByUser(db, userId)
+	deleteTradingId(db, date)
+
+	dao := createTradingDAO(db)
+	item, err := dao.Create(date, "company1111", "subject2222",
+		1234, 5678, userId, "product3333")
+	if err != nil {
+		t.Errorf("Failed to create tradings : %s", err)
+		return
+	}
+	if item.Id != "20150203001" {
+		t.Errorf("Wrong ID : %s", item.Id)
+	}
+	if item.CompanyId != "company1111" {
+		t.Errorf("Wrong Company ID : %s", item.CompanyId)
+	}
+	if item.Subject != "subject2222" {
+		t.Errorf("Wrong Subject : %s", item.Subject)
+	}
+	if item.Product != "product3333" {
+		t.Errorf("Wrong Product : %s", item.Product)
+	}
+}
+
+func TestTrading0101_Create_2(t *testing.T) {
+	db, err := connect()
+	if err != nil {
+		t.Errorf("Failed to connect")
+		return
+	}
+	defer db.Close()
+	// prepare
+	date := "20150203"
+	userId := "user1122"
+	deleteTradingByUser(db, userId)
+	deleteTradingId(db, date)
+
+	dao := createTradingDAO(db)
+	item, err := dao.Create(date, "company1111", "subject2222",
+		1234, 5678, userId, "product3333")
+	if err != nil {
+		t.Errorf("Failed to create tradings : %s", err)
+		return
+	}
+	if item.Id != "20150203001" {
+		t.Errorf("Wrong ID : %s", item.Id)
+	}
+
+	// again
+	item, err = dao.Create(date, "company4444", "subject5555",
+		1234, 5678, userId, "product6666")
+	if err != nil {
+		t.Errorf("Failed to create tradings : %s", err)
+		return
+	}
+	if item.Id != "20150203002" {
+		t.Errorf("Wrong ID : %s", item.Id)
+	}
+	if item.CompanyId != "company4444" {
+		t.Errorf("Wrong Company ID : %s", item.CompanyId)
+	}
+	if item.Subject != "subject5555" {
+		t.Errorf("Wrong Subject : %s", item.Subject)
+	}
+	if item.Product != "product6666" {
+		t.Errorf("Wrong Product : %s", item.Product)
 	}
 }

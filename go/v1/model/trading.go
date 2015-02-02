@@ -2,6 +2,7 @@ package model
 
 type TradingDAO interface {
 	GetListByUser(userId string) ([]*Trading, error)
+	Create(date, companyId, subject string, workFrom, workTo int64, assignee, product string) (*Trading, error)
 }
 
 type Trading struct {

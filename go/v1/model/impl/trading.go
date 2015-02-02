@@ -2,7 +2,10 @@ package impl
 
 import (
 	m "../"
+	"database/sql"
 	_ "errors"
+	"fmt"
+	_ "github.com/go-sql-driver/mysql"
 )
 
 type tradingDAO struct {
@@ -53,4 +56,114 @@ func (d *tradingDAO) GetListByUser(userId string) ([]*m.Trading, error) {
 	}
 	return list, nil
 
+}
+
+func (d *tradingDAO) Create(date, companyId, subject string, workFrom, workTo int64, assignee, product string) (*m.Trading, error) {
+	tr, err := d.connection.Begin()
+	if err != nil {
+		return nil, err
+	}
+	defer tr.Rollback()
+	// generate ID
+	id, err := d.generateNextId(tr, date)
+	if err != nil {
+		return nil, err
+	}
+
+	st, err := tr.Prepare("INSERT INTO trading(" +
+		"id,company_id,subject," +
+		"work_from,work_to,assignee,product," +
+		"created_time,modified_time,deleted)" +
+		"VALUES(?,?,?," +
+		"?,?,?,?," +
+		"unix_timestamp(now()),unix_timestamp(now()),0)")
+	if err != nil {
+		return nil, err
+	}
+	defer st.Close()
+
+	_, err = st.Exec(id, companyId, subject, workFrom, workTo, assignee, product)
+	if err != nil {
+		return nil, err
+	}
+
+	tr.Commit()
+
+	return &m.Trading{
+		Id:         id,
+		CompanyId:  companyId,
+		Subject:    subject,
+		WorkFrom:   workFrom,
+		WorkTo:     workTo,
+		AssigneeId: assignee,
+		Product:    product,
+	}, nil
+}
+
+func (d *tradingDAO) generateNextId(tr *sql.Tx, date string) (string, error) {
+	num, err := d.getId(tr, date)
+	if err != nil {
+		return "", err
+	}
+
+	if num == -1 {
+		err = d.insertId(tr, date)
+		if err != nil {
+			return "", err
+		}
+		return fmt.Sprintf("%s001", date), nil
+	} else {
+		num += 1
+		err = d.updateId(tr, date, num)
+		if err != nil {
+			return "", err
+		}
+		return fmt.Sprintf("%s%03d", date, num), nil
+	}
+}
+
+func (d *tradingDAO) getId(tr *sql.Tx, date string) (int, error) {
+	st, err := tr.Prepare("SELECT num FROM trading_id WHERE date=?")
+	if err != nil {
+		return -1, err
+	}
+	defer st.Close()
+
+	rows, err := st.Query(date)
+	if err != nil {
+		return -1, err
+	}
+	defer rows.Close()
+
+	if !rows.Next() {
+		return -1, nil
+	}
+
+	var num int
+	rows.Scan(&num)
+	return num, nil
+}
+
+func (d *tradingDAO) insertId(tr *sql.Tx, date string) error {
+	st, err := tr.Prepare("INSERT INTO trading_id" +
+		"(date,num) VALUES(?,1)")
+	if err != nil {
+		return err
+	}
+	defer st.Close()
+
+	_, err = st.Exec(date)
+	return err
+}
+
+func (d *tradingDAO) updateId(tr *sql.Tx, date string, num int) error {
+	st, err := tr.Prepare("UPDATe trading_id " +
+		"SET num=? WHERE date=?")
+	if err != nil {
+		return err
+	}
+	defer st.Close()
+
+	_, err = st.Exec(num, date)
+	return err
 }

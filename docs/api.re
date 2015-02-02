@@ -84,9 +84,10 @@ tradingレコードを作成する。assigneeは権限のあるユーザーの�
 
 //emlist{
   Authorization:bearer {access_token}
-  PUT /api/v1/tradings/{取引ID}
+  POST /api/v1/tradings
 
   {
+    "date" : "20150131",
     "company_id" : "会社ID",
     "subject" : "件名",
     "work_from" : 1122,
@@ -97,7 +98,12 @@ tradingレコードを作成する。assigneeは権限のあるユーザーの�
 
   response
 
-  HTTP 204 No body
+  HTTP 201 Created
+
+  {
+    "id":"t20150131001"
+  }
+  
 //}
 
 == 取引の項目取得
