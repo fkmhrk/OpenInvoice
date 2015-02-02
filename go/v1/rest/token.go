@@ -7,7 +7,6 @@ import (
 	"net/http"
 )
 
-//func getToken() func(http.ResponseWriter, *http.Request) {
 func getToken(user s.UserService) handler {
 	return func(w http.ResponseWriter, req *http.Request) {
 		// read input

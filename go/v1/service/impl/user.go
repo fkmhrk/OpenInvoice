@@ -15,6 +15,7 @@ const (
 	MSG_ERR_PASS_EMPTY   = "password must not be empty."
 	MSG_WRONG_IDENTIFIER = "Wrong name or password."
 
+	MSG_WRONG_TOKEN  = "Wrong token."
 	MSG_SERVER_ERROR = "Server error."
 
 	TIME_30MIN = 30 * 60
