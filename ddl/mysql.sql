@@ -52,7 +52,7 @@ create table if not exists trading_item(
   created_time bigint,
   modified_time bigint,
   deleted tinyint,
-  primary key(id)
+  primary key(id, trading_id)
 ) engine=InnoDB;
 
 create table if not exists settings(

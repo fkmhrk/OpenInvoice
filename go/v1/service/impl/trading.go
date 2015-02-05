@@ -83,3 +83,36 @@ func (s *tradingService) Create(token, date, companyId, subject, product string,
 	}
 	return jsonResult(201, body)
 }
+
+func (s *tradingService) GetItemListByTradingId(token, tradingId string) s.Result {
+	// input check
+	session, err := s.sessionDAO.GetByToken(token)
+	if err != nil {
+		return errorResult(500, MSG_SERVER_ERROR)
+	}
+	if session == nil {
+		return errorResult(400, MSG_WRONG_TOKEN)
+	}
+	// get trading
+	// get
+	items, err := s.tradingDAO.GetItemsById(tradingId)
+	if err != nil {
+		return errorResult(500, MSG_SERVER_ERROR)
+	}
+	list := make([]interface{}, 0)
+	for _, t := range items {
+		list = append(list, map[string]interface{}{
+			"id":         t.Id,
+			"subject":    t.Subject,
+			"unit_price": t.UnitPrice,
+			"amount":     t.Amount,
+			"degree":     t.Degree,
+			"tax_type":   t.TaxType,
+			"memo":       t.Memo,
+		})
+	}
+	body := map[string]interface{}{
+		"items": list,
+	}
+	return jsonResult(200, body)
+}

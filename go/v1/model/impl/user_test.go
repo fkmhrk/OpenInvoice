@@ -71,13 +71,13 @@ func TestUserDAO_0001_GetByNamePassword_wrongPass(t *testing.T) {
 	insertUser(db, id, name, password)
 
 	dao := createUserDAO(db)
-	_, err = dao.GetByNamePassword(name, "dummyPass")
-	if err == nil {
-		t.Errorf("err must not be nil")
+	user, err := dao.GetByNamePassword(name, "dummyPass")
+	if err != nil {
+		t.Errorf("Unexpected error : %s", err)
 		return
 	}
-	if err.Error() != "Invalid Name / Password" {
-		t.Errorf("wrong error message : %s", err)
+	if user != nil {
+		t.Errorf("User must be nil : %s", user.Id)
 		return
 	}
 }

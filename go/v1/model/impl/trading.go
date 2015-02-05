@@ -100,6 +100,44 @@ func (d *tradingDAO) Create(date, companyId, subject string, workFrom, workTo in
 	}, nil
 }
 
+func (d *tradingDAO) GetItemsById(tradingId string) ([]*m.TradingItem, error) {
+	db := d.connection.Connect()
+	st, err := db.Prepare("SELECT id,subject,unit_price,amount," +
+		"degree,tax_type,memo FROM trading_item " +
+		"WHERE trading_id=? AND deleted <> 1")
+	if err != nil {
+		return nil, err
+	}
+	defer st.Close()
+
+	rows, err := st.Query(tradingId)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var list []*m.TradingItem
+	var id, subject, degree, memo string
+	var unitPrice, amount, taxType int
+	for rows.Next() {
+		rows.Scan(&id, &subject, &unitPrice, &amount,
+			&degree, &taxType, &memo)
+
+		list = append(list, &m.TradingItem{
+			Id:        id,
+			TradingId: tradingId,
+			Subject:   subject,
+			UnitPrice: unitPrice,
+			Amount:    amount,
+			Degree:    degree,
+			TaxType:   taxType,
+			Memo:      memo,
+		})
+	}
+	return list, nil
+
+}
+
 func (d *tradingDAO) generateNextId(tr *sql.Tx, date string) (string, error) {
 	num, err := d.getId(tr, date)
 	if err != nil {
