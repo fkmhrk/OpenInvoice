@@ -19,3 +19,10 @@ func generateSessionId() string {
 	id := strings.Replace(id1+id2, "-", "", -1)
 	return id[:48]
 }
+
+func generateId(length int) string {
+	id1 := uuid.New()
+	id2 := uuid.New()
+	id := strings.Replace(id1+id2, "-", "", -1)
+	return id[:length]
+}

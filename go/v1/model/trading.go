@@ -6,6 +6,8 @@ type TradingDAO interface {
 
 	// Gets all trading items by trading ID
 	GetItemsById(tradingId string) ([]*TradingItem, error)
+	CreateItem(tradingId, subject string, unitPrice, Amount int,
+		degree string, taxType int, memo string) (*TradingItem, error)
 }
 
 type Trading struct {
@@ -23,6 +25,7 @@ type Trading struct {
 type TradingItem struct {
 	Id        string
 	TradingId string
+	SortOrder int
 	Subject   string
 	UnitPrice int
 	Amount    int

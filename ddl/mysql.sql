@@ -43,6 +43,7 @@ create table if not exists trading(
 create table if not exists trading_item(
   id varchar(32),
   trading_id varchar(32),
+  sort_order tinyint,
   subject text,
   unit_price integer,
   amount integer,

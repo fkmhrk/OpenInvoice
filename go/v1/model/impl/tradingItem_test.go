@@ -12,13 +12,13 @@ func deleteTradingItemByTradingId(db *sql.DB, tradingId string) {
 	s.Exec(tradingId)
 }
 
-func insertTradingItem(db *sql.DB, id, tradingId, subject string, unitPrice, amount int, degree string, taxType int, memo string) {
+func insertTradingItem(db *sql.DB, id string, sortOrder int, tradingId, subject string, unitPrice, amount int, degree string, taxType int, memo string) {
 	s, _ := db.Prepare("INSERT INTO trading_item(" +
-		"id,trading_id,subject,unit_price,amount," +
+		"id,sort_order,trading_id,subject,unit_price,amount," +
 		"degree,tax_type,memo,deleted)" +
-		"VALUES(?,?,?,?,?,?,?,?,0)")
+		"VALUES(?,?,?,?,?,?,?,?,?,0)")
 	defer s.Close()
-	s.Exec(id, tradingId, subject, unitPrice, amount, degree, taxType, memo)
+	s.Exec(id, sortOrder, tradingId, subject, unitPrice, amount, degree, taxType, memo)
 }
 
 func TestTradingItem0000_GetItemsById(t *testing.T) {
@@ -31,8 +31,8 @@ func TestTradingItem0000_GetItemsById(t *testing.T) {
 	// prepare
 	tradingId := "user1122"
 	deleteTradingItemByTradingId(db, tradingId)
-	insertTradingItem(db, "item1", tradingId, "subject1", 100, 2, "Yen", 1, "memo1")
-	insertTradingItem(db, "item2", tradingId, "subject2", 200, 4, "Yen", 1, "memo2")
+	insertTradingItem(db, "item1", 1, tradingId, "subject1", 100, 2, "Yen", 1, "memo1")
+	insertTradingItem(db, "item2", 2, tradingId, "subject2", 200, 4, "Yen", 1, "memo2")
 
 	dao := createTradingDAO(db)
 	list, err := dao.GetItemsById(tradingId)
@@ -47,6 +47,9 @@ func TestTradingItem0000_GetItemsById(t *testing.T) {
 	item := list[0]
 	if item.Id != "item1" {
 		t.Errorf("Wrong ID : %s", item.Id)
+	}
+	if item.SortOrder != 1 {
+		t.Errorf("Wrong SortOrder : %d", item.SortOrder)
 	}
 	if item.Subject != "subject1" {
 		t.Errorf("Wrong Subject : %s", item.Subject)

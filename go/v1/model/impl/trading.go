@@ -3,9 +3,9 @@ package impl
 import (
 	m "../"
 	"database/sql"
-	_ "errors"
+	"errors"
 	"fmt"
-	_ "github.com/go-sql-driver/mysql"
+	"github.com/go-sql-driver/mysql"
 )
 
 type tradingDAO struct {
@@ -102,9 +102,9 @@ func (d *tradingDAO) Create(date, companyId, subject string, workFrom, workTo in
 
 func (d *tradingDAO) GetItemsById(tradingId string) ([]*m.TradingItem, error) {
 	db := d.connection.Connect()
-	st, err := db.Prepare("SELECT id,subject,unit_price,amount," +
+	st, err := db.Prepare("SELECT id,sort_order,subject,unit_price,amount," +
 		"degree,tax_type,memo FROM trading_item " +
-		"WHERE trading_id=? AND deleted <> 1")
+		"WHERE trading_id=? AND deleted <> 1 ORDER BY sort_order ASC")
 	if err != nil {
 		return nil, err
 	}
@@ -118,14 +118,15 @@ func (d *tradingDAO) GetItemsById(tradingId string) ([]*m.TradingItem, error) {
 
 	var list []*m.TradingItem
 	var id, subject, degree, memo string
-	var unitPrice, amount, taxType int
+	var sortOrder, unitPrice, amount, taxType int
 	for rows.Next() {
-		rows.Scan(&id, &subject, &unitPrice, &amount,
+		rows.Scan(&id, &sortOrder, &subject, &unitPrice, &amount,
 			&degree, &taxType, &memo)
 
 		list = append(list, &m.TradingItem{
 			Id:        id,
 			TradingId: tradingId,
+			SortOrder: sortOrder,
 			Subject:   subject,
 			UnitPrice: unitPrice,
 			Amount:    amount,
@@ -136,6 +137,63 @@ func (d *tradingDAO) GetItemsById(tradingId string) ([]*m.TradingItem, error) {
 	}
 	return list, nil
 
+}
+
+func (d *tradingDAO) CreateItem(tradingId, subject string, unitPrice, amount int, degree string, taxType int, memo string) (*m.TradingItem, error) {
+	tr, err := d.connection.Begin()
+	if err != nil {
+		return nil, err
+	}
+	defer tr.Rollback()
+
+	st, err := tr.Prepare("INSERT INTO trading_item(" +
+		"id,trading_id,subject," +
+		"unit_price,amount,degree," +
+		"tax_type,memo," +
+		"created_time,modified_time,deleted)" +
+		"VALUES(?,?,?," +
+		"?,?,?," +
+		"?,?," +
+		"unix_timestamp(now()),unix_timestamp(now()),0)")
+	if err != nil {
+		return nil, err
+	}
+	defer st.Close()
+
+	// generate ID
+	var id string
+	for i := 0; i < 10; i++ {
+		id = generateId(32)
+		_, err = st.Exec(id, tradingId, subject, unitPrice, amount,
+			degree, taxType, memo)
+		if err == nil {
+			break
+		}
+		id = ""
+		if err2, ok := err.(*mysql.MySQLError); ok {
+			if err2.Number != 1062 {
+				return nil, err2
+			}
+		} else {
+			return nil, err
+		}
+	}
+	if len(id) == 0 {
+		return nil, errors.New("Failed to create")
+	}
+
+	tr.Commit()
+
+	return &m.TradingItem{
+		Id:        id,
+		TradingId: tradingId,
+		Subject:   subject,
+		UnitPrice: unitPrice,
+		Amount:    amount,
+		Degree:    degree,
+		TaxType:   taxType,
+		Memo:      memo,
+	}, nil
 }
 
 func (d *tradingDAO) generateNextId(tr *sql.Tx, date string) (string, error) {
