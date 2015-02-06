@@ -139,7 +139,7 @@ func (d *tradingDAO) GetItemsById(tradingId string) ([]*m.TradingItem, error) {
 
 }
 
-func (d *tradingDAO) CreateItem(tradingId, subject string, unitPrice, amount int, degree string, taxType int, memo string) (*m.TradingItem, error) {
+func (d *tradingDAO) CreateItem(tradingId, subject, degree, memo string, sortOrder, unitPrice, amount, taxType int) (*m.TradingItem, error) {
 	tr, err := d.connection.Begin()
 	if err != nil {
 		return nil, err
@@ -147,11 +147,11 @@ func (d *tradingDAO) CreateItem(tradingId, subject string, unitPrice, amount int
 	defer tr.Rollback()
 
 	st, err := tr.Prepare("INSERT INTO trading_item(" +
-		"id,trading_id,subject," +
+		"id,trading_id,sort_order,subject," +
 		"unit_price,amount,degree," +
 		"tax_type,memo," +
 		"created_time,modified_time,deleted)" +
-		"VALUES(?,?,?," +
+		"VALUES(?,?,?,?," +
 		"?,?,?," +
 		"?,?," +
 		"unix_timestamp(now()),unix_timestamp(now()),0)")
@@ -164,7 +164,7 @@ func (d *tradingDAO) CreateItem(tradingId, subject string, unitPrice, amount int
 	var id string
 	for i := 0; i < 10; i++ {
 		id = generateId(32)
-		_, err = st.Exec(id, tradingId, subject, unitPrice, amount,
+		_, err = st.Exec(id, tradingId, sortOrder, subject, unitPrice, amount,
 			degree, taxType, memo)
 		if err == nil {
 			break
@@ -187,6 +187,7 @@ func (d *tradingDAO) CreateItem(tradingId, subject string, unitPrice, amount int
 	return &m.TradingItem{
 		Id:        id,
 		TradingId: tradingId,
+		SortOrder: sortOrder,
 		Subject:   subject,
 		UnitPrice: unitPrice,
 		Amount:    amount,

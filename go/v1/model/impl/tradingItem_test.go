@@ -93,3 +93,97 @@ func TestTradingItem0001_GetItemsById_0(t *testing.T) {
 		return
 	}
 }
+
+func TestTradingItem0100_CreateItem(t *testing.T) {
+	db, err := connect()
+	if err != nil {
+		t.Errorf("Failed to connect")
+		return
+	}
+	defer db.Close()
+	// prepare
+	tradingId := "trade1122"
+	deleteTradingItemByTradingId(db, tradingId)
+
+	dao := createTradingDAO(db)
+	item, err := dao.CreateItem(tradingId, "Subject1", "M/D", "Memo1",
+		1, 100, 5, 1)
+	if err != nil {
+		t.Errorf("Unexpected error : %s", err)
+		return
+	}
+	if item.TradingId != "trade1122" {
+		t.Errorf("Unexpected trading ID : %s", item.TradingId)
+	}
+
+	// check
+	list, err := dao.GetItemsById(tradingId)
+	if err != nil {
+		t.Errorf("Unexpected getList error : %s", err)
+		return
+	}
+	if len(list) != 1 {
+		t.Errorf("Unexpected list length : %d", len(list))
+		return
+	}
+	item2 := list[0]
+	if item2.Id != item.Id {
+		t.Errorf("Id must be equal : %s -> %s", item.Id, item2.Id)
+	}
+	if item2.TradingId != "trade1122" {
+		t.Errorf("Unexpected Trading ID : %s", item2.TradingId)
+	}
+	if item2.Subject != "Subject1" {
+		t.Errorf("Unexpected Subject ID : %s", item2.Subject)
+	}
+	if item2.SortOrder != 1 {
+		t.Errorf("Unexpected SortOrder : %d", item2.SortOrder)
+	}
+	if item2.UnitPrice != 100 {
+		t.Errorf("Unexpected UnitPrice : %d", item2.UnitPrice)
+	}
+	if item2.Amount != 5 {
+		t.Errorf("Unexpected Amount : %d", item2.Amount)
+	}
+	if item2.Degree != "M/D" {
+		t.Errorf("Unexpected Degree : %s", item2.Degree)
+	}
+	if item2.TaxType != 1 {
+		t.Errorf("Unexpected TaxType : %d", item2.TaxType)
+	}
+	if item2.Memo != "Memo1" {
+		t.Errorf("Unexpected memo : %s", item2.Memo)
+	}
+}
+func TestTradingItem0101_CreateItem_2(t *testing.T) {
+	db, err := connect()
+	if err != nil {
+		t.Errorf("Failed to connect")
+		return
+	}
+	defer db.Close()
+	// prepare
+	tradingId := "trade1122"
+	deleteTradingItemByTradingId(db, tradingId)
+
+	dao := createTradingDAO(db)
+	for i := 0; i < 2; i++ {
+		_, err := dao.CreateItem(tradingId, "Subject1", "M/D", "Memo1",
+			i, 100*i, 5*i, 1)
+		if err != nil {
+			t.Errorf("Unexpected error : %s", err)
+			return
+		}
+	}
+
+	// check
+	list, err := dao.GetItemsById(tradingId)
+	if err != nil {
+		t.Errorf("Unexpected getList error : %s", err)
+		return
+	}
+	if len(list) != 2 {
+		t.Errorf("Unexpected list length : %d", len(list))
+		return
+	}
+}
