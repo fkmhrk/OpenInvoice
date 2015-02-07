@@ -106,3 +106,35 @@ func TestUserDAO_0002_GetByNamePassword_notFound(t *testing.T) {
 		return
 	}
 }
+
+func TestUserDAO_0100_GetList(t *testing.T) {
+	db, err := connect()
+	if err != nil {
+		t.Errorf("Failed to connect")
+		return
+	}
+	defer db.Close()
+	// prepare
+	id := "testID0000"
+	name := "test0000"
+	password := "pass1234"
+	deleteByID(db, id)
+
+	dao := createUserDAO(db)
+	list, err := dao.GetList()
+	if err != nil {
+		t.Errorf("Failed to get user by name / password : %s", err)
+		return
+	}
+	l := len(list)
+
+	insertUser(db, id, name, password)
+	list, err = dao.GetList()
+	if err != nil {
+		t.Errorf("Failed to get user by name / password : %s", err)
+		return
+	}
+	if len(list) != l+1 {
+		t.Errorf("Wrong length : %d", len(list))
+	}
+}

@@ -6,6 +6,7 @@ create table if not exists user(
   id varchar(32),
   login_name varchar(64),
   password varchar(32),
+  display_name text,
   created_time bigint,
   modified_time bigint,
   deleted tinyint,

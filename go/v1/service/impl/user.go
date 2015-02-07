@@ -49,3 +49,30 @@ func (s *userService) GetToken(name, pass string) s.Result {
 	}
 	return jsonResult(200, body)
 }
+
+func (s *userService) GetUsers(token string) s.Result {
+	// input check
+	session, err := s.sessionDAO.GetByToken(token)
+	if err != nil {
+		return errorResult(500, MSG_SERVER_ERROR)
+	}
+	if session == nil {
+		return errorResult(400, MSG_WRONG_TOKEN)
+	}
+	// get User
+	users, err := s.userDAO.GetList()
+	if err != nil {
+		return errorResult(500, MSG_SERVER_ERROR)
+	}
+	list := make([]interface{}, 0)
+	for _, t := range users {
+		list = append(list, map[string]interface{}{
+			"id":           t.Id,
+			"display_name": t.DisplayName,
+		})
+	}
+	body := map[string]interface{}{
+		"users": list,
+	}
+	return jsonResult(200, body)
+}
