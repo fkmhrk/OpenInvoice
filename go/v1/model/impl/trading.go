@@ -58,6 +58,45 @@ func (d *tradingDAO) GetListByUser(userId string) ([]*m.Trading, error) {
 
 }
 
+func (d *tradingDAO) GetById(id, userId string) (*m.Trading, error) {
+	db := d.connection.Connect()
+	st, err := db.Prepare("SELECT company_id,subject," +
+		"work_from,work_to,product," +
+		"created_time, modified_time FROM trading " +
+		"WHERE id=? AND assignee=? AND deleted <> 1 LIMIT 1")
+	if err != nil {
+		return nil, err
+	}
+	defer st.Close()
+
+	rows, err := st.Query(id, userId)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	if !rows.Next() {
+		return nil, nil
+	}
+
+	var companyId, subject, product string
+	var workFrom, workTo, created, modified int64
+	rows.Scan(&companyId, &subject, &workFrom, &workTo,
+		&product, &created, &modified)
+
+	return &m.Trading{
+		Id:           id,
+		CompanyId:    companyId,
+		Subject:      subject,
+		WorkFrom:     workFrom,
+		WorkTo:       workTo,
+		AssigneeId:   userId,
+		Product:      product,
+		CreatedTime:  created,
+		ModifiedTime: modified,
+	}, nil
+}
+
 func (d *tradingDAO) Create(date, companyId, subject string, workFrom, workTo int64, assignee, product string) (*m.Trading, error) {
 	tr, err := d.connection.Begin()
 	if err != nil {
@@ -83,6 +122,42 @@ func (d *tradingDAO) Create(date, companyId, subject string, workFrom, workTo in
 	defer st.Close()
 
 	_, err = st.Exec(id, companyId, subject, workFrom, workTo, assignee, product)
+	if err != nil {
+		return nil, err
+	}
+
+	tr.Commit()
+
+	return &m.Trading{
+		Id:         id,
+		CompanyId:  companyId,
+		Subject:    subject,
+		WorkFrom:   workFrom,
+		WorkTo:     workTo,
+		AssigneeId: assignee,
+		Product:    product,
+	}, nil
+}
+
+func (d *tradingDAO) Update(id, companyId, subject string, titleType int, workFrom, workTo int64, assignee, product string) (*m.Trading, error) {
+	tr, err := d.connection.Begin()
+	if err != nil {
+		return nil, err
+	}
+	defer tr.Rollback()
+
+	st, err := tr.Prepare("UPDATE trading SET " +
+		"company_id=?,title_type=?,subject=?," +
+		"work_from=?,work_to=?,assignee=?,product=?," +
+		"modified_time=unix_timestamp(now()) " +
+		"WHERE id=? AND deleted <> 1")
+	if err != nil {
+		return nil, err
+	}
+	defer st.Close()
+
+	_, err = st.Exec(companyId, titleType, subject, workFrom, workTo,
+		assignee, product, id)
 	if err != nil {
 		return nil, err
 	}

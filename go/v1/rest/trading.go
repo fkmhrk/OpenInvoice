@@ -30,6 +30,29 @@ func createTrading(trading s.TradingService) handler {
 	})
 }
 
+func updateTrading(trading s.TradingService) handler {
+	return makeHandler(func(token, tType string,
+		req *http.Request) s.Result {
+		// read path param
+		vars := mux.Vars(req)
+		tradingId := vars["tradingId"]
+
+		// to json
+		json, _ := rj.ObjectFromString(readBody(req))
+
+		// read input
+		companyId, _ := json.String("company_id")
+		subject, _ := json.String("subject")
+		titleType, _ := json.Int("title_type")
+		workFrom, _ := json.Long("work_from")
+		workTo, _ := json.Long("work_to")
+		product, _ := json.String("product")
+
+		return trading.Update(token, tradingId, companyId,
+			subject, product, titleType, workFrom, workTo)
+	})
+}
+
 func getTradingItems(trading s.TradingService) handler {
 	return makeHandler(func(token, tType string,
 		req *http.Request) s.Result {

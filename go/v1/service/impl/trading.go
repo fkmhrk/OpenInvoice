@@ -84,6 +84,50 @@ func (s *tradingService) Create(token, date, companyId, subject, product string,
 	return jsonResult(201, body)
 }
 
+func (s *tradingService) Update(token, id, companyId, subject, product string, titleType int, workFrom, workTo int64) s.Result {
+	// input check
+	if len(id) == 0 {
+		return errorResult(400, MSG_ERR_ID_EMPTY)
+	}
+	if len(companyId) == 0 {
+		return errorResult(400, MSG_ERR_COMPANY_ID_EMPTY)
+	}
+	if len(subject) == 0 {
+		return errorResult(400, MSG_ERR_SUBJECT_EMPTY)
+	}
+	if len(product) == 0 {
+		return errorResult(400, MSG_ERR_PRODUCT_EMPTY)
+	}
+
+	// get session
+	session, err := s.sessionDAO.GetByToken(token)
+	if err != nil {
+		return errorResult(500, MSG_SERVER_ERROR)
+	}
+	if session == nil {
+		return errorResult(400, MSG_WRONG_TOKEN)
+	}
+
+	// get item
+	item, err := s.tradingDAO.GetById(id, session.UserId)
+	if err != nil {
+		return errorResult(500, MSG_SERVER_ERROR)
+	}
+	if item == nil {
+		return errorResult(404, MSG_TRADING_NOT_FOUND)
+	}
+	// update
+	item2, err := s.tradingDAO.Update(id, companyId, subject, titleType, workFrom, workTo, session.UserId, product)
+	if err != nil {
+		return errorResult(500, MSG_SERVER_ERROR)
+	}
+
+	body := map[string]interface{}{
+		"id": item2.Id,
+	}
+	return jsonResult(200, body)
+}
+
 func (s *tradingService) GetItemListByTradingId(token, tradingId string) s.Result {
 	// input check
 	session, err := s.sessionDAO.GetByToken(token)

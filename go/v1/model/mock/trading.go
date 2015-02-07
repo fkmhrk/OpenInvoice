@@ -6,7 +6,9 @@ import (
 
 type TradingDAO struct {
 	GetListByUserResult []*m.Trading
+	GetByIdResult       *m.Trading
 	CreateResult        *m.Trading
+	UpdateResult        *m.Trading
 	GetItemsByIdResult  []*m.TradingItem
 	CreateItemResult    *m.TradingItem
 }
@@ -15,8 +17,16 @@ func (d *TradingDAO) GetListByUser(userId string) ([]*m.Trading, error) {
 	return d.GetListByUserResult, nil
 }
 
+func (d *TradingDAO) GetById(id, userId string) (*m.Trading, error) {
+	return d.GetByIdResult, nil
+}
+
 func (d *TradingDAO) Create(date, companyId, subject string, workFrom, workTo int64, assignee, product string) (*m.Trading, error) {
 	return d.CreateResult, nil
+}
+
+func (d *TradingDAO) Update(id, companyId, subject string, titleType int, workFrom, workTo int64, assignee, product string) (*m.Trading, error) {
+	return d.UpdateResult, nil
 }
 
 func (d *TradingDAO) GetItemsById(tradingId string) ([]*m.TradingItem, error) {

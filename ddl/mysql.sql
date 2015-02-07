@@ -30,6 +30,7 @@ create table if not exists trading(
   id varchar(32),
   company_id varchar(32),
   subject text,
+  title_type tinyint,
   work_from bigint,
   work_to bigint,
   assignee varchar(32),

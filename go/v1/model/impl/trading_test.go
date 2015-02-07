@@ -91,6 +91,62 @@ func TestTrading0001_GetListByUser_0(t *testing.T) {
 	}
 }
 
+func TestTrading0100_GetById(t *testing.T) {
+	db, err := connect()
+	if err != nil {
+		t.Errorf("Failed to connect")
+		return
+	}
+	defer db.Close()
+	// prepare
+	userId := "user1122"
+	product := "product2233"
+	deleteTradingByUser(db, userId)
+	insertTrading(db, "trade1", userId, "subject1", product)
+	insertTrading(db, "trade2", userId, "subject2", product)
+
+	dao := createTradingDAO(db)
+	item, err := dao.GetById("trade1", userId)
+	if err != nil {
+		t.Errorf("Failed to get tradings by Id : %s", err)
+		return
+	}
+	if item.Id != "trade1" {
+		t.Errorf("Wrong ID : %s", item.Id)
+	}
+	if item.Subject != "subject1" {
+		t.Errorf("Wrong Subject : %s", item.Subject)
+	}
+	if item.Product != "product2233" {
+		t.Errorf("Wrong Product : %s", item.Product)
+	}
+}
+
+func TestTrading0101_GetById_noId(t *testing.T) {
+	db, err := connect()
+	if err != nil {
+		t.Errorf("Failed to connect")
+		return
+	}
+	defer db.Close()
+	// prepare
+	userId := "user1122"
+	product := "product2233"
+	deleteTradingByUser(db, userId)
+	insertTrading(db, "trade1", userId, "subject1", product)
+	insertTrading(db, "trade2", userId, "subject2", product)
+
+	dao := createTradingDAO(db)
+	item, err := dao.GetById("trade3", userId)
+	if err != nil {
+		t.Errorf("Failed to get tradings by Id : %s", err)
+		return
+	}
+	if item != nil {
+		t.Errorf("item must be nil ID=%s", item.Id)
+	}
+}
+
 func TestTrading0100_Create(t *testing.T) {
 	db, err := connect()
 	if err != nil {
@@ -167,5 +223,66 @@ func TestTrading0101_Create_2(t *testing.T) {
 	}
 	if item.Product != "product6666" {
 		t.Errorf("Wrong Product : %s", item.Product)
+	}
+}
+
+func TestTrading0300_Update(t *testing.T) {
+	db, err := connect()
+	if err != nil {
+		t.Errorf("Failed to connect")
+		return
+	}
+	defer db.Close()
+	// prepare
+	date := "20150203"
+	userId := "user1122"
+	deleteTradingByUser(db, userId)
+	deleteTradingId(db, date)
+
+	dao := createTradingDAO(db)
+	item, err := dao.Create(date, "company1111", "subject2222",
+		1234, 5678, userId, "product3333")
+	if err != nil {
+		t.Errorf("Failed to create tradings : %s", err)
+		return
+	}
+
+	// update
+	item2, err := dao.Update(item.Id, "company2222", "subject3333",
+		0, 2345, 6789, userId, "product4444")
+	if err != nil {
+		t.Errorf("Failed to update trading : %s", err)
+		return
+	}
+	if item2.Id != "20150203001" {
+		t.Errorf("Wrong ID : %s", item2.Id)
+	}
+	if item2.CompanyId != "company2222" {
+		t.Errorf("Wrong Company ID : %s", item2.CompanyId)
+	}
+	if item2.Subject != "subject3333" {
+		t.Errorf("Wrong Subject : %s", item2.Subject)
+	}
+	if item2.Product != "product4444" {
+		t.Errorf("Wrong Product : %s", item2.Product)
+	}
+
+	// get by id
+	item3, err := dao.GetById(item.Id, userId)
+	if err != nil {
+		t.Errorf("Failed to get trading : %s", err)
+		return
+	}
+	if item3.Id != "20150203001" {
+		t.Errorf("Wrong ID : %s", item3.Id)
+	}
+	if item3.CompanyId != "company2222" {
+		t.Errorf("Wrong Company ID : %s", item3.CompanyId)
+	}
+	if item3.Subject != "subject3333" {
+		t.Errorf("Wrong Subject : %s", item3.Subject)
+	}
+	if item3.Product != "product4444" {
+		t.Errorf("Wrong Product : %s", item3.Product)
 	}
 }

@@ -115,6 +115,62 @@ func TestTrading0100_Create(t *testing.T) {
 	}
 }
 
+func TestTrading0200_Update(t *testing.T) {
+	sessionDAO := &m.SessionDAO{
+		GetByTokenResult: &model.Session{
+			Token:  "testToken",
+			UserId: "user1122",
+		},
+	}
+	tradingDAO := &m.TradingDAO{
+		GetByIdResult: &model.Trading{
+			Id:         "trade1111",
+			CompanyId:  "company2233",
+			Subject:    "subject3344",
+			WorkFrom:   2233,
+			WorkTo:     4455,
+			AssigneeId: "user2233",
+			Product:    "product",
+		},
+		UpdateResult: &model.Trading{
+			Id:         "trade1111",
+			CompanyId:  "company2233",
+			Subject:    "subject3344",
+			WorkFrom:   2233,
+			WorkTo:     4455,
+			AssigneeId: "user2233",
+			Product:    "product",
+		},
+	}
+
+	s := NewTradingSerivce(sessionDAO, tradingDAO)
+
+	// params
+	token := "token1122"
+	id := "20150203"
+	companyId := "company1122"
+	subject := "subject3344"
+	product := "product4455"
+	titleType := 1
+	workFrom := int64(100)
+	workTo := int64(200)
+
+	r := s.Update(token, id, companyId, subject, product, titleType, workFrom, workTo)
+	if r == nil {
+		t.Errorf("Result must not be nil")
+		return
+	}
+	if r.Status() != 200 {
+		t.Errorf("Wrong status : %d", r.Status())
+		return
+	}
+
+	json := json(r)
+	if v, _ := json.String("id"); v != "trade1111" {
+		t.Errorf("Wrong id : %s", v)
+	}
+}
+
 func TestTrading0200_GetItemsByTradingId(t *testing.T) {
 	sessionDAO := &m.SessionDAO{
 		GetByTokenResult: &model.Session{
