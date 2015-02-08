@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset='utf-8'>
+  <title>OpenInvoice</title>
+  <link rel="stylesheet" type="text/css" href="assets/style.css">
+  <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
+  <link href="lib/easyselectbox/easyselectbox.css" rel="stylesheet">  
+</head>
+<body>
+<section id="container"></section>
+
+<script id="topTemplate" type="text/ractive">
+  <header>
+    <p>OpenInvoice</p>
+  </header>
+  <section class="wrapper">
+    <label>Username</label><br/>
+    <input type="text" value="{{username}}"/><br/>
+    <label>Password</label><br/>
+    <input type="password" value="{{password}}"/><br/>
+    <button on-click="login" disabled="{{loginInProgress}}">Log in</button>
+  </section>
+</script>
+
+<script id="tradingTemplate" type="text/ractive">
+  <header>
+    <p>List</p>
+  </header>
+  <section class="wrapper">
+    <input type="text" value="{{newId}}"/><button on-click="newTrading">新規作成</button>
+    <table class="wrapper">
+      {{#tradings:i}}
+      <tr on-click="itemClick:{{i}}">
+        <th>{{subject}}</th>
+      </tr>
+      {{/}}
+    </table>
+  </section>
+</script>
+
+<script id="editTradingTemplate" type="text/ractive">
+  <section class="sheet">
+    <header>
+      <p><i class="fa fa-chevron-left"></i>シート</p>    
+    </header>
+    <div class="wrapper">
+      <section id="basicInfo">
+        <p>
+          <input type="text" placeholder="ID" value="{{trading.date}}" readonly/>
+        </p>
+        <p>
+	  <select id="company" decorator="easyselect">
+            {{#companies}}
+	    <option value="{{id}}">{{name}}</option>
+            {{/}}
+	  </select>
+          
+	  <select id="titleType" value="{{trading.title_type}}" decorator="easyselect">
+	    <option value="0">御中</option>
+	    <option value="1">様</option>
+	  </select>
+        </p>
+        <ul>
+	  <li><input type="text" placeholder="件名" value="{{trading.subject}}" /></li>
+	  <li><span>作業期間</span><input type="date" value="{{workFrom}}">〜<input type="date" value="{{workTo}}"></li>
+	  <li><textarea placeholder="成果物" value="{{trading.product}}"></textarea></li>
+	  <li>
+	    <span>担当者</span>
+	    <select id="assignee" value="{{selectedAssignee}}" decorator="easyselect">
+            {{#users}}
+              <option value="{{id}}">{{display_name}}</option>
+            {{/}}
+	    </select>
+	  </li>
+          <li>
+            <button on-click="save">保存</button>
+          </li>
+        </ul>
+      </section>
+      
+      <section id="inputArea">
+        <div class="inputBox">
+          {{#tradingItems:i}}
+	  <article>
+	    <ul class="table">
+	      <li><input type="text" placeholder="項目名" value="{{subject}}"></li>
+              <li>&yen;<input on-focus="numFocus:{{unit_price}}" on-blur="sumBlur:{{unit_price}},{{i}}" type="text" placeholder="50,000" value="{{unit_price}}"></li>
+              <li><input type="text" on-blur="amountBlur" placeholder="1" value="{{amount}}"></li>
+              <li><input type="text" placeholder="人日" value="{{degree}}"></li><li>&yen;<input type="text" placeholder="小計" value="{{numToCurrency(sum)}}" readonly></li>
+	    </ul>
+	    <p class="note"><textarea placeholder="備考" value="{{memo}}"></textarea></p>
+	    <ul class="tax">
+	      <li>
+	        <input type="radio" name="{{tax_type}}" id="taxoff" value="1" checked="checked" />
+	        <label for="taxoff" data-label="税抜">税抜</label>
+	      </li>
+	      <li>
+	        <input type="radio" name="{{tax_type}}" id="taxon" value="2" />
+	        <label for="taxon" data-label="税込">税込</label>
+	      </li>
+	      <li>
+	        <input type="radio" name="{{tax_type}}" id="taxno" value="0" />
+	        <label for="taxno" data-label="非課税">非課税</label>
+	      </li>
+	    </ul>
+	  </article>
+          {{/}}
+        </div>
+<p class="addInput" on-click="addItem"><i class="fa fa-plus-circle"></i></p>          
+      </section>
+      
+    </div><!-- class="wrapper" -->
+  </section>
+</script>  
+
+<script src="https://cdn.ractivejs.org/latest/ractive.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.7.0/underscore-min.js" type="text/javascript"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.1.2/backbone-min.js" type="text/javascript"></script>
+<script src="./assets/js/MockClient.js"></script>
+<script src="./assets/js/ClientImpl.js"></script>
+<script src="./assets/js/app.js"></script>
+
+<script type="text/javascript" src="./lib/easyselectbox/easyselectbox.min.js"></script>
+</body>
+</html>

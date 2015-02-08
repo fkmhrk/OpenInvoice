@@ -1,0 +1,232 @@
+.commonWidth {
+  width: 900px;
+  margin: 0 auto;
+}
+.alR {
+  text-align: right;
+}
+.alC {
+  text-align: center;
+}
+.shadow1 {
+  box-shadow: 0 0 3px rgba(0, 0, 0, 0.2);
+}
+.shadow2 {
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+}
+.shadow3 {
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+.transition {
+  transition: all 0.2s;
+}
+.card {
+  background: white;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+}
+* {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+html,
+body,
+div,
+ul,
+li,
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin: 0;
+  padding: 0;
+}
+ul,
+li {
+  list-style: none;
+}
+body {
+  background-color: #ececec;
+  font-family: sans-serif;
+  width: 100%;
+  padding: 0;
+  color: #333;
+}
+header {
+  width: 100%;
+  color: #fff;
+  background: #c81c22;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  position: fixed;
+  z-index: 10;
+  height: 48px;
+}
+header p {
+  width: 900px;
+  margin: 0 auto;
+  padding-top: 10px;
+  font-size: 1.2em;
+}
+header p i {
+  margin-right: 20px;
+}
+.wrapper {
+  margin: 0 auto;
+  padding: 58px 0 0;
+}
+input[type=text],
+input[type=date] {
+  -webkit-appearance: none;
+  border: none;
+  border-bottom: 1px dotted #999;
+  margin-bottom: 5px;
+  font-size: 1em;
+}
+textarea {
+  -webkit-appearance: none;
+  border: 1px solid #ccc;
+  font-size: 1em;
+}
+/*input:focus,
+textarea:focus*/
+*:focus {
+  outline: none;
+}
+.sheet .wrapper {
+  width: 900px;
+  margin: 0 auto;
+}
+.sheet .wrapper #basicInfo {
+  padding: 30px;
+  background: white;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+  margin-bottom: 15px;
+}
+.sheet .wrapper #basicInfo p {
+  margin-bottom: 10px;
+}
+.sheet .wrapper #basicInfo li {
+  margin-bottom: 10px;
+}
+.sheet .wrapper #basicInfo li span {
+  color: #999;
+  margin-right: 10px;
+}
+.sheet .wrapper #basicInfo li input[type=text],
+.sheet .wrapper #basicInfo li textarea {
+  width: 400px;
+}
+.sheet .wrapper #basicInfo li textarea {
+  height: 4em;
+  margin: 10px 0 5px;
+}
+.sheet .wrapper #inputArea {
+  /*border-top: 3px solid #ccc;*/
+
+  background: white;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+}
+.sheet .wrapper #inputArea article {
+  border-bottom: 1px solid #ccc;
+  padding: 30px 25px;
+  position: relative;
+  transition: all 0.2s;
+}
+.sheet .wrapper #inputArea article:hover,
+.sheet .wrapper #inputArea article.active {
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+.sheet .wrapper #inputArea article .table li {
+  display: inline-block;
+  margin: 0 5px;
+}
+.sheet .wrapper #inputArea article .table li:first-child {
+  width: 430px;
+}
+.sheet .wrapper #inputArea article .table li:nth-child(2) {
+  width: 120px;
+}
+.sheet .wrapper #inputArea article .table li:nth-child(2) input[type=text] {
+  width: 80%;
+  text-align: right;
+}
+.sheet .wrapper #inputArea article .table li:nth-child(3) {
+  width: 50px;
+}
+.sheet .wrapper #inputArea article .table li:nth-child(3) input[type=text] {
+  text-align: center;
+}
+.sheet .wrapper #inputArea article .table li:nth-child(4) {
+  width: 80px;
+}
+.sheet .wrapper #inputArea article .table li:nth-child(4) input[type=text] {
+  text-align: center;
+}
+.sheet .wrapper #inputArea article .table li:last-child {
+  width: 120px;
+}
+.sheet .wrapper #inputArea article .table li:last-child input[type=text] {
+  width: 80%;
+  text-align: right;
+}
+.sheet .wrapper #inputArea article .table li input[type=text] {
+  width: 100%;
+}
+.sheet .wrapper #inputArea article .note textarea {
+  width: 700px;
+  margin: 20px 5px 0;
+  height: 6em;
+}
+.sheet .wrapper #inputArea article .tax {
+  position: absolute;
+  bottom: 30px;
+  right: 30px;
+  border: 2px solid #ccc;
+  font-size: 0.8em;
+  /*					position: absolute;
+					bottom: 30px;
+					right: 30px;
+					border-radius: 20px;
+					border: 1px solid #666;
+					padding: 5px 10px;
+*/
+
+}
+.sheet .wrapper #inputArea article .tax input {
+  display: none;
+}
+.sheet .wrapper #inputArea article .tax label {
+  padding: 5px 10px;
+  text-align: center;
+  display: block;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.sheet .wrapper #inputArea article .tax label:hover {
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+  background: #dedede;
+}
+.sheet .wrapper #inputArea article .tax input[type=radio]:checked + label {
+  background: #c81c22;
+  color: #fff;
+}
+.sheet .wrapper #inputArea .addInput {
+  background: #dedede;
+  border-bottom: 1px solid #ccc;
+  padding: 30px;
+  text-align: center;
+  font-size: 2em;
+  color: #fff;
+  text-shadow: 0 0 3px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  transition: all 0.2s;
+  /*.shadow1;*/
+
+}
+.sheet .wrapper #inputArea .addInput:hover {
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  background: #ccc;
+}

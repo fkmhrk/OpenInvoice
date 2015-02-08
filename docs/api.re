@@ -32,6 +32,7 @@
 
  {
    "username" : "fkm",
+   "display_name" : "hrk fkm",
    "password" : "123456"
  }
 
@@ -41,6 +42,66 @@
  {
    "id" : "user1234"
  }
+//}
+
+
+== ユーザー取得
+
+IDとdisplay_nameのみ返す
+
+//emlist{
+ Authorization:bearer {access_token}
+ GET /api/v1/users
+
+ response
+
+ HTTP 200
+ {
+   "users":[
+     {
+       "id": "user1234",
+       "display_name" : "hrk fkm"
+     },
+     {
+       "id": "user5678",
+       "display_name" : "Chihiro akiba"
+     },     
+  ]
+}
+//}
+
+
+== 会社取得
+
+登録されている全会社を取得する。
+
+//emlist{
+ Authorization:bearer {access_token}
+ GET /api/v1/companies
+
+ response
+
+ HTTP 200
+ {
+   "companies":[
+     {
+       "id" : "company1",
+       "name" : "A株式会社",
+       "zip" : "111-2222",
+       "address" : "東京",
+       "phone" : "03-1111-2222",
+       "unit" : "開発部"
+     },
+     {
+       "id" : "company2",  
+       "name" : "株式会社B",
+       "zip" : "333-4444",
+       "address" : "大阪",
+       "phone" : "06-2222-3333",
+       "unit" : "営業部"
+     }
+  ]
+}
 //}
 
 
