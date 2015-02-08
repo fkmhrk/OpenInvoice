@@ -22,7 +22,7 @@ func (d *TradingDAO) GetById(id, userId string) (*m.Trading, error) {
 	return d.GetByIdResult, nil
 }
 
-func (d *TradingDAO) Create(date, companyId, subject string, workFrom, workTo int64, assignee, product string) (*m.Trading, error) {
+func (d *TradingDAO) Create(date, companyId, subject string, titleType int, workFrom, workTo int64, assignee, product string) (*m.Trading, error) {
 	return d.CreateResult, nil
 }
 

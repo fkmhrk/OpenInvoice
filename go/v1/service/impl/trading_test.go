@@ -94,12 +94,13 @@ func TestTrading0100_Create(t *testing.T) {
 	token := "token1122"
 	date := "20150203"
 	companyId := "company1122"
+	titleType := 1
 	subject := "subject3344"
 	product := "product4455"
 	workFrom := int64(100)
 	workTo := int64(200)
 
-	r := s.Create(token, date, companyId, subject, product, workFrom, workTo)
+	r := s.Create(token, date, companyId, subject, product, titleType, workFrom, workTo)
 	if r == nil {
 		t.Errorf("Result must not be nil")
 		return

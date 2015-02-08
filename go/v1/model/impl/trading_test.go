@@ -161,7 +161,7 @@ func TestTrading0100_Create(t *testing.T) {
 	deleteTradingId(db, date)
 
 	dao := createTradingDAO(db)
-	item, err := dao.Create(date, "company1111", "subject2222",
+	item, err := dao.Create(date, "company1111", "subject2222", 1,
 		1234, 5678, userId, "product3333")
 	if err != nil {
 		t.Errorf("Failed to create tradings : %s", err)
@@ -195,7 +195,7 @@ func TestTrading0101_Create_2(t *testing.T) {
 	deleteTradingId(db, date)
 
 	dao := createTradingDAO(db)
-	item, err := dao.Create(date, "company1111", "subject2222",
+	item, err := dao.Create(date, "company1111", "subject2222", 1,
 		1234, 5678, userId, "product3333")
 	if err != nil {
 		t.Errorf("Failed to create tradings : %s", err)
@@ -206,7 +206,7 @@ func TestTrading0101_Create_2(t *testing.T) {
 	}
 
 	// again
-	item, err = dao.Create(date, "company4444", "subject5555",
+	item, err = dao.Create(date, "company4444", "subject5555", 1,
 		1234, 5678, userId, "product6666")
 	if err != nil {
 		t.Errorf("Failed to create tradings : %s", err)
@@ -240,7 +240,7 @@ func TestTrading0300_Update(t *testing.T) {
 	deleteTradingId(db, date)
 
 	dao := createTradingDAO(db)
-	item, err := dao.Create(date, "company1111", "subject2222",
+	item, err := dao.Create(date, "company1111", "subject2222", 1,
 		1234, 5678, userId, "product3333")
 	if err != nil {
 		t.Errorf("Failed to create tradings : %s", err)

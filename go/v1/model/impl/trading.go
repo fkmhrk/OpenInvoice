@@ -97,7 +97,7 @@ func (d *tradingDAO) GetById(id, userId string) (*m.Trading, error) {
 	}, nil
 }
 
-func (d *tradingDAO) Create(date, companyId, subject string, workFrom, workTo int64, assignee, product string) (*m.Trading, error) {
+func (d *tradingDAO) Create(date, companyId, subject string, titleType int, workFrom, workTo int64, assignee, product string) (*m.Trading, error) {
 	tr, err := d.connection.Begin()
 	if err != nil {
 		return nil, err
@@ -110,10 +110,10 @@ func (d *tradingDAO) Create(date, companyId, subject string, workFrom, workTo in
 	}
 
 	st, err := tr.Prepare("INSERT INTO trading(" +
-		"id,company_id,subject," +
+		"id,company_id,subject,title_type," +
 		"work_from,work_to,assignee,product," +
 		"created_time,modified_time,deleted)" +
-		"VALUES(?,?,?," +
+		"VALUES(?,?,?,?," +
 		"?,?,?,?," +
 		"unix_timestamp(now()),unix_timestamp(now()),0)")
 	if err != nil {
@@ -121,7 +121,7 @@ func (d *tradingDAO) Create(date, companyId, subject string, workFrom, workTo in
 	}
 	defer st.Close()
 
-	_, err = st.Exec(id, companyId, subject, workFrom, workTo, assignee, product)
+	_, err = st.Exec(id, companyId, subject, titleType, workFrom, workTo, assignee, product)
 	if err != nil {
 		return nil, err
 	}
@@ -132,6 +132,7 @@ func (d *tradingDAO) Create(date, companyId, subject string, workFrom, workTo in
 		Id:         id,
 		CompanyId:  companyId,
 		Subject:    subject,
+		TitleType:  titleType,
 		WorkFrom:   workFrom,
 		WorkTo:     workTo,
 		AssigneeId: assignee,

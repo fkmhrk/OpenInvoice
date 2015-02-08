@@ -20,13 +20,14 @@ func createTrading(trading s.TradingService) handler {
 		// read input
 		date, _ := json.String("date")
 		companyId, _ := json.String("company_id")
+		titleType, _ := json.Int("title_type")
 		subject, _ := json.String("subject")
 		workFrom, _ := json.Long("work_from")
 		workTo, _ := json.Long("work_to")
 		product, _ := json.String("product")
 
 		return trading.Create(token, date, companyId,
-			subject, product, workFrom, workTo)
+			subject, product, titleType, workFrom, workTo)
 	})
 }
 
