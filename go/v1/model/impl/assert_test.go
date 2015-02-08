@@ -8,6 +8,37 @@ import (
 	"testing"
 )
 
+func assertTrading(t *testing.T, item *m.Trading,
+	id, companyId, subject string, titleType int,
+	workFrom, workTo int64, assignee, product string) {
+	caller := getCaller()
+	if item.Id != id {
+		t.Errorf("%s Id must be %s but %s", caller, id, item.Id)
+	}
+	if item.CompanyId != companyId {
+		t.Errorf("%s CompanyId must be %s but %s", caller, companyId, item.CompanyId)
+	}
+	if item.Subject != subject {
+		t.Errorf("%s Subject must be %s but %s", caller, subject, item.Subject)
+	}
+	if item.TitleType != titleType {
+		t.Errorf("%s TitleType must be %d but %d", caller, titleType, item.TitleType)
+	}
+	if item.WorkFrom != workFrom {
+		t.Errorf("%s WorkFrom must be %d but %d", caller, workFrom, item.WorkFrom)
+	}
+	if item.WorkTo != workTo {
+		t.Errorf("%s WorkTo must be %d but %d", caller, workTo, item.WorkTo)
+	}
+	if item.AssigneeId != assignee {
+		t.Errorf("%s AssigneeId must be %s but %s", caller, assignee, item.AssigneeId)
+	}
+	if item.Product != product {
+		t.Errorf("%s Product must be %s but %s", caller, product, item.Product)
+	}
+
+}
+
 func assertTradingItem(t *testing.T, item *m.TradingItem,
 	id, tradingId, subject string, sortOrder, unitPrice, amount int,
 	degree string, taxType int, memo string) {

@@ -25,9 +25,9 @@ func deleteTradingId(db *sql.DB, date string) {
 
 func insertTrading(db *sql.DB, id, user, subject, product string) {
 	s, _ := db.Prepare("INSERT INTO trading(" +
-		"id,company_id,subject," +
+		"id,company_id,title_type,subject," +
 		"work_from,work_to,assignee,product,deleted)" +
-		"VALUES(?,'company1',?,0,0,?,?,0)")
+		"VALUES(?,'company1',0,?,0,0,?,?,0)")
 	defer s.Close()
 	s.Exec(id, subject, user, product)
 }
@@ -56,16 +56,10 @@ func TestTrading0000_GetListByUser(t *testing.T) {
 		t.Errorf("Wrong list length : %d", len(list))
 		return
 	}
-	item := list[0]
-	if item.Id != "trade1" {
-		t.Errorf("Wrong ID : %s", item.Id)
-	}
-	if item.Subject != "subject1" {
-		t.Errorf("Wrong Subject : %s", item.Subject)
-	}
-	if item.Product != "product2233" {
-		t.Errorf("Wrong Product : %s", item.Product)
-	}
+	assertTrading(t, list[0], "trade1", "company1", "subject1", 0,
+		0, 0, "user1122", "product2233")
+	assertTrading(t, list[1], "trade2", "company1", "subject2", 0,
+		0, 0, "user1122", "product2233")
 }
 
 func TestTrading0001_GetListByUser_0(t *testing.T) {
@@ -111,15 +105,8 @@ func TestTrading0100_GetById(t *testing.T) {
 		t.Errorf("Failed to get tradings by Id : %s", err)
 		return
 	}
-	if item.Id != "trade1" {
-		t.Errorf("Wrong ID : %s", item.Id)
-	}
-	if item.Subject != "subject1" {
-		t.Errorf("Wrong Subject : %s", item.Subject)
-	}
-	if item.Product != "product2233" {
-		t.Errorf("Wrong Product : %s", item.Product)
-	}
+	assertTrading(t, item, "trade1", "company1", "subject1", 0,
+		0, 0, "user1122", "product2233")
 }
 
 func TestTrading0101_GetById_noId(t *testing.T) {

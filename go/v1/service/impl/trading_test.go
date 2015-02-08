@@ -17,6 +17,7 @@ func TestTrading0000_GetListByUser(t *testing.T) {
 	list = append(list, &model.Trading{
 		Id:         "trade1111",
 		CompanyId:  "company2233",
+		TitleType:  1,
 		Subject:    "subject3344",
 		WorkFrom:   1122,
 		WorkTo:     3344,
@@ -55,6 +56,9 @@ func TestTrading0000_GetListByUser(t *testing.T) {
 	}
 	if v, _ := item.String("company_id"); v != "company2233" {
 		t.Errorf("Wrong company id : %s", v)
+	}
+	if v, _ := item.Int("title_type"); v != 1 {
+		t.Errorf("Wrong title_type : %d", v)
 	}
 	if v, _ := item.String("subject"); v != "subject3344" {
 		t.Errorf("Wrong subject : %s", v)

@@ -20,7 +20,7 @@ func NewTradingDAO(connection *Connection) *tradingDAO {
 
 func (d *tradingDAO) GetListByUser(userId string) ([]*m.Trading, error) {
 	db := d.connection.Connect()
-	st, err := db.Prepare("SELECT id,company_id,subject," +
+	st, err := db.Prepare("SELECT id,company_id,title_type,subject," +
 		"work_from,work_to,product," +
 		"created_time, modified_time FROM trading " +
 		"WHERE assignee=? AND deleted <> 1 ORDER BY id ASC")
@@ -37,14 +37,17 @@ func (d *tradingDAO) GetListByUser(userId string) ([]*m.Trading, error) {
 
 	var list []*m.Trading
 	var id, companyId, subject, product string
+	var titleType int
 	var workFrom, workTo, created, modified int64
 	for rows.Next() {
-		rows.Scan(&id, &companyId, &subject, &workFrom, &workTo,
-			&product, &created, &modified)
+		rows.Scan(&id, &companyId, &titleType, &subject,
+			&workFrom, &workTo, &product,
+			&created, &modified)
 
 		list = append(list, &m.Trading{
 			Id:           id,
 			CompanyId:    companyId,
+			TitleType:    titleType,
 			Subject:      subject,
 			WorkFrom:     workFrom,
 			WorkTo:       workTo,
@@ -60,7 +63,7 @@ func (d *tradingDAO) GetListByUser(userId string) ([]*m.Trading, error) {
 
 func (d *tradingDAO) GetById(id, userId string) (*m.Trading, error) {
 	db := d.connection.Connect()
-	st, err := db.Prepare("SELECT company_id,subject," +
+	st, err := db.Prepare("SELECT company_id,title_type,subject," +
 		"work_from,work_to,product," +
 		"created_time, modified_time FROM trading " +
 		"WHERE id=? AND assignee=? AND deleted <> 1 LIMIT 1")
@@ -80,13 +83,15 @@ func (d *tradingDAO) GetById(id, userId string) (*m.Trading, error) {
 	}
 
 	var companyId, subject, product string
+	var titleType int
 	var workFrom, workTo, created, modified int64
-	rows.Scan(&companyId, &subject, &workFrom, &workTo,
+	rows.Scan(&companyId, &titleType, &subject, &workFrom, &workTo,
 		&product, &created, &modified)
 
 	return &m.Trading{
 		Id:           id,
 		CompanyId:    companyId,
+		TitleType:    titleType,
 		Subject:      subject,
 		WorkFrom:     workFrom,
 		WorkTo:       workTo,

@@ -36,6 +36,7 @@ func (s *tradingService) GetListByUser(token string) s.Result {
 		list = append(list, map[string]interface{}{
 			"id":         t.Id,
 			"company_id": t.CompanyId,
+			"title_type": t.TitleType,
 			"subject":    t.Subject,
 			"work_from":  t.WorkFrom,
 			"work_to":    t.WorkTo,
