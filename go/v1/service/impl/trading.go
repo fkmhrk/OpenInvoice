@@ -182,3 +182,25 @@ func (s *tradingService) CreateItem(token, tradingId, subject, degree, memo stri
 	}
 	return jsonResult(201, body)
 }
+
+func (s *tradingService) UpdateItem(token, id, tradingId, subject, degree, memo string, sortOrder, unitPrice, amount, taxType int) s.Result {
+	// input check
+	// get session
+	session, err := s.sessionDAO.GetByToken(token)
+	if err != nil {
+		return errorResult(500, MSG_SERVER_ERROR)
+	}
+	if session == nil {
+		return errorResult(400, MSG_WRONG_TOKEN)
+	}
+	// get trading
+	// create
+	item, err := s.tradingDAO.UpdateItem(id, tradingId, subject, degree, memo, sortOrder, unitPrice, amount, taxType)
+	if err != nil {
+		return errorResult(500, MSG_SERVER_ERROR)
+	}
+	body := map[string]interface{}{
+		"id": item.Id,
+	}
+	return jsonResult(200, body)
+}

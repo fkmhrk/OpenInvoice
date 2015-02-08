@@ -272,6 +272,46 @@ func (d *tradingDAO) CreateItem(tradingId, subject, degree, memo string, sortOrd
 	}, nil
 }
 
+func (d *tradingDAO) UpdateItem(id, tradingId, subject, degree, memo string, sortOrder, unitPrice, amount, taxType int) (*m.TradingItem, error) {
+	tr, err := d.connection.Begin()
+	if err != nil {
+		return nil, err
+	}
+	defer tr.Rollback()
+
+	st, err := tr.Prepare("UPDATE trading_item SET " +
+		"sort_order=?,subject=?," +
+		"unit_price=?,amount=?,degree=?," +
+		"tax_type=?,memo=?," +
+		"modified_time=unix_timestamp(now()) " +
+		"WHERE id=? AND trading_id=? AND deleted <> 1")
+	if err != nil {
+		return nil, err
+	}
+	defer st.Close()
+
+	// execute
+	_, err = st.Exec(sortOrder, subject, unitPrice, amount,
+		degree, taxType, memo, id, tradingId)
+	if err != nil {
+		return nil, err
+	}
+
+	tr.Commit()
+
+	return &m.TradingItem{
+		Id:        id,
+		TradingId: tradingId,
+		SortOrder: sortOrder,
+		Subject:   subject,
+		UnitPrice: unitPrice,
+		Amount:    amount,
+		Degree:    degree,
+		TaxType:   taxType,
+		Memo:      memo,
+	}, nil
+}
+
 func (d *tradingDAO) generateNextId(tr *sql.Tx, date string) (string, error) {
 	num, err := d.getId(tr, date)
 	if err != nil {

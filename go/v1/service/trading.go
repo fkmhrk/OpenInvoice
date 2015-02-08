@@ -8,4 +8,6 @@ type TradingService interface {
 	// Gets trading items
 	GetItemListByTradingId(token, tradingId string) Result
 	CreateItem(token, tradingId, subject, degree, memo string, sortOrder, unitPrice, amount, taxType int) Result
+	// Updates trading item
+	UpdateItem(token, id, tradingId, subject, degree, memo string, sortOrder, unitPrice, amount, taxType int) Result
 }

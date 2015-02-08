@@ -11,6 +11,7 @@ type TradingDAO struct {
 	UpdateResult        *m.Trading
 	GetItemsByIdResult  []*m.TradingItem
 	CreateItemResult    *m.TradingItem
+	UpdateItemResult    *m.TradingItem
 }
 
 func (d *TradingDAO) GetListByUser(userId string) ([]*m.Trading, error) {
@@ -35,4 +36,8 @@ func (d *TradingDAO) GetItemsById(tradingId string) ([]*m.TradingItem, error) {
 
 func (d *TradingDAO) CreateItem(tradingId, subject, degree, memo string, sortOrder, unitPrice, Amount, taxType int) (*m.TradingItem, error) {
 	return d.CreateItemResult, nil
+}
+
+func (d *TradingDAO) UpdateItem(id, tradingId, subject, degree, memo string, sortOrder, unitPrice, Amount, taxType int) (*m.TradingItem, error) {
+	return d.UpdateItemResult, nil
 }

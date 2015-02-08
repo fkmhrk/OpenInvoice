@@ -269,3 +269,37 @@ func TestTrading0300_CreateItem(t *testing.T) {
 		t.Errorf("Wrong id : %s", v)
 	}
 }
+
+func TestTrading0400_UpdateItem(t *testing.T) {
+	sessionDAO := &m.SessionDAO{
+		GetByTokenResult: &model.Session{
+			Token: "testToken",
+		},
+	}
+	tradingDAO := &m.TradingDAO{
+		UpdateItemResult: &model.TradingItem{
+			Id: "item2233",
+		},
+	}
+
+	s := NewTradingSerivce(sessionDAO, tradingDAO)
+
+	token := "token1122"
+	id := "item1122"
+	tradingId := "tradingId1"
+	r := s.UpdateItem(token, id, tradingId, "subject", "M/M", "Memo",
+		1, 100, 2, 1)
+	if r == nil {
+		t.Errorf("Result must not be nil")
+		return
+	}
+	if r.Status() != 200 {
+		t.Errorf("Wrong status : %d", r.Status())
+		return
+	}
+
+	json := json(r)
+	if v, _ := json.String("id"); v != "item2233" {
+		t.Errorf("Wrong id : %s", v)
+	}
+}
