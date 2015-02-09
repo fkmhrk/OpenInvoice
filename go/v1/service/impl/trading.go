@@ -34,14 +34,17 @@ func (s *tradingService) GetListByUser(token string) s.Result {
 	list := make([]interface{}, 0)
 	for _, t := range tradings {
 		list = append(list, map[string]interface{}{
-			"id":         t.Id,
-			"company_id": t.CompanyId,
-			"title_type": t.TitleType,
-			"subject":    t.Subject,
-			"work_from":  t.WorkFrom,
-			"work_to":    t.WorkTo,
-			"assignee":   t.AssigneeId,
-			"product":    t.Product,
+			"id":             t.Id,
+			"company_id":     t.CompanyId,
+			"title_type":     t.TitleType,
+			"subject":        t.Subject,
+			"work_from":      t.WorkFrom,
+			"work_to":        t.WorkTo,
+			"quotation_date": t.QuotationDate,
+			"bill_date":      t.BillDate,
+			"tax_rate":       t.TaxRate,
+			"assignee":       t.AssigneeId,
+			"product":        t.Product,
 		})
 	}
 	body := map[string]interface{}{
