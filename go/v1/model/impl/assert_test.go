@@ -3,6 +3,7 @@ package impl
 import (
 	m "../"
 	"fmt"
+	"math"
 	"runtime"
 	"strings"
 	"testing"
@@ -10,7 +11,8 @@ import (
 
 func assertTrading(t *testing.T, item *m.Trading,
 	id, companyId, subject string, titleType int,
-	workFrom, workTo int64, assignee, product string) {
+	workFrom, workTo, quotationDate, billDate int64,
+	taxRate float32, assignee, product string) {
 	caller := getCaller()
 	if item.Id != id {
 		t.Errorf("%s Id must be %s but %s", caller, id, item.Id)
@@ -29,6 +31,15 @@ func assertTrading(t *testing.T, item *m.Trading,
 	}
 	if item.WorkTo != workTo {
 		t.Errorf("%s WorkTo must be %d but %d", caller, workTo, item.WorkTo)
+	}
+	if item.QuotationDate != quotationDate {
+		t.Errorf("%s QuotationDate must be %d but %d", caller, quotationDate, item.QuotationDate)
+	}
+	if item.BillDate != billDate {
+		t.Errorf("%s BillDate must be %d but %d", caller, billDate, item.BillDate)
+	}
+	if math.Abs(float64(item.TaxRate-taxRate)) > 0.1 {
+		t.Errorf("%s TaxRate must be %f but %f", caller, taxRate, item.TaxRate)
 	}
 	if item.AssigneeId != assignee {
 		t.Errorf("%s AssigneeId must be %s but %s", caller, assignee, item.AssigneeId)

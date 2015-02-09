@@ -123,6 +123,9 @@ tradingテーブルの内容を取得する。
         "subject" : "件名",
         "work_from" : 1122,
         "work_to" : 2233,
+        "quotation_date" : 3344,
+        "bill_date" : 4455,
+        "tax_rate" : 8.0,
         "assignee" : "担当者ID",
         "product" : "成果物"
       },
@@ -132,6 +135,9 @@ tradingテーブルの内容を取得する。
         "subject" : "件名",
         "work_from" : 1133,
         "work_to" : 2288,
+        "quotation_date" : 8899,
+        "bill_date" : 9900,
+        "tax_rate" : 10.0,        
         "assignee" : "担当者ID",
         "product" : "成果物"      
       }
@@ -153,6 +159,9 @@ tradingレコードを作成する。assigneeは権限のあるユーザーの�
     "subject" : "件名",
     "work_from" : 1122,
     "work_to" : 2233,
+    "quotation_date" : 3344,
+    "bill_date" : 4455,
+    "tax_rate" : 8.0,    
     "assignee" : "担当者ID",
     "product" : "成果物"
   }
@@ -160,6 +169,36 @@ tradingレコードを作成する。assigneeは権限のあるユーザーの�
   response
 
   HTTP 201 Created
+
+  {
+    "id":"t20150131001"
+  }
+  
+//}
+
+== 取引レコード更新
+
+指定したtradingレコードを更新するする。
+
+//emlist{
+  Authorization:bearer {access_token}
+  PUT /api/v1/tradings/{取引ID}
+
+  {
+    "company_id" : "会社ID",
+    "subject" : "件名",
+    "work_from" : 1122,
+    "work_to" : 2233,
+    "quotation_date" : 4499,
+    "bill_date" : 9900,
+    "tax_rate" : 10.0,    
+    "assignee" : "担当者ID",
+    "product" : "新しい成果物"
+  }
+
+  response
+
+  HTTP 200 OK
 
   {
     "id":"t20150131001"

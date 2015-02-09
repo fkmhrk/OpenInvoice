@@ -26,8 +26,9 @@ func deleteTradingId(db *sql.DB, date string) {
 func insertTrading(db *sql.DB, id, user, subject, product string) {
 	s, _ := db.Prepare("INSERT INTO trading(" +
 		"id,company_id,title_type,subject," +
-		"work_from,work_to,assignee,product,deleted)" +
-		"VALUES(?,'company1',0,?,0,0,?,?,0)")
+		"work_from,work_to,quotation_date,bill_date," +
+		"tax_rate,assignee,product,deleted)" +
+		"VALUES(?,'company1',0,?,0,0,100,200,8.0,?,?,0)")
 	defer s.Close()
 	s.Exec(id, subject, user, product)
 }
@@ -57,9 +58,9 @@ func TestTrading0000_GetListByUser(t *testing.T) {
 		return
 	}
 	assertTrading(t, list[0], "trade1", "company1", "subject1", 0,
-		0, 0, "user1122", "product2233")
+		0, 0, 100, 200, 8, "user1122", "product2233")
 	assertTrading(t, list[1], "trade2", "company1", "subject2", 0,
-		0, 0, "user1122", "product2233")
+		0, 0, 100, 200, 8, "user1122", "product2233")
 }
 
 func TestTrading0001_GetListByUser_0(t *testing.T) {
@@ -106,7 +107,7 @@ func TestTrading0100_GetById(t *testing.T) {
 		return
 	}
 	assertTrading(t, item, "trade1", "company1", "subject1", 0,
-		0, 0, "user1122", "product2233")
+		0, 0, 100, 200, 8, "user1122", "product2233")
 }
 
 func TestTrading0101_GetById_noId(t *testing.T) {
@@ -144,28 +145,21 @@ func TestTrading0100_Create(t *testing.T) {
 	// prepare
 	date := "20150203"
 	userId := "user1122"
+	quotationDate := int64(1111)
+	billDate := int64(2222)
+	taxRate := float32(8)
 	deleteTradingByUser(db, userId)
 	deleteTradingId(db, date)
 
 	dao := createTradingDAO(db)
 	item, err := dao.Create(date, "company1111", "subject2222", 1,
-		1234, 5678, userId, "product3333")
+		1234, 5678, quotationDate, billDate, taxRate, userId, "product3333")
 	if err != nil {
 		t.Errorf("Failed to create tradings : %s", err)
 		return
 	}
-	if item.Id != "20150203001" {
-		t.Errorf("Wrong ID : %s", item.Id)
-	}
-	if item.CompanyId != "company1111" {
-		t.Errorf("Wrong Company ID : %s", item.CompanyId)
-	}
-	if item.Subject != "subject2222" {
-		t.Errorf("Wrong Subject : %s", item.Subject)
-	}
-	if item.Product != "product3333" {
-		t.Errorf("Wrong Product : %s", item.Product)
-	}
+	assertTrading(t, item, "20150203001", "company1111", "subject2222", 1,
+		1234, 5678, 1111, 2222, 8, "user1122", "product3333")
 }
 
 func TestTrading0101_Create_2(t *testing.T) {
@@ -178,12 +172,15 @@ func TestTrading0101_Create_2(t *testing.T) {
 	// prepare
 	date := "20150203"
 	userId := "user1122"
+	quotationDate := int64(1111)
+	billDate := int64(2222)
+	taxRate := float32(8)
 	deleteTradingByUser(db, userId)
 	deleteTradingId(db, date)
 
 	dao := createTradingDAO(db)
 	item, err := dao.Create(date, "company1111", "subject2222", 1,
-		1234, 5678, userId, "product3333")
+		1234, 5678, quotationDate, billDate, taxRate, userId, "product3333")
 	if err != nil {
 		t.Errorf("Failed to create tradings : %s", err)
 		return
@@ -194,7 +191,7 @@ func TestTrading0101_Create_2(t *testing.T) {
 
 	// again
 	item, err = dao.Create(date, "company4444", "subject5555", 1,
-		1234, 5678, userId, "product6666")
+		1234, 5678, quotationDate, billDate, taxRate, userId, "product6666")
 	if err != nil {
 		t.Errorf("Failed to create tradings : %s", err)
 		return
@@ -223,12 +220,15 @@ func TestTrading0300_Update(t *testing.T) {
 	// prepare
 	date := "20150203"
 	userId := "user1122"
+	quotationDate := int64(1111)
+	billDate := int64(2222)
+	taxRate := float32(8)
 	deleteTradingByUser(db, userId)
 	deleteTradingId(db, date)
 
 	dao := createTradingDAO(db)
 	item, err := dao.Create(date, "company1111", "subject2222", 1,
-		1234, 5678, userId, "product3333")
+		1234, 5678, quotationDate, billDate, taxRate, userId, "product3333")
 	if err != nil {
 		t.Errorf("Failed to create tradings : %s", err)
 		return
@@ -236,7 +236,7 @@ func TestTrading0300_Update(t *testing.T) {
 
 	// update
 	item2, err := dao.Update(item.Id, "company2222", "subject3333",
-		0, 2345, 6789, userId, "product4444")
+		0, 2345, 6789, 2222, 3333, 10, userId, "product4444")
 	if err != nil {
 		t.Errorf("Failed to update trading : %s", err)
 		return

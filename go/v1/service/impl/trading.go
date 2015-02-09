@@ -50,7 +50,7 @@ func (s *tradingService) GetListByUser(token string) s.Result {
 	return jsonResult(200, body)
 }
 
-func (s *tradingService) Create(token, date, companyId, subject, product string, titleType int, workFrom, workTo int64) s.Result {
+func (s *tradingService) Create(token, date, companyId, subject, product string, titleType int, workFrom, workTo, quotationDate, billDate int64, taxRate float32) s.Result {
 	// input check
 	if len(date) == 0 {
 		return errorResult(400, MSG_ERR_DATE_EMPTY)
@@ -74,7 +74,7 @@ func (s *tradingService) Create(token, date, companyId, subject, product string,
 		return errorResult(400, MSG_WRONG_TOKEN)
 	}
 	// create
-	item, err := s.tradingDAO.Create(date, companyId, subject, titleType, workFrom, workTo, session.UserId, product)
+	item, err := s.tradingDAO.Create(date, companyId, subject, titleType, workFrom, workTo, quotationDate, billDate, taxRate, session.UserId, product)
 	if err != nil {
 		return errorResult(500, MSG_SERVER_ERROR)
 	}
@@ -85,7 +85,7 @@ func (s *tradingService) Create(token, date, companyId, subject, product string,
 	return jsonResult(201, body)
 }
 
-func (s *tradingService) Update(token, id, companyId, subject, product string, titleType int, workFrom, workTo int64) s.Result {
+func (s *tradingService) Update(token, id, companyId, subject, product string, titleType int, workFrom, workTo, quotationDate, billDate int64, taxRate float32) s.Result {
 	// input check
 	if len(id) == 0 {
 		return errorResult(400, MSG_ERR_ID_EMPTY)
@@ -118,7 +118,7 @@ func (s *tradingService) Update(token, id, companyId, subject, product string, t
 		return errorResult(404, MSG_TRADING_NOT_FOUND)
 	}
 	// update
-	item2, err := s.tradingDAO.Update(id, companyId, subject, titleType, workFrom, workTo, session.UserId, product)
+	item2, err := s.tradingDAO.Update(id, companyId, subject, titleType, workFrom, workTo, quotationDate, billDate, taxRate, session.UserId, product)
 	if err != nil {
 		return errorResult(500, MSG_SERVER_ERROR)
 	}
