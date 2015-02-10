@@ -51,7 +51,7 @@
           <input type="text" placeholder="ID" value="{{trading.date}}" readonly/>
         </p>
         <p>
-	  <select id="company" decorator="easyselect">
+	  <select id="company" value="{{trading.company_id}}" decorator="easyselect">
             {{#companies}}
 	    <option value="{{id}}">{{name}}</option>
             {{/}}

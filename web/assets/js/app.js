@@ -225,7 +225,6 @@ var EditTradingApp = {
 
                 list.push(item);
             }
-            console.log(list);
 
             EditTradingApp.save(trading, list);
         });
