@@ -9,6 +9,29 @@ import (
 	"testing"
 )
 
+func assertCompany(t *testing.T, item *m.Company,
+	id, name, zip, address, phone, unit string) {
+	caller := getCaller()
+	if item.Id != id {
+		t.Errorf("%s Id must be %s but %s", caller, id, item.Id)
+	}
+	if item.Name != name {
+		t.Errorf("%s Name must be %s but %s", caller, name, item.Name)
+	}
+	if item.Zip != zip {
+		t.Errorf("%s Zip must be %s but %s", caller, zip, item.Zip)
+	}
+	if item.Address != address {
+		t.Errorf("%s Address must be %s but %s", caller, address, item.Address)
+	}
+	if item.Phone != phone {
+		t.Errorf("%s Phone must be %s but %s", caller, phone, item.Phone)
+	}
+	if item.Unit != unit {
+		t.Errorf("%s Unit must be %s but %s", caller, unit, item.Unit)
+	}
+}
+
 func assertTrading(t *testing.T, item *m.Trading,
 	id, companyId, subject string, titleType int,
 	workFrom, workTo, quotationDate, billDate int64,

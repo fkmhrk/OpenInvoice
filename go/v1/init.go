@@ -20,13 +20,16 @@ func InitRouter(r *mux.Router) error {
 	userDAO := mi.NewUserDAO(c)
 	sessionDAO := mi.NewSessionDAO(c)
 	tradingDAO := mi.NewTradingDAO(c)
+	companyDAO := mi.NewCompanyDAO(c)
+
 	userService := si.NewUserSerivce(userDAO, sessionDAO)
 	tradingService := si.NewTradingSerivce(sessionDAO, tradingDAO)
-	initRouter(r, userService, tradingService)
+	companyService := si.NewCompanySerivce(sessionDAO, companyDAO)
+	initRouter(r, userService, tradingService, companyService)
 	return nil
 }
 
-func initRouter(r *mux.Router, u s.UserService, t s.TradingService) {
+func initRouter(r *mux.Router, u s.UserService, t s.TradingService, c s.CompanyService) {
 	r1 := r.PathPrefix("/api/v1").Subrouter()
-	rest.SetHandlers(r1, u, t)
+	rest.SetHandlers(r1, u, t, c)
 }
