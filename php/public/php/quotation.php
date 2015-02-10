@@ -80,7 +80,7 @@ $pdf->write(4, s("御見積書"));
 
 $pdf->SetFont(MINCHO,'', 9);
 $pdf->SetXY(180, 16);
-$pdf->write(4, s(date('Y年m月d日', $trading['quotation_date'])));
+$pdf->write(4, s(date('Y年m月d日', $trading['quotation_date'] / 1000)));
 
 $pdf->SetFont(MINCHO,'', 16);
 $pdf->SetXY(16, 32);
