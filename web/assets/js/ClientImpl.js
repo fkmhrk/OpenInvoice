@@ -63,6 +63,15 @@ var Invoice;
         };
 
         AppClientImpl.prototype.getCompanies = function (token, callback) {
+            var url = this.url + '/api/v1/companies';
+            this.exec(url, 'GET', token, null, {
+                success: function (json) {
+                    callback.success(json.companies);
+                },
+                error: function (status, body) {
+                    callback.error(body.msg);
+                }
+            });
             var list = [];
             list.push({
                 id: "dummy0001",

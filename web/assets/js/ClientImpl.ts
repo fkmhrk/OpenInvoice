@@ -66,6 +66,15 @@ module Invoice {
         }
 
         getCompanies(token : string, callback : CompanyListCallback) {
+            var url = this.url + '/api/v1/companies';
+            this.exec(url, 'GET', token, null, {
+                success : (json : any) => {
+                    callback.success(json.companies);
+                },
+                error : (status : any, body : any) => {
+                    callback.error(body.msg);
+                }
+            });                        
             var list : Array<Company> = [];
             list.push({
                 id : "dummy0001",
