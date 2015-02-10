@@ -2,14 +2,13 @@
 
 define('TAX_RATE', 8);
 
-require_once (dirname(__FILE__). '/../../libs/model/SessionDAO.php');
-require_once (dirname(__FILE__). '/../../libs/model/TradingDAO.php');
-require_once (dirname(__FILE__). '/../../libs/model/TradingItemDAO.php');
-
 require_once (dirname(__FILE__). '/../../libs/model/impl/MySQLConnection.php');
 require_once (dirname(__FILE__). '/../../libs/model/impl/MySQLSessionDAO.php');
 require_once (dirname(__FILE__). '/../../libs/model/impl/MySQLTradingDAO.php');
 require_once (dirname(__FILE__). '/../../libs/model/impl/MySQLTradingItemDAO.php');
+require_once (dirname(__FILE__). '/../../libs/model/impl/MySQLCompanyDAO.php');
+
+date_default_timezone_set('Asia/Tokyo');
 
 function s($str) {
     return mb_convert_encoding($str, "SJIS", "UTF-8");
@@ -34,6 +33,7 @@ $tradingId = $_GET['trading_id'];
 $sessionDAO = new MySQLSessionDAO($db);
 $tradingDAO = new MySQLTradingDAO($db);
 $tradingItemDAO = new MySQLTradingItemDAO($db);
+$companyDAO = new MySQLCompanyDAO($db);
 
 // execute
 $session = $sessionDAO->getSession($token);
@@ -48,12 +48,19 @@ if ($trading === null) {
     echo 'Wrogn trading ID';
     return;
 }
+$title = $trading['title_type'] == 0 ? '御中' : '様';
 
 $items = $tradingItemDAO->getListByTradingId($tradingId);
 if ($items === null) {
     echo 'Wrogn trading ID';
     return;
 }
+
+$company = $companyDAO->getById($trading['company_id']);
+if ($company === null) {
+    $company = array('name' => '(不明な会社)');
+}
+
 //print_r($items);
 
 define('FPDF_FONTPATH', dirname(__FILE__) . '/../../libs/fpdf/font/');
@@ -73,11 +80,11 @@ $pdf->write(4, s("御見積書"));
 
 $pdf->SetFont(MINCHO,'', 9);
 $pdf->SetXY(180, 16);
-$pdf->write(4, s("2015年2月8日"));
+$pdf->write(4, s(date('Y年m月d日', $trading['quotation_date'])));
 
 $pdf->SetFont(MINCHO,'', 16);
 $pdf->SetXY(16, 32);
-$pdf->write(4, s("サンプル株式会社 御中"));
+$pdf->write(4, s($company['name']. " ". $title));
 
 $pdf->SetFont(MINCHO,'', 12);
 $pdf->SetXY(140, 50);
