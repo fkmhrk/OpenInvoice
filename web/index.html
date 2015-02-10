@@ -64,6 +64,9 @@
         <ul>
 	  <li><input type="text" placeholder="件名" value="{{trading.subject}}" /></li>
 	  <li><span>作業期間</span><input type="date" value="{{workFrom}}">〜<input type="date" value="{{workTo}}"></li>
+	  <li><span>見積書発行日</span><input type="date" value="{{quotationDate}}"></li>
+	  <li><span>請求書発行日</span><input type="date" value="{{billDate}}"></li>
+	  <li><span>消費税率</span><input type="number" value="{{trading.tax_rate}}">%</li>          
 	  <li><textarea placeholder="成果物" value="{{trading.product}}"></textarea></li>
 	  <li>
 	    <span>担当者</span>

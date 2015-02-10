@@ -33,6 +33,9 @@ module Invoice {
         subject : string;
         work_from : number;
         work_to : number;
+        quotation_date : number;
+        bill_date : number;
+        tax_rate : number;
         assignee : string;
         product : string;
     }

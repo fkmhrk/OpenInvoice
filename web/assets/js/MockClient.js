@@ -19,6 +19,9 @@ var Invoice;
                     subject: "件名" + i,
                     work_from: 1122,
                     work_to: 2233,
+                    quotation_date: 1423502769379,
+                    bill_date: 5555,
+                    tax_rate: 8,
                     assignee: "担当者ID" + i,
                     product: "成果物" + i
                 });

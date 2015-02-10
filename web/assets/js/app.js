@@ -87,7 +87,10 @@ var TradingApp = {
             id: null,
             date: id,
             work_from: new Date().getTime(),
-            work_to: new Date().getTime()
+            work_to: new Date().getTime(),
+            quotation_date: new Date().getTime(),
+            bill_date: new Date().getTime(),
+            tax_rate: 8
         };
         app.tradingMap['new'] = app.trading;
         app.router.navigate('tradings/new', { trigger: true });
@@ -142,6 +145,8 @@ var EditTradingApp = {
         var item = app.tradingMap[id];
         var workFrom = toDateStr(new Date(item.work_from));
         var workTo = toDateStr(new Date(item.work_to));
+        var quotationDate = toDateStr(new Date(item.quotation_date));
+        var billDate = toDateStr(new Date(item.bill_date));
         app.router.r = new Ractive({
             el: '#container',
             template: '#editTradingTemplate',
@@ -155,6 +160,8 @@ var EditTradingApp = {
                 companies: app.companies,
                 workFrom: workFrom,
                 workTo: workTo,
+                quotationDate: quotationDate,
+                billDate: billDate,
                 numToCurrency: function (val) {
                     return util.numToCurrency(val);
                 }
@@ -201,6 +208,9 @@ var EditTradingApp = {
             trading.assignee = assignee.id;
             trading.work_from = new Date(r.get('workFrom')).getTime();
             trading.work_to = new Date(r.get('workTo')).getTime();
+            trading.quotation_date = new Date(r.get('quotationDate')).getTime();
+            trading.bill_date = new Date(r.get('billDate')).getTime();
+            trading.tax_rate = parseFloat(r.get('trading.tax_rate'));
 
             var items = r.get('tradingItems');
             var list = [];
