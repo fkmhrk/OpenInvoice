@@ -69,11 +69,15 @@ var TradingApp = {
             el: '#container',
             template: '#tradingTemplate',
             data: {
-                tradings: app.tradings
+                tradings: app.tradings,
+                token: app.token
             }
         });
         app.router.r.on('itemClick', function (e, i) {
             TradingApp.edit(i);
+        });
+        app.router.r.on('printQuotation', function (e, i) {
+            TradingApp.printQuotation(i);
         });
         app.router.r.on('newTrading', function (e) {
             TradingApp.newTrading(app.router.r.get('newId'));
@@ -102,6 +106,10 @@ var TradingApp = {
         console.log(app.tradings[i]);
         app.trading = app.tradings[i];
         app.router.navigate('tradings/' + app.tradings[i].id, { trigger: true });
+    },
+    printQuotation: function (i) {
+        var trading = app.tradings[i];
+        window.location.href = "/php/quotation.php?access_token=" + app.token + "&trading_id=" + trading.id;
     }
 };
 

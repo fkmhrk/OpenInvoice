@@ -32,8 +32,10 @@
     <button on-click="company">会社</button>
     <table class="wrapper">
       {{#tradings:i}}
-      <tr on-click="itemClick:{{i}}">
+      <tr>
         <th>{{subject}}</th>
+        <td><button on-click="itemClick:{{i}}">編集</button></td>
+        <td><button on-click="printQuotation:{{i}}">請求書発行</button></td>
       </tr>
       {{/}}
     </table>
