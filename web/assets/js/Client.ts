@@ -8,7 +8,9 @@ module Invoice {
 
         saveTrading(token : string, item : Trading, callback : SaveCallback);
         saveTradingItem(token : string, tradingId : string,
-                        item : TradingItem, callback : SaveCallback);        
+                        item : TradingItem, callback : SaveCallback);
+
+        saveCompany(token : string, item : Company, callback : SaveCallback);
     }
 
     export interface User {

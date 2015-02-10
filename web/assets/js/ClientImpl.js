@@ -91,6 +91,14 @@ var Invoice;
             }
         };
 
+        AppClientImpl.prototype.saveCompany = function (token, item, callback) {
+            if (item.id === null) {
+                this.createCompany(token, item, callback);
+            } else {
+                this.updateCompany(token, item, callback);
+            }
+        };
+
         AppClientImpl.prototype.createTrading = function (token, item, callback) {
             var url = this.url + '/api/v1/tradings';
             this.exec(url, 'POST', token, item, {
@@ -132,6 +140,30 @@ var Invoice;
             this.exec(url, 'PUT', token, item, {
                 success: function (json) {
                     callback.success(item.id);
+                },
+                error: function (status, body) {
+                    callback.error(body.msg);
+                }
+            });
+        };
+
+        AppClientImpl.prototype.createCompany = function (token, item, callback) {
+            var url = this.url + '/api/v1/companies';
+            this.exec(url, 'POST', token, item, {
+                success: function (json) {
+                    callback.success(json.id);
+                },
+                error: function (status, body) {
+                    callback.error(body.msg);
+                }
+            });
+        };
+
+        AppClientImpl.prototype.updateCompany = function (token, item, callback) {
+            var url = this.url + '/api/v1/companies/' + item.id;
+            this.exec(url, 'PUT', token, item, {
+                success: function (json) {
+                    callback.success(json.id);
                 },
                 error: function (status, body) {
                     callback.error(body.msg);

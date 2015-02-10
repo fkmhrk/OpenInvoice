@@ -77,6 +77,9 @@ var Invoice;
         MockClient.prototype.saveTradingItem = function (token, tradingId, item, callback) {
             callback.success('item1122');
         };
+        MockClient.prototype.saveCompany = function (token, item, callback) {
+            callback.success('company1122');
+        };
         return MockClient;
     })();
     Invoice.MockClient = MockClient;

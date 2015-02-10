@@ -76,6 +76,9 @@ var TradingApp = {
         });
         app.router.r.on('newTrading', (e : any) => {
             TradingApp.newTrading(app.router.r.get('newId'));
+        });
+        app.router.r.on('company', (e : any) => {
+            app.router.navigate('companies', {trigger:true})            
         });        
     },
     newTrading : (id : string) => {
@@ -252,14 +255,69 @@ var EditTradingApp = {
     }
 }
 
+var CompanyApp = {
+    show : () => {
+        app.router.r = new Ractive({
+            el : '#container',
+            template : '#companyTemplate',
+            data : {
+                companies : app.companies,
+            }
+        });
+        app.router.r.on('itemClick', (e : any, i : any) => {
+            CompanyApp.edit(i);
+        });
+        app.router.r.on('newCompany', (e : any) => {
+            CompanyApp.newCompany();
+        });
+    },
+    edit : (i : any) => {
+        app.company = app.companies[i];
+        app.router.navigate('companies/' + app.companies[i].id, {trigger:true})
+    },
+    newCompany : () => {
+        app.company = {
+            id : null
+        };
+        app.router.navigate('companies/new', {trigger:true})
+    }
+}
+
+var EditCompanyApp = {
+    show : (company : any) => {
+        app.router.r = new Ractive({
+            el : '#container',
+            template : '#editCompanyTemplate',
+            data : {
+                company : company
+            }
+        });
+        app.router.r.on('save', (e : any) => {
+            var company = app.router.r.get('company');
+            EditCompanyApp.save(company);
+        });
+    },
+    save : (company : any) => {
+        app.client.saveCompany(app.token, company, {
+            success : (id : string) => {
+                window.history.back();
+            },
+            error : (msg : string) =>{
+            }
+        });
+    }
+}
+
 var AppRouter = Backbone.Router.extend({
     routes : {
         "" : "top",
         "tradings" : "tradings",
-        "tradings(/:id)" : "editTrading"
+        "tradings(/:id)" : "editTrading",
+        "companies" : "companies",
+        "companies(/:id)" : "editCompanies",
     },
     initialize : function() {
-        _.bindAll(this, 'top', 'tradings', 'editTrading');
+        _.bindAll(this, 'top', 'tradings', 'editTrading', 'companies', 'editCompanies');
     },
     top : () => {
         this.r = new Ractive({
@@ -288,6 +346,38 @@ var AppRouter = Backbone.Router.extend({
             return;
         }        
         EditTradingApp.loadTrading(app.token, id);
+    },
+    companies : () => {
+        if (app.token == null) {
+            app.router.navigate('', {trigger:true})           
+            return;
+        }
+        CompanyApp.show();
+    },
+    editCompanies : (id : any) => {
+        if (app.token == null) {
+            app.router.navigate('', {trigger:true})           
+            return;
+        }
+        var company : any = null;
+        if (id === 'new') {
+            company = {
+                id : null
+            };
+            EditCompanyApp.show(company);        
+            return;
+        }
+        for (var i = 0 ; i < app.companies.length ; ++i) {
+            if (app.companies[i].id === id) {
+                company = app.companies[i];
+                break;
+            }
+        }
+        if (company === null) {
+            app.router.navigate('', {trigger:true})           
+            return;
+        }        
+        EditCompanyApp.show(company);        
     }
 });
 

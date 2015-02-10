@@ -95,6 +95,14 @@ module Invoice {
             }            
         }
 
+        saveCompany(token : string, item : Company, callback : SaveCallback) {
+            if (item.id === null) {
+                this.createCompany(token, item, callback);
+            } else {
+                this.updateCompany(token, item, callback);
+            }
+        }
+
         private createTrading(token : string, item : Trading, callback : SaveCallback) {
             var url = this.url + '/api/v1/tradings';
             this.exec(url, 'POST', token, item, {
@@ -139,6 +147,30 @@ module Invoice {
             this.exec(url, 'PUT', token, item, {
                 success : (json : any) => {
                     callback.success(item.id);
+                },
+                error : (status : any, body : any) => {
+                    callback.error(body.msg);
+                }
+            });
+        }
+
+        private createCompany(token : string, item : Company, callback : SaveCallback) {
+            var url = this.url + '/api/v1/companies';
+            this.exec(url, 'POST', token, item, {
+                success : (json : any) => {
+                    callback.success(json.id);
+                },
+                error : (status : any, body : any) => {
+                    callback.error(body.msg);
+                }
+            });
+        }
+
+        private updateCompany(token : string, item : Company, callback : SaveCallback) {
+            var url = this.url + '/api/v1/companies/' + item.id;
+            this.exec(url, 'PUT', token, item, {
+                success : (json : any) => {
+                    callback.success(json.id);
                 },
                 error : (status : any, body : any) => {
                     callback.error(body.msg);

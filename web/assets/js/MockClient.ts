@@ -75,5 +75,8 @@ module Invoice {
                         item : TradingItem, callback : SaveCallback) {
             callback.success('item1122');
         }
+        saveCompany(token : string, item : Company, callback : SaveCallback) {
+            callback.success('company1122');
+        }
     }
 }

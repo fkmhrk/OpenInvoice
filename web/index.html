@@ -29,6 +29,7 @@
   </header>
   <section class="wrapper">
     <input type="text" value="{{newId}}"/><button on-click="newTrading">新規作成</button>
+    <button on-click="company">会社</button>
     <table class="wrapper">
       {{#tradings:i}}
       <tr on-click="itemClick:{{i}}">
@@ -114,6 +115,43 @@
       </section>
       
     </div><!-- class="wrapper" -->
+  </section>
+</script>
+
+<script id="companyTemplate" type="text/ractive">
+  <section class="sheet">
+    <header>
+      <p><i class="fa fa-chevron-left"></i>シート</p>    
+    </header>
+    <div class="wrapper">
+      <button on-click="newCompany">新規作成</button>
+      <table>
+        {{#companies:i}}
+        <tr on-click="itemClick:{{i}}">
+          <th>{{name}}</th>
+        </tr>
+        {{/}}
+      </table>      
+    </div>
+  </section>
+</script>
+
+<script id="editCompanyTemplate" type="text/ractive">
+  <section class="sheet">
+    <header>
+      <p><i class="fa fa-chevron-left"></i>シート</p>    
+    </header>
+    <div class="wrapper">
+      <section id="basicInfo">
+        <p><input type="text" placeholder="ID" value="{{company.id}}" readonly/></p>
+        <p><input type="text" placeholder="会社名" value="{{company.name}}"/></p>
+        <p><input type="text" placeholder="郵便番号" value="{{company.zip}}"/></p>
+        <p><input type="text" placeholder="住所" value="{{company.address}}"/></p>
+        <p><input type="text" placeholder="電話番号" value="{{company.phone}}"/></p>
+        <p><input type="text" placeholder="部署" value="{{company.unit}}"/></p>
+        <p><button on-click="save">保存</button></p>
+        </ul>
+      </section>      
   </section>
 </script>  
 
