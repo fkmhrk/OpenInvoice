@@ -92,7 +92,7 @@ var Invoice;
         };
 
         AppClientImpl.prototype.saveCompany = function (token, item, callback) {
-            if (item.id === null) {
+            if (item.id === null || item.id.length == 0) {
                 this.createCompany(token, item, callback);
             } else {
                 this.updateCompany(token, item, callback);

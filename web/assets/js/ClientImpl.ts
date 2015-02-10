@@ -96,7 +96,7 @@ module Invoice {
         }
 
         saveCompany(token : string, item : Company, callback : SaveCallback) {
-            if (item.id === null) {
+            if (item.id === null || item.id.length == 0 ) {
                 this.createCompany(token, item, callback);
             } else {
                 this.updateCompany(token, item, callback);
