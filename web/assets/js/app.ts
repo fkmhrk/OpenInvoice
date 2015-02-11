@@ -77,7 +77,10 @@ var TradingApp = {
         });
         app.router.r.on('printQuotation', (e : any, i : any) => {
             TradingApp.printQuotation(i);
-        });        
+        });
+        app.router.r.on('printBill', (e : any, i : any) => {
+            TradingApp.printBill(i);
+        });
         app.router.r.on('newTrading', (e : any) => {
             TradingApp.newTrading(app.router.r.get('newId'));
         });
@@ -109,6 +112,10 @@ var TradingApp = {
     printQuotation : (i : any) => {
         var trading = app.tradings[i];
         window.location.href = "/php/quotation.php?access_token=" + app.token + "&trading_id=" + trading.id;
+    },
+    printBill : (i : any) => {
+        var trading = app.tradings[i];
+        window.location.href = "/php/bill.php?access_token=" + app.token + "&trading_id=" + trading.id;        
     }
 }
 

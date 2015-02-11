@@ -79,6 +79,9 @@ var TradingApp = {
         app.router.r.on('printQuotation', function (e, i) {
             TradingApp.printQuotation(i);
         });
+        app.router.r.on('printBill', function (e, i) {
+            TradingApp.printBill(i);
+        });
         app.router.r.on('newTrading', function (e) {
             TradingApp.newTrading(app.router.r.get('newId'));
         });
@@ -110,6 +113,10 @@ var TradingApp = {
     printQuotation: function (i) {
         var trading = app.tradings[i];
         window.location.href = "/php/quotation.php?access_token=" + app.token + "&trading_id=" + trading.id;
+    },
+    printBill: function (i) {
+        var trading = app.tradings[i];
+        window.location.href = "/php/bill.php?access_token=" + app.token + "&trading_id=" + trading.id;
     }
 };
 
