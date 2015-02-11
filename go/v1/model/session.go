@@ -15,7 +15,7 @@ type SessionDAO interface {
 type Session struct {
 	Token       string
 	UserId      string
-	Scope       string
+	Role        Role
 	CreatedTime int64
 	ExpireTime  int64
 }

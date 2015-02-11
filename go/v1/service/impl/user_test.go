@@ -94,3 +94,65 @@ func TestUser0100_GetList(t *testing.T) {
 		t.Errorf("Wrong display_name : %s", v)
 	}
 }
+
+func TestUser0200_Create(t *testing.T) {
+	sessionDAO := &m.SessionDAO{
+		GetByTokenResult: &model.Session{
+			Token: "testToken",
+			Role:  model.Role("Admin"),
+		},
+	}
+	userDAO := &m.UserDAO{
+		CreateResult: &model.User{
+			Id: "id1234",
+		},
+	}
+
+	s := NewUserSerivce(userDAO, sessionDAO)
+
+	token := "token1122"
+	r := s.Create(token, "loginName", "disp", "Read,Write", "pass1122")
+	if r == nil {
+		t.Errorf("Result must not be nil")
+		return
+	}
+	if r.Status() != 201 {
+		t.Errorf("Wrong status : %d", r.Status())
+		return
+	}
+	json := json(r)
+	if v, _ := json.String("id"); v != "id1234" {
+		t.Errorf("Wrong id : %s", v)
+	}
+}
+
+func TestUser0201_Create_Not_Admin(t *testing.T) {
+	sessionDAO := &m.SessionDAO{
+		GetByTokenResult: &model.Session{
+			Token: "testToken",
+			Role:  model.Role("Read,Write"),
+		},
+	}
+	userDAO := &m.UserDAO{
+		CreateResult: &model.User{
+			Id: "id1234",
+		},
+	}
+
+	s := NewUserSerivce(userDAO, sessionDAO)
+
+	token := "token1122"
+	r := s.Create(token, "loginName", "disp", "Read,Write", "pass1122")
+	if r == nil {
+		t.Errorf("Result must not be nil")
+		return
+	}
+	if r.Status() != 401 {
+		t.Errorf("Wrong status : %d", r.Status())
+		return
+	}
+	json := json(r)
+	if v, _ := json.String("msg"); v != MSG_NOT_AUTHORIZED {
+		t.Errorf("Wrong msg : %s", v)
+	}
+}

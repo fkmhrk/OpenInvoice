@@ -7,6 +7,7 @@ create table if not exists user(
   login_name varchar(64),
   password varchar(32),
   display_name text,
+  role text, 
   created_time bigint,
   modified_time bigint,
   deleted tinyint,
@@ -73,7 +74,7 @@ create table if not exists settings(
 create table if not exists session(
   access_token varchar(48),
   user_id varchar(32),
-  scope text,
+  role text,
   expire_time bigint,
   created_time bigint,
   modified_time bigint,

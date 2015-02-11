@@ -9,6 +9,25 @@ import (
 	"testing"
 )
 
+func assertUser(t *testing.T, item *m.User,
+	id, loginName, displayName, role string) {
+	caller := getCaller()
+	if item.Id != id {
+		t.Errorf("%s Id must be %s but %s", caller, id, item.Id)
+	}
+	if item.LoginName != loginName {
+		t.Errorf("%s LoginName must be %s but %s", caller, loginName, item.LoginName)
+	}
+	if item.DisplayName != displayName {
+		t.Errorf("%s DisplayName must be %s but %s", caller,
+			displayName, item.DisplayName)
+	}
+	if string(item.Role) != role {
+		t.Errorf("%s Role must be %s but %s", caller,
+			role, string(item.Role))
+	}
+}
+
 func assertCompany(t *testing.T, item *m.Company,
 	id, name, zip, address, phone, unit string) {
 	caller := getCaller()

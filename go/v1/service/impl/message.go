@@ -11,6 +11,7 @@ const (
 	MSG_WRONG_IDENTIFIER     = "Wrong name or password."
 	MSG_TRADING_NOT_FOUND    = "Trading not found."
 
-	MSG_WRONG_TOKEN  = "Wrong token."
-	MSG_SERVER_ERROR = "Server error."
+	MSG_WRONG_TOKEN    = "Wrong token."
+	MSG_NOT_AUTHORIZED = "User not authorized."
+	MSG_SERVER_ERROR   = "Server error."
 )

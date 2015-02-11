@@ -71,12 +71,12 @@ func TestSessionDAO_0100_Create_Get(t *testing.T) {
 	defer db.Close()
 	// prepare
 	id := "testID0000"
-	scope := "read"
+	role := "Read"
 	var expireIn int64 = 60 * 1000
 	deleteSessionByUserId(db, id)
 
 	dao := createSessionDAO(db)
-	session, err := dao.Create(id, scope, expireIn)
+	session, err := dao.Create(id, role, expireIn)
 	if err != nil {
 		t.Errorf("Failed to create session : %s", err)
 		return
@@ -85,8 +85,8 @@ func TestSessionDAO_0100_Create_Get(t *testing.T) {
 		t.Errorf("Invalid User ID %s", session.UserId)
 		return
 	}
-	if session.Scope != scope {
-		t.Errorf("Invalid Scope %s", session.Scope)
+	if string(session.Role) != role {
+		t.Errorf("Role must be %s but %s", role, string(session.Role))
 		return
 	}
 
@@ -100,8 +100,8 @@ func TestSessionDAO_0100_Create_Get(t *testing.T) {
 		t.Errorf("Invalid User ID %s", session.UserId)
 		return
 	}
-	if session.Scope != scope {
-		t.Errorf("Invalid Scope %s", session.Scope)
+	if string(session.Role) != role {
+		t.Errorf("Role must be %s but %s", role, string(session.Role))
 		return
 	}
 }

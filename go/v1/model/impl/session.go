@@ -18,7 +18,7 @@ func NewSessionDAO(connection *Connection) *sessionDAO {
 
 func (d *sessionDAO) GetByToken(token string) (*m.Session, error) {
 	db := d.connection.Connect()
-	st, err := db.Prepare("SELECT user_id,scope,expire_time " +
+	st, err := db.Prepare("SELECT user_id,role,expire_time " +
 		"FROM session " +
 		"WHERE access_token=? AND deleted <> 1 " +
 		"AND unix_timestamp(now())<expire_time LIMIT 1")
@@ -37,18 +37,18 @@ func (d *sessionDAO) GetByToken(token string) (*m.Session, error) {
 		return nil, nil
 	}
 
-	var userId, scope string
+	var userId, role string
 	var expire int64
-	rows.Scan(&userId, &scope, &expire)
+	rows.Scan(&userId, &role, &expire)
 	return &m.Session{
 		Token:      token,
-		Scope:      scope,
+		Role:       m.Role(role),
 		UserId:     userId,
 		ExpireTime: expire,
 	}, nil
 }
 
-func (d *sessionDAO) Create(userId, scope string, expireIn int64) (*m.Session, error) {
+func (d *sessionDAO) Create(userId, role string, expireIn int64) (*m.Session, error) {
 	tr, err := d.connection.Begin()
 	if err != nil {
 		return nil, err
@@ -56,7 +56,7 @@ func (d *sessionDAO) Create(userId, scope string, expireIn int64) (*m.Session, e
 	defer tr.Rollback()
 
 	st, err := tr.Prepare("INSERT INTO session(" +
-		"access_token,user_id,scope,expire_time," +
+		"access_token,user_id,role,expire_time," +
 		"created_time,modified_time,deleted)" +
 		"VALUES(?,?,?,unix_timestamp(now())+?," +
 		"unix_timestamp(now()),unix_timestamp(now()),0)")
@@ -68,7 +68,7 @@ func (d *sessionDAO) Create(userId, scope string, expireIn int64) (*m.Session, e
 	var token string
 	for i := 0; i < 10; i++ {
 		token = generateSessionId()
-		_, err = st.Exec(token, userId, scope, expireIn)
+		_, err = st.Exec(token, userId, role, expireIn)
 		if err == nil {
 			tr.Commit()
 			break
@@ -88,6 +88,6 @@ func (d *sessionDAO) Create(userId, scope string, expireIn int64) (*m.Session, e
 	return &m.Session{
 		Token:  token,
 		UserId: userId,
-		Scope:  scope,
+		Role:   m.Role(role),
 	}, nil
 }

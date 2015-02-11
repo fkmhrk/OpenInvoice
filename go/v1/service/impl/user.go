@@ -38,7 +38,7 @@ func (s *userService) GetToken(name, pass string) s.Result {
 		return errorResult(400, MSG_WRONG_IDENTIFIER)
 	}
 	// create session
-	session, err := s.sessionDAO.Create(user.Id, "read,write", TIME_30MIN)
+	session, err := s.sessionDAO.Create(user.Id, string(user.Role), TIME_30MIN)
 	if err != nil {
 		return errorResult(500, MSG_SERVER_ERROR)
 	}
@@ -75,4 +75,28 @@ func (s *userService) GetUsers(token string) s.Result {
 		"users": list,
 	}
 	return jsonResult(200, body)
+}
+
+func (s *userService) Create(token, loginName, displayName, role, password string) s.Result {
+	// get session
+	session, err := s.sessionDAO.GetByToken(token)
+	if err != nil {
+		return errorResult(500, MSG_SERVER_ERROR)
+	}
+	if session == nil {
+		return errorResult(400, MSG_WRONG_TOKEN)
+	}
+	if !session.Role.IsAdmin() {
+		return errorResult(401, MSG_NOT_AUTHORIZED)
+	}
+	// create
+	user, err := s.userDAO.Create(loginName, displayName, role, password)
+	if err != nil {
+		return errorResult(500, MSG_SERVER_ERROR)
+	}
+
+	body := map[string]interface{}{
+		"id": user.Id,
+	}
+	return jsonResult(201, body)
 }
