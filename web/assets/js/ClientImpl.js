@@ -99,6 +99,21 @@ var Invoice;
                 this.updateTradingItem(token, tradingId, item, callback);
             }
         };
+        AppClientImpl.prototype.deleteTradingItem = function (token, tradingId, itemId, callback) {
+            var url = this.url + '/api/v1/tradings/' + tradingId + '/items/' + itemId;
+            this.exec(url, 'DELETE', token, null, {
+                success: function (json) {
+                    callback.success(itemId);
+                },
+                error: function (status, body) {
+                    if (status == 404) {
+                        callback.success(itemId);
+                    } else {
+                        callback.error(body.msg);
+                    }
+                }
+            });
+        };
 
         AppClientImpl.prototype.saveCompany = function (token, item, callback) {
             if (item.id === null || item.id.length == 0) {

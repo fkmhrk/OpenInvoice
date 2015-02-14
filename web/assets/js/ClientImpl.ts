@@ -103,6 +103,23 @@ module Invoice {
                 this.updateTradingItem(token, tradingId, item, callback);
             }            
         }
+        deleteTradingItem(token : string, tradingId : string,
+                          itemId : string, callback : SaveCallback) {
+            var url = this.url + '/api/v1/tradings/' + tradingId +
+                '/items/' + itemId;
+            this.exec(url, 'DELETE', token, null, {
+                success : (json : any) => {
+                    callback.success(itemId);
+                },
+                error : (status : any, body : any) => {
+                    if (status == 404) {
+                        callback.success(itemId);
+                    } else {
+                        callback.error(body.msg);
+                    }
+                }
+            });            
+        }
 
         saveCompany(token : string, item : Company, callback : SaveCallback) {
             if (item.id === null || item.id.length == 0 ) {

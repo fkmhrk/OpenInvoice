@@ -175,6 +175,7 @@ var EditTradingApp = {
                 workTo : workTo,
                 quotationDate : quotationDate,
                 billDate : billDate,
+                deleteList : [],
                 numToCurrency : (val : any) => {
                     return util.numToCurrency(val);
                 }
@@ -195,6 +196,21 @@ var EditTradingApp = {
             var item = e.context;
             item.sum = util.currencyToNum(item.unit_price) * item.amount;
             app.router.r.update();
+        });
+        app.router.r.on('deleteItem', (e :any, index : any) => {
+            if (!confirm('この項目を削除しますか？')) {
+                return;
+            }
+            var tradings : Array<any> = app.router.r.get('tradingItems');
+            var trading = tradings[index];
+            if (trading.id != null) {
+                var list : Array<string> = app.router.r.get('deleteList');
+                list.push(trading.id);
+                app.router.r.set('deleteList', list);
+            }
+            tradings.splice(index, 1);
+            app.router.r.set('tradingItems', tradings);
+            app.router.r.update(); 
         });
         app.router.r.on('addItem', (e : any) => {
             var list = app.router.r.get('tradingItems');
@@ -235,11 +251,13 @@ var EditTradingApp = {
                 
                 list.push(item);
             }
+            var deleteList : Array<string> = r.get('deleteList');
 
-            EditTradingApp.save(trading, list);
+            EditTradingApp.save(trading, list, deleteList);
         });
     },
-    save : (trading : any, items : Array<any>) => {
+    save : (trading : any, items : Array<any>, deleteList : Array<string>) => {
+        EditTradingApp.deleteItems(trading, items, deleteList);
         app.client.saveTrading(app.token, trading, {
             success : (id : string) => {
                 console.log('ok');
@@ -249,6 +267,23 @@ var EditTradingApp = {
                 console.log('failed to save ' + msg);
             }
         });
+    },
+    deleteItems : (trading : any, items : Array<any>, deleteList : Array<string>) => {
+        if (deleteList.length == 0) {
+            EditTradingApp.saveTrading(trading, items);
+            return;
+        }
+        app.client.deleteTradingItem(app.token, trading.id, deleteList[0], {
+            success : (id : string) => {
+                deleteList.shift();
+                EditTradingApp.deleteItems(trading, items, deleteList);
+            },
+            error : (msg : string) => {
+                console.log('failed to delete ' + msg);
+            }            
+        });
+    },
+    saveTrading : (trading : any, items : Array<any>) => {
     },
     saveItems : (tradingId : string, items : Array<any>) => {
         if (items.length == 0) {

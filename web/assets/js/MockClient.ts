@@ -75,6 +75,10 @@ module Invoice {
                         item : TradingItem, callback : SaveCallback) {
             callback.success('item1122');
         }
+        deleteTradingItem(token : string, tradingId : string,
+                          itemId : string, callback : SaveCallback) {
+            callback.success(itemId);
+        }
         saveCompany(token : string, item : Company, callback : SaveCallback) {
             callback.success('company1122');
         }

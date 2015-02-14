@@ -180,6 +180,7 @@ var EditTradingApp = {
                 workTo: workTo,
                 quotationDate: quotationDate,
                 billDate: billDate,
+                deleteList: [],
                 numToCurrency: function (val) {
                     return util.numToCurrency(val);
                 }
@@ -199,6 +200,21 @@ var EditTradingApp = {
         app.router.r.on('amountBlur', function (e) {
             var item = e.context;
             item.sum = util.currencyToNum(item.unit_price) * item.amount;
+            app.router.r.update();
+        });
+        app.router.r.on('deleteItem', function (e, index) {
+            if (!confirm('この項目を削除しますか？')) {
+                return;
+            }
+            var tradings = app.router.r.get('tradingItems');
+            var trading = tradings[index];
+            if (trading.id != null) {
+                var list = app.router.r.get('deleteList');
+                list.push(trading.id);
+                app.router.r.set('deleteList', list);
+            }
+            tradings.splice(index, 1);
+            app.router.r.set('tradingItems', tradings);
             app.router.r.update();
         });
         app.router.r.on('addItem', function (e) {
@@ -240,11 +256,13 @@ var EditTradingApp = {
 
                 list.push(item);
             }
+            var deleteList = r.get('deleteList');
 
-            EditTradingApp.save(trading, list);
+            EditTradingApp.save(trading, list, deleteList);
         });
     },
-    save: function (trading, items) {
+    save: function (trading, items, deleteList) {
+        EditTradingApp.deleteItems(trading, items, deleteList);
         app.client.saveTrading(app.token, trading, {
             success: function (id) {
                 console.log('ok');
@@ -254,6 +272,23 @@ var EditTradingApp = {
                 console.log('failed to save ' + msg);
             }
         });
+    },
+    deleteItems: function (trading, items, deleteList) {
+        if (deleteList.length == 0) {
+            EditTradingApp.saveTrading(trading, items);
+            return;
+        }
+        app.client.deleteTradingItem(app.token, trading.id, deleteList[0], {
+            success: function (id) {
+                deleteList.shift();
+                EditTradingApp.deleteItems(trading, items, deleteList);
+            },
+            error: function (msg) {
+                console.log('failed to delete ' + msg);
+            }
+        });
+    },
+    saveTrading: function (trading, items) {
     },
     saveItems: function (tradingId, items) {
         if (items.length == 0) {
