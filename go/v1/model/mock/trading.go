@@ -5,13 +5,14 @@ import (
 )
 
 type TradingDAO struct {
-	GetListByUserResult []*m.Trading
-	GetByIdResult       *m.Trading
-	CreateResult        *m.Trading
-	UpdateResult        *m.Trading
-	GetItemsByIdResult  []*m.TradingItem
-	CreateItemResult    *m.TradingItem
-	UpdateItemResult    *m.TradingItem
+	GetListByUserResult  []*m.Trading
+	GetByIdResult        *m.Trading
+	CreateResult         *m.Trading
+	UpdateResult         *m.Trading
+	GetItemsByIdResult   []*m.TradingItem
+	CreateItemResult     *m.TradingItem
+	UpdateItemResult     *m.TradingItem
+	SoftDeleteItemResult error
 }
 
 func (d *TradingDAO) GetListByUser(userId string) ([]*m.Trading, error) {
@@ -40,4 +41,8 @@ func (d *TradingDAO) CreateItem(tradingId, subject, degree, memo string, sortOrd
 
 func (d *TradingDAO) UpdateItem(id, tradingId, subject, degree, memo string, sortOrder, unitPrice, Amount, taxType int) (*m.TradingItem, error) {
 	return d.UpdateItemResult, nil
+}
+
+func (d *TradingDAO) SoftDeleteItem(id, tradingId string) error {
+	return d.SoftDeleteItemResult
 }

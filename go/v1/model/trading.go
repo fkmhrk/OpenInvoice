@@ -11,6 +11,9 @@ type TradingDAO interface {
 	CreateItem(tradingId, subject, degree, memo string, sortOrder, unitPrice, Amount, taxType int) (*TradingItem, error)
 	// Updates specified trading Item
 	UpdateItem(id, tradingId, subject, degree, memo string, sortOrder, unitPrice, Amount, taxType int) (*TradingItem, error)
+
+	// Deletes specified trading Item
+	SoftDeleteItem(id, tradingId string) error
 }
 
 type Trading struct {

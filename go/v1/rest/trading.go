@@ -119,3 +119,15 @@ func updateTradingItem(trading s.TradingService) handler {
 		return trading.UpdateItem(token, id, tradingId, subject, degree, memo, sortOrder, unitPrice, amount, taxType)
 	})
 }
+
+func deleteTradingItem(trading s.TradingService) handler {
+	return makeHandler(func(token, tType string,
+		req *http.Request) s.Result {
+		// read path param
+		vars := mux.Vars(req)
+		tradingId := vars["tradingId"]
+		id := vars["itemId"]
+
+		return trading.DeleteItem(token, id, tradingId)
+	})
+}

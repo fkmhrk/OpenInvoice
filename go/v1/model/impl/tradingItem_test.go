@@ -207,3 +207,41 @@ func TestTradingItem0200_UpdateItem(t *testing.T) {
 	assertTradingItem(t, item2, item.Id, "trade1122", "Subject2", 2,
 		200, 10, "M/M", 2, "NewMemo")
 }
+
+func TestTradingItem0300_DeleteItem(t *testing.T) {
+	db, err := connect()
+	if err != nil {
+		t.Errorf("Failed to connect")
+		return
+	}
+	defer db.Close()
+	// prepare
+	tradingId := "trade1122"
+	deleteTradingItemByTradingId(db, tradingId)
+
+	dao := createTradingDAO(db)
+	item, err := dao.CreateItem(tradingId, "Subject1", "M/D", "Memo1",
+		1, 100, 5, 1)
+	if err != nil {
+		t.Errorf("Unexpected error : %s", err)
+		return
+	}
+
+	// delete
+	err = dao.SoftDeleteItem(item.Id, tradingId)
+	if err != nil {
+		t.Errorf("DeleteItem is failed : %s", err)
+		return
+	}
+
+	// check
+	list, err := dao.GetItemsById(tradingId)
+	if err != nil {
+		t.Errorf("Unexpected getList error : %s", err)
+		return
+	}
+	if len(list) != 0 {
+		t.Errorf("Unexpected list length : %d", len(list))
+		return
+	}
+}

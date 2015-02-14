@@ -208,3 +208,24 @@ func (s *tradingService) UpdateItem(token, id, tradingId, subject, degree, memo 
 	}
 	return jsonResult(200, body)
 }
+
+func (s *tradingService) DeleteItem(token, id, tradingId string) s.Result {
+	// input check
+	// get session
+	session, err := s.sessionDAO.GetByToken(token)
+	if err != nil {
+		return errorResult(500, MSG_SERVER_ERROR)
+	}
+	if session == nil {
+		return errorResult(400, MSG_WRONG_TOKEN)
+	}
+	// soft delete
+	err = s.tradingDAO.SoftDeleteItem(id, tradingId)
+	if err != nil {
+		return errorResult(500, MSG_SERVER_ERROR)
+	}
+	return &result{
+		status: 204,
+		body:   "",
+	}
+}

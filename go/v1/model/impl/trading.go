@@ -341,6 +341,31 @@ func (d *tradingDAO) UpdateItem(id, tradingId, subject, degree, memo string, sor
 	}, nil
 }
 
+func (d *tradingDAO) SoftDeleteItem(id, tradingId string) error {
+	tr, err := d.connection.Begin()
+	if err != nil {
+		return err
+	}
+	defer tr.Rollback()
+
+	st, err := tr.Prepare("UPDATE trading_item SET " +
+		"deleted=1 " +
+		"WHERE id=? AND trading_id=? AND deleted <> 1")
+	if err != nil {
+		return err
+	}
+	defer st.Close()
+
+	// execute
+	_, err = st.Exec(id, tradingId)
+	if err != nil {
+		return err
+	}
+
+	tr.Commit()
+	return nil
+}
+
 func (d *tradingDAO) generateNextId(tr *sql.Tx, date string) (string, error) {
 	num, err := d.getId(tr, date)
 	if err != nil {

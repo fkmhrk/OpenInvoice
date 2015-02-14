@@ -314,3 +314,29 @@ func TestTrading0400_UpdateItem(t *testing.T) {
 		t.Errorf("Wrong id : %s", v)
 	}
 }
+
+func TestTrading0500_DeleteItem(t *testing.T) {
+	sessionDAO := &m.SessionDAO{
+		GetByTokenResult: &model.Session{
+			Token: "testToken",
+		},
+	}
+	tradingDAO := &m.TradingDAO{
+		SoftDeleteItemResult: nil,
+	}
+
+	s := NewTradingSerivce(sessionDAO, tradingDAO)
+
+	token := "token1122"
+	id := "item1122"
+	tradingId := "tradingId1"
+	r := s.DeleteItem(token, id, tradingId)
+	if r == nil {
+		t.Errorf("Result must not be nil")
+		return
+	}
+	if r.Status() != 204 {
+		t.Errorf("Wrong status : %d", r.Status())
+		return
+	}
+}

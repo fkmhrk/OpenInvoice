@@ -10,4 +10,7 @@ type TradingService interface {
 	CreateItem(token, tradingId, subject, degree, memo string, sortOrder, unitPrice, amount, taxType int) Result
 	// Updates trading item
 	UpdateItem(token, id, tradingId, subject, degree, memo string, sortOrder, unitPrice, amount, taxType int) Result
+
+	// Deletes trading item
+	DeleteItem(token, id, tradingId string) Result
 }
