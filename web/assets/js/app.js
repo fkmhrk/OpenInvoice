@@ -244,33 +244,14 @@ var TradingListPage = (function () {
     };
     return TradingListPage;
 })();
-/// <reference path="./ractive.d.ts"/>
-/// <reference path="./TopPage.ts"/>
-/// <reference path="./TradingListPage.ts"/>
-var $;
-var _;
-var Backbone;
-var EditTradingApp = {
-    loadTrading: function (token, id) {
-        if (id == 'new') {
-            app.tradingItems = [];
-            EditTradingApp.show(id);
-            return;
-        }
-        app.client.getTradingItems(token, id, {
-            success: function (list) {
-                app.tradingItems = _.map(list, function (item) {
-                    item.unit_price = util.numToCurrency(item.unit_price);
-                    return item;
-                });
-                EditTradingApp.show(id);
-            },
-            error: function (msg) {
-                console.log('error ' + msg);
-            }
-        });
-    },
-    show: function (id) {
+/// <reference path="./Page.ts"/>
+var EditTradingPage = (function () {
+    function EditTradingPage(id) {
+        this.id = id;
+    }
+    EditTradingPage.prototype.onCreate = function (app) {
+        var _this = this;
+        this.app = app;
         var es = function (node) {
             $(node).easySelectBox({ speed: 200 });
             return {
@@ -290,12 +271,12 @@ var EditTradingApp = {
             }
             return date.getFullYear() + "-" + m + "-" + d;
         };
-        var item = app.tradingMap[id];
+        var item = app.tradingMap[this.id];
         var workFrom = toDateStr(new Date(item.work_from));
         var workTo = toDateStr(new Date(item.work_to));
         var quotationDate = toDateStr(new Date(item.quotation_date));
         var billDate = toDateStr(new Date(item.bill_date));
-        app.router.r = new Ractive({
+        var r = app.ractive = new Ractive({
             el: '#container',
             template: '#editTradingTemplate',
             decorators: {
@@ -303,7 +284,6 @@ var EditTradingApp = {
             },
             data: {
                 trading: item,
-                tradingItems: app.tradingItems,
                 users: app.users,
                 companies: app.companies,
                 workFrom: workFrom,
@@ -316,124 +296,161 @@ var EditTradingApp = {
                 }
             }
         });
-        app.router.r.on('numFocus', function (e, val) {
-            e.node.value = util.currencyToNum(val);
-            app.router.r.updateModel();
-        });
-        app.router.r.on('sumBlur', function (e, val, index) {
-            e.node.value = util.numToCurrency(val);
-            app.router.r.updateModel();
-            var item = e.context;
-            item.sum = util.currencyToNum(item.unit_price) * item.amount;
-            app.router.r.update();
-        });
-        app.router.r.on('amountBlur', function (e) {
-            var item = e.context;
-            item.sum = util.currencyToNum(item.unit_price) * item.amount;
-            app.router.r.update();
-        });
-        app.router.r.on('deleteItem', function (e, index) {
-            if (!confirm('この項目を削除しますか？')) {
-                return;
+        r.on({
+            numFocus: function (e, val) {
+                e.node.value = util.currencyToNum(val);
+                r.updateModel();
+            },
+            'sumBlur': function (e, val, index) {
+                e.node.value = util.numToCurrency(val);
+                r.updateModel();
+                var item = e.context;
+                item.sum = util.currencyToNum(item.unit_price) * item.amount;
+                r.update();
+            },
+            amountBlur: function (e) {
+                var item = e.context;
+                item.sum = util.currencyToNum(item.unit_price) * item.amount;
+                r.update();
+            },
+            deleteItem: function (e, index) {
+                if (!confirm('この項目を削除しますか？')) {
+                    return;
+                }
+                var tradings = r.get('tradingItems');
+                var trading = tradings[index];
+                if (trading.id != null) {
+                    var list = r.get('deleteList');
+                    list.push(trading.id);
+                    r.set('deleteList', list);
+                }
+                tradings.splice(index, 1);
+                r.set('tradingItems', tradings);
+                r.update();
+            },
+            addItem: function (e) {
+                var list = r.get('tradingItems');
+                list.push({
+                    id: null,
+                    subject: "",
+                    unit_price: 0,
+                    amount: 0,
+                    degree: "人月",
+                    tax_type: 1,
+                    memo: "",
+                    sum: 0
+                });
+                r.set('tradingItems', list);
+                r.update();
+            },
+            save: function () {
+                var company = r.get('companies')[$('#company').prop('selectedIndex')];
+                var assignee = r.get('users')[$('#assignee').prop('selectedIndex')];
+                var trading = r.get('trading');
+                trading.company_id = company.id;
+                trading.title_type = $('#titleType').prop('selectedIndex');
+                trading.assignee = assignee.id;
+                trading.work_from = new Date(r.get('workFrom')).getTime();
+                trading.work_to = new Date(r.get('workTo')).getTime();
+                trading.quotation_date = new Date(r.get('quotationDate')).getTime();
+                trading.bill_date = new Date(r.get('billDate')).getTime();
+                trading.tax_rate = parseFloat(r.get('trading.tax_rate'));
+                var items = r.get('tradingItems');
+                var list = [];
+                for (var i = 0; i < items.length; ++i) {
+                    var item = items[i];
+                    item.unit_price = util.currencyToNum(item.unit_price);
+                    item.amount = parseInt(item.amount);
+                    item.tax_type = parseInt(item.tax_type);
+                    list.push(item);
+                }
+                var deleteList = r.get('deleteList');
+                _this.save(trading, list, deleteList);
             }
-            var tradings = app.router.r.get('tradingItems');
-            var trading = tradings[index];
-            if (trading.id != null) {
-                var list = app.router.r.get('deleteList');
-                list.push(trading.id);
-                app.router.r.set('deleteList', list);
+        });
+        this.loadTrading();
+    };
+    EditTradingPage.prototype.loadTrading = function () {
+        var _this = this;
+        if (this.id == 'new') {
+            app.tradingItems = [];
+            this.show();
+            return;
+        }
+        this.app.client.getTradingItems(this.app.token, this.id, {
+            success: function (list) {
+                _this.app.tradingItems = _.map(list, function (item) {
+                    item.unit_price = util.numToCurrency(item.unit_price);
+                    return item;
+                });
+                _this.show();
+            },
+            error: function (msg) {
+                console.log('error ' + msg);
             }
-            tradings.splice(index, 1);
-            app.router.r.set('tradingItems', tradings);
-            app.router.r.update();
         });
-        app.router.r.on('addItem', function (e) {
-            var list = app.router.r.get('tradingItems');
-            list.push({
-                id: null,
-                subject: "",
-                unit_price: 0,
-                amount: 0,
-                degree: "人月",
-                tax_type: 1,
-                memo: "",
-                sum: 0
-            });
-            app.router.r.set('tradingItems', list);
-            app.router.r.update();
-        });
-        app.router.r.on('save', function () {
-            var r = app.router.r;
-            var company = r.get('companies')[$('#company').prop('selectedIndex')];
-            var assignee = r.get('users')[$('#assignee').prop('selectedIndex')];
-            var trading = r.get('trading');
-            trading.company_id = company.id;
-            trading.title_type = $('#titleType').prop('selectedIndex');
-            trading.assignee = assignee.id;
-            trading.work_from = new Date(r.get('workFrom')).getTime();
-            trading.work_to = new Date(r.get('workTo')).getTime();
-            trading.quotation_date = new Date(r.get('quotationDate')).getTime();
-            trading.bill_date = new Date(r.get('billDate')).getTime();
-            trading.tax_rate = parseFloat(r.get('trading.tax_rate'));
-            var items = r.get('tradingItems');
-            var list = [];
-            for (var i = 0; i < items.length; ++i) {
-                var item = items[i];
-                item.unit_price = util.currencyToNum(item.unit_price);
-                item.amount = parseInt(item.amount);
-                item.tax_type = parseInt(item.tax_type);
-                list.push(item);
-            }
-            var deleteList = r.get('deleteList');
-            EditTradingApp.save(trading, list, deleteList);
-        });
-    },
-    save: function (trading, items, deleteList) {
-        EditTradingApp.deleteItems(trading, items, deleteList);
-        app.client.saveTrading(app.token, trading, {
+    };
+    EditTradingPage.prototype.show = function () {
+        this.app.ractive.set('tradingItems', this.app.tradingItems);
+        this.app.ractive.update();
+    };
+    EditTradingPage.prototype.save = function (trading, items, deleteList) {
+        var _this = this;
+        this.deleteItems(trading, items, deleteList);
+        this.app.client.saveTrading(this.app.token, trading, {
             success: function (id) {
                 console.log('ok');
-                EditTradingApp.saveItems(id, items);
+                _this.saveItems(id, items);
             },
             error: function (msg) {
                 console.log('failed to save ' + msg);
             }
         });
-    },
-    deleteItems: function (trading, items, deleteList) {
+    };
+    EditTradingPage.prototype.deleteItems = function (trading, items, deleteList) {
+        var _this = this;
         if (deleteList.length == 0) {
-            EditTradingApp.saveTrading(trading, items);
+            this.saveTrading(trading, items);
             return;
         }
-        app.client.deleteTradingItem(app.token, trading.id, deleteList[0], {
+        this.app.client.deleteTradingItem(this.app.token, trading.id, deleteList[0], {
             success: function (id) {
                 deleteList.shift();
-                EditTradingApp.deleteItems(trading, items, deleteList);
+                _this.deleteItems(trading, items, deleteList);
             },
             error: function (msg) {
                 console.log('failed to delete ' + msg);
             }
         });
-    },
-    saveTrading: function (trading, items) {
-    },
-    saveItems: function (tradingId, items) {
+    };
+    EditTradingPage.prototype.saveTrading = function (trading, items) {
+    };
+    EditTradingPage.prototype.saveItems = function (tradingId, items) {
+        var _this = this;
         if (items.length == 0) {
             window.history.back();
             return;
         }
-        app.client.saveTradingItem(app.token, tradingId, items[0], {
+        this.app.client.saveTradingItem(this.app.token, tradingId, items[0], {
             success: function (id) {
                 console.log('ok');
                 items.shift();
-                EditTradingApp.saveItems(tradingId, items);
+                _this.saveItems(tradingId, items);
             },
             error: function (msg) {
                 console.log('failed to save ' + msg);
             }
         });
-    }
-};
+    };
+    return EditTradingPage;
+})();
+/// <reference path="./ractive.d.ts"/>
+/// <reference path="./TopPage.ts"/>
+/// <reference path="./TradingListPage.ts"/>
+/// <reference path="./EditTradingPage.ts"/>
+var $;
+var _;
+var Backbone;
 var CompanyApp = {
     show: function () {
         app.router.r = new Ractive({
@@ -518,7 +535,8 @@ var AppRouter = Backbone.Router.extend({
             app.router.navigate('', { trigger: true });
             return;
         }
-        EditTradingApp.loadTrading(app.token, id);
+        app.page = new EditTradingPage(id);
+        app.page.onCreate(app);
     },
     companies: function () {
         if (app.token == null) {

@@ -5,4 +5,6 @@ declare class Ractive {
     get(name : string) : any;
     set(name : string, value : any);
     update();
+    updateModel();
+    observe(name : string, func : any);
 }
