@@ -1,10 +1,10 @@
 var _this = this;
 /// <reference path="./ClientImpl.ts"/>
 /// <reference path="./MockClient.ts"/>
+/// <reference path="./ractive.d.ts"/>
 var $;
 var _;
 var Backbone;
-var Ractive;
 
 var TopApp = {
     onCreate: function () {
@@ -37,7 +37,7 @@ var TradingApp = {
                 });
                 TradingApp.loadUsers(token);
             },
-            error: function (msg) {
+            error: function (statuc, msg) {
                 console.log('error ' + msg);
             }
         });
@@ -96,11 +96,16 @@ var TradingApp = {
         app.trading = {
             id: null,
             date: id,
+            company_id: '',
+            title_type: 0,
+            subject: '',
             work_from: new Date().getTime(),
             work_to: new Date().getTime(),
             quotation_date: new Date().getTime(),
             bill_date: new Date().getTime(),
-            tax_rate: 8
+            tax_rate: 8,
+            assignee: '',
+            product: ''
         };
         app.tradingMap['new'] = app.trading;
         app.router.navigate('tradings/new', { trigger: true });
@@ -330,7 +335,12 @@ var CompanyApp = {
     },
     newCompany: function () {
         app.company = {
-            id: null
+            id: null,
+            name: '',
+            zip: '',
+            address: '',
+            phone: '',
+            unit: ''
         };
         app.router.navigate('companies/new', { trigger: true });
     }
@@ -432,10 +442,16 @@ var AppRouter = Backbone.Router.extend({
     }
 });
 
-var app = {
-    //    client : new Invoice.AppClientImpl('http://localhost:9001')
-    client: new Invoice.MockClient()
-};
+var App = (function () {
+    function App() {
+        //this.client = new Invoice.AppClientImpl('http://localhost:9001');
+        this.client = new Invoice.MockClient();
+    }
+    return App;
+})();
+
+var app = new App();
+
 var util = {
     numToCurrency: function (val) {
         var n = parseInt(val);

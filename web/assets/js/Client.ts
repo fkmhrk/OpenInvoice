@@ -1,7 +1,7 @@
 module Invoice {
     export interface AppClient {
         login(username : string, password : string, callback : LoginCallback);
-        getTradings(token : string, callback : TradingCallback);
+        getTradings(token : string, callback : ItemListCallback<Trading>);
         getTradingItems(token : string, tradingId : string, callback : TradingItemCallback)
         getUsers(token : string, callback : UserListCallback);
         getCompanies(token : string, callback : CompanyListCallback);
@@ -53,8 +53,18 @@ module Invoice {
         tax_type : number;
         memo : string;
         sum : number;
-    }    
+    }
 
+    export interface ItemCallback<T> {
+        success : (item : T) => void;
+        error : (status : number, msg : string) => void;
+    }
+
+    export interface ItemListCallback<T> {
+        success : (item : Array<T>) => void;
+        error : (status : number, msg : string) => void;
+    }
+    
     export interface UserListCallback {
         success : (list : Array<User>) => void;
         error : (msg : string) => void;        

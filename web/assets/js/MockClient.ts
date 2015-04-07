@@ -5,7 +5,7 @@ module Invoice {
         login(username : string, password : string, callback : LoginCallback) {
             callback.success('token1122');
         }
-        getTradings(token : string, callback : TradingCallback) {
+        getTradings(token : string, callback : ItemListCallback<Trading>) {
             var tradings : Array<Trading> = [];
             for (var i = 0 ; i < 10 ; ++i) {
                 tradings.push({
