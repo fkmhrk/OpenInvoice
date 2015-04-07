@@ -129,51 +129,14 @@ var TopPage = (function () {
     };
     return TopPage;
 })();
-/// <reference path="./ractive.d.ts"/>
-/// <reference path="./TopPage.ts"/>
-var $;
-var _;
-var Backbone;
-var TradingApp = {
-    loadTradings: function (token) {
-        app.client.getTradings(token, {
-            success: function (list) {
-                app.tradings = list;
-                app.tradingMap = {};
-                _.each(list, function (item) {
-                    app.tradingMap[item.id] = item;
-                });
-                TradingApp.loadUsers(token);
-            },
-            error: function (statuc, msg) {
-                console.log('error ' + msg);
-            }
-        });
-    },
-    loadUsers: function (token) {
-        app.client.getUsers(token, {
-            success: function (list) {
-                app.users = list;
-                TradingApp.loadCompanies(token);
-            },
-            error: function (msg) {
-                console.log('error getUsers ' + msg);
-            }
-        });
-    },
-    loadCompanies: function (token) {
-        app.client.getCompanies(token, {
-            success: function (list) {
-                app.companies = list;
-                TradingApp.show();
-            },
-            error: function (msg) {
-                console.log('error getCompanies ' + msg);
-            }
-        });
-    },
-    show: function () {
-        app.router.r = new Ractive({
+/// <reference path="./Page.ts"/>
+var TradingListPage = (function () {
+    function TradingListPage() {
+    }
+    TradingListPage.prototype.onCreate = function (app) {
+        var _this = this;
+        this.app = app;
+        var r = app.ractive = new Ractive({
             el: '#container',
             template: '#tradingTemplate',
             data: {
@@ -181,23 +144,71 @@ var TradingApp = {
                 token: app.token
             }
         });
-        app.router.r.on('itemClick', function (e, i) {
-            TradingApp.edit(i);
+        r.on({
+            itemClick: function (e, i) {
+                _this.edit(i);
+            },
+            printQuotation: function (e, i) {
+                _this.printQuotation(i);
+            },
+            printBill: function (e, i) {
+                _this.printBill(i);
+            },
+            newTrading: function (e) {
+                _this.newTrading(r.get('newId'));
+            },
+            company: function (e) {
+                _this.app.router.navigate('companies', { trigger: true });
+            }
         });
-        app.router.r.on('printQuotation', function (e, i) {
-            TradingApp.printQuotation(i);
+        this.loadTradings();
+    };
+    TradingListPage.prototype.loadTradings = function () {
+        var _this = this;
+        this.app.client.getTradings(this.app.token, {
+            success: function (list) {
+                _this.app.tradings = list;
+                _this.app.tradingMap = {};
+                _.each(list, function (item) {
+                    _this.app.tradingMap[item.id] = item;
+                });
+                _this.loadUsers();
+            },
+            error: function (statuc, msg) {
+                console.log('error ' + msg);
+            }
         });
-        app.router.r.on('printBill', function (e, i) {
-            TradingApp.printBill(i);
+    };
+    TradingListPage.prototype.loadUsers = function () {
+        var _this = this;
+        this.app.client.getUsers(this.app.token, {
+            success: function (list) {
+                _this.app.users = list;
+                _this.loadCompanies();
+            },
+            error: function (msg) {
+                console.log('error getUsers ' + msg);
+            }
         });
-        app.router.r.on('newTrading', function (e) {
-            TradingApp.newTrading(app.router.r.get('newId'));
+    };
+    TradingListPage.prototype.loadCompanies = function () {
+        var _this = this;
+        this.app.client.getCompanies(this.app.token, {
+            success: function (list) {
+                _this.app.companies = list;
+                _this.show();
+            },
+            error: function (msg) {
+                console.log('error getCompanies ' + msg);
+            }
         });
-        app.router.r.on('company', function (e) {
-            app.router.navigate('companies', { trigger: true });
-        });
-    },
-    newTrading: function (id) {
+    };
+    TradingListPage.prototype.show = function () {
+        this.app.ractive.set('tradings', this.app.tradings);
+        this.app.ractive.set('token', this.app.token);
+        this.app.ractive.update();
+    };
+    TradingListPage.prototype.newTrading = function (id) {
         if (id == null || id.length == 0) {
             return;
         }
@@ -217,21 +228,28 @@ var TradingApp = {
         };
         app.tradingMap['new'] = app.trading;
         app.router.navigate('tradings/new', { trigger: true });
-    },
-    edit: function (i) {
+    };
+    TradingListPage.prototype.edit = function (i) {
         console.log(app.tradings[i]);
         app.trading = app.tradings[i];
         app.router.navigate('tradings/' + app.tradings[i].id, { trigger: true });
-    },
-    printQuotation: function (i) {
+    };
+    TradingListPage.prototype.printQuotation = function (i) {
         var trading = app.tradings[i];
         window.location.href = "/php/quotation.php?access_token=" + app.token + "&trading_id=" + trading.id;
-    },
-    printBill: function (i) {
+    };
+    TradingListPage.prototype.printBill = function (i) {
         var trading = app.tradings[i];
         window.location.href = "/php/bill.php?access_token=" + app.token + "&trading_id=" + trading.id;
-    }
-};
+    };
+    return TradingListPage;
+})();
+/// <reference path="./ractive.d.ts"/>
+/// <reference path="./TopPage.ts"/>
+/// <reference path="./TradingListPage.ts"/>
+var $;
+var _;
+var Backbone;
 var EditTradingApp = {
     loadTrading: function (token, id) {
         if (id == 'new') {
@@ -492,7 +510,8 @@ var AppRouter = Backbone.Router.extend({
             app.router.navigate('', { trigger: true });
             return;
         }
-        TradingApp.loadTradings(app.token);
+        app.page = new TradingListPage();
+        app.page.onCreate(app);
     },
     editTrading: function (id) {
         if (app.token == null) {

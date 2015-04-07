@@ -1,107 +1,9 @@
 /// <reference path="./ractive.d.ts"/>
 /// <reference path="./TopPage.ts"/>
+/// <reference path="./TradingListPage.ts"/>
 var $;
 var _;
 var Backbone;
-
-var TradingApp = {
-    loadTradings : (token : string) => {
-        app.client.getTradings(token, {
-            success : (list : Array<Invoice.Trading>) => {
-                app.tradings = list;
-                app.tradingMap = {};
-                _.each(list, (item) => {
-                    app.tradingMap[item.id] = item;
-                });
-                TradingApp.loadUsers(token);
-            },
-            error : (statuc : number, msg : string) => {
-                console.log('error ' + msg);
-            }
-        });
-    },
-    loadUsers : (token : string) => {
-        app.client.getUsers(token, {
-            success : (list : Array<Invoice.User>) => {
-                app.users = list;
-                TradingApp.loadCompanies(token);
-            },
-            error : (msg : string) => {
-                console.log('error getUsers ' + msg);
-            }
-        });
-    },
-    loadCompanies : (token : string) => {
-        app.client.getCompanies(token, {
-            success : (list : Array<Invoice.Company>) => {
-                app.companies = list;
-                TradingApp.show();
-            },
-            error : (msg : string) => {
-                console.log('error getCompanies ' + msg);
-            }
-        });
-    },    
-    show : () => {
-        app.router.r = new Ractive({
-            el : '#container',
-            template : '#tradingTemplate',
-            data : {
-                tradings : app.tradings,
-                token : app.token
-            }
-        });
-        app.router.r.on('itemClick', (e : any, i : any) => {
-            TradingApp.edit(i);
-        });
-        app.router.r.on('printQuotation', (e : any, i : any) => {
-            TradingApp.printQuotation(i);
-        });
-        app.router.r.on('printBill', (e : any, i : any) => {
-            TradingApp.printBill(i);
-        });
-        app.router.r.on('newTrading', (e : any) => {
-            TradingApp.newTrading(app.router.r.get('newId'));
-        });
-        app.router.r.on('company', (e : any) => {
-            app.router.navigate('companies', {trigger:true})            
-        });        
-    },
-    newTrading : (id : string) => {
-        if (id == null || id.length == 0) {
-            return;
-        }
-        app.trading = {
-            id : null,
-            date : id,
-            company_id : '',
-            title_type : 0,
-            subject : '',
-            work_from : new Date().getTime(),
-            work_to : new Date().getTime(),
-            quotation_date : new Date().getTime(),
-            bill_date : new Date().getTime(),
-            tax_rate : 8,
-            assignee : '',
-            product : '',
-        };
-        app.tradingMap['new'] = app.trading;
-        app.router.navigate('tradings/new', {trigger:true})
-    },
-    edit : (i : any) => {
-        console.log(app.tradings[i]);
-        app.trading = app.tradings[i];
-        app.router.navigate('tradings/' + app.tradings[i].id, {trigger:true})
-    },
-    printQuotation : (i : any) => {
-        var trading = app.tradings[i];
-        window.location.href = "/php/quotation.php?access_token=" + app.token + "&trading_id=" + trading.id;
-    },
-    printBill : (i : any) => {
-        var trading = app.tradings[i];
-        window.location.href = "/php/bill.php?access_token=" + app.token + "&trading_id=" + trading.id;        
-    }
-}
 
 var EditTradingApp = {
     loadTrading : (token : string, id : string) => {
@@ -366,7 +268,8 @@ var AppRouter = Backbone.Router.extend({
             app.router.navigate('', {trigger:true})           
             return;
         }
-        TradingApp.loadTradings(app.token);
+        app.page = new TradingListPage();
+        app.page.onCreate(app);
     },
     editTrading : (id : any) => {
         if (app.token == null) {
