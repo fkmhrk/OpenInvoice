@@ -48,7 +48,7 @@
             <th></th>
           </tr>
       {{#tradings:i}}          
-          <tr>
+          <tr on-click="itemClick:{{i}}">
             <td>2015.05.25</td>
             <td>株式会社ABC<span>{{subject}}</span></td>
             <td>650,000</td>
@@ -57,7 +57,6 @@
             <td>
               <a href="#" class="btn" title="削除"><i class="fa fa-trash-o"></i></a>
               <a href="#" class="btn" title="コピー"><i class="fa fa-copy"></i></a>
-              <i class="btn fa fa-copy" on-click="itemClick:{{i}}"></i>
               <i class="btn fa fa-copy" on-click="printQuotation:{{i}}"></i>
               <i class="btn fa fa-copy" on-click="printBill:{{i}}"></i>
             </td>
