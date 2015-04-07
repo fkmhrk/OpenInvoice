@@ -1,6 +1,6 @@
 # app
-app : app.ts ClientImpl.ts
-	tsc app.ts ClientImpl.ts -out app.js
+app : app.ts Application.ts
+	tsc Application.ts app.ts -out app.js
 
-mock : app.ts MockClient.ts
-	tsc app.ts MockClient.ts -out app.js
+mock : app.ts MockApplication.ts
+	tsc MockApplication.ts app.ts -out app.js

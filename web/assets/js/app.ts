@@ -1,29 +1,8 @@
-/// <reference path="./ClientImpl.ts"/>
-/// <reference path="./MockClient.ts"/>
 /// <reference path="./ractive.d.ts"/>
+/// <reference path="./TopPage.ts"/>
 var $;
 var _;
 var Backbone;
-
-var TopApp = {
-    onCreate : () => {
-        console.log(this);
-    },
-    login : (username : string, password : string, r : any) => {
-        r.set('loginInProgress', true);
-        app.client.login(username, password, {
-            success : (token : string) => {
-                r.set('loginInProgress', false);
-                app.token = token;
-                app.router.navigate('tradings', {trigger:true})
-            },
-            error : (msg : string) => {
-                r.set('loginInProgress', false);
-                console.log('error ' + msg);
-            }
-        });
-    }
-}
 
 var TradingApp = {
     loadTradings : (token : string) => {
@@ -379,18 +358,8 @@ var AppRouter = Backbone.Router.extend({
         _.bindAll(this, 'top', 'tradings', 'editTrading', 'companies', 'editCompanies');
     },
     top : () => {
-        this.r = new Ractive({
-            el : '#container',
-            template : '#topTemplate',
-            data : {
-                loginInProgress : false,
-            }
-        });
-        this.r.on('login', (e : any) => {
-            TopApp.login(this.r.get('username'),
-                         this.r.get('password'),
-                         this.r);
-        });    
+        app.page = new TopPage();
+        app.page.onCreate(app);
     },
     tradings : () => {
         if (app.token == null) {
@@ -440,25 +409,7 @@ var AppRouter = Backbone.Router.extend({
     }
 });
 
-class App {
-    token : string;
-    router : any;
-    client : Invoice.AppClient;
-    users : Array<Invoice.User>;
-    trading : Invoice.Trading;
-    tradings : Array<Invoice.Trading>;
-    tradingMap : any;    
-    tradingItems : Array<Invoice.TradingItem>;
-    company : Invoice.Company;
-    companies : Array<Invoice.Company>;
-    
-    constructor() {
-        //this.client = new Invoice.AppClientImpl('http://localhost:9001');
-        this.client = new Invoice.MockClient();
-    }
-}
-
-var app : App = new App();
+var app : Application = new Application();
 
 var util : any = {
     numToCurrency : (val : any) => {

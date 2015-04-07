@@ -1,232 +1,5 @@
 /// <reference path="./Client.ts"/>
 var $;
-var _;
-var Invoice;
-(function (Invoice) {
-    var AppClientImpl = (function () {
-        function AppClientImpl(url) {
-            this.url = url;
-        }
-        AppClientImpl.prototype.login = function (username, password, callback) {
-            var params = {
-                username: username,
-                password: password
-            };
-            this.exec(this.url + '/api/v1/token', 'POST', null, params, {
-                success: function (json) {
-                    callback.success(json.access_token);
-                },
-                error: function (status, body) {
-                    callback.error(body.msg);
-                }
-            });
-        };
-        AppClientImpl.prototype.getTradings = function (token, callback) {
-            this.exec(this.url + '/api/v1/tradings', 'GET', token, null, {
-                success: function (json) {
-                    callback.success(_.map(json.tradings, function (item) {
-                        item.date = item.id;
-                        return item;
-                    }));
-                },
-                error: function (status, body) {
-                    callback.error(status, body.msg);
-                }
-            });
-        };
-
-        AppClientImpl.prototype.getTradingItems = function (token, tradingId, callback) {
-            var url = this.url + '/api/v1/tradings/' + tradingId + '/items';
-            this.exec(url, 'GET', token, null, {
-                success: function (json) {
-                    callback.success(_.map(json.items, function (item) {
-                        item.sum = item.unit_price * item.amount;
-                        return item;
-                    }));
-                },
-                error: function (status, body) {
-                    callback.error(body.msg);
-                }
-            });
-        };
-
-        AppClientImpl.prototype.getUsers = function (token, callback) {
-            var url = this.url + '/api/v1/users';
-            this.exec(url, 'GET', token, null, {
-                success: function (json) {
-                    callback.success(json.users);
-                },
-                error: function (status, body) {
-                    callback.error(body.msg);
-                }
-            });
-        };
-
-        AppClientImpl.prototype.getCompanies = function (token, callback) {
-            var url = this.url + '/api/v1/companies';
-            this.exec(url, 'GET', token, null, {
-                success: function (json) {
-                    callback.success(json.companies);
-                },
-                error: function (status, body) {
-                    callback.error(body.msg);
-                }
-            });
-            var list = [];
-            list.push({
-                id: "dummy0001",
-                name: "仮会社会社",
-                zip: "111-2222",
-                address: "日本",
-                phone: "03-1111-2222",
-                unit: "開発部"
-            });
-            callback.success(list);
-        };
-
-        AppClientImpl.prototype.saveTrading = function (token, item, callback) {
-            if (item.id === null) {
-                this.createTrading(token, item, callback);
-            } else {
-                this.updateTrading(token, item, callback);
-            }
-        };
-
-        AppClientImpl.prototype.saveTradingItem = function (token, tradingId, item, callback) {
-            if (item.id === null) {
-                this.createTradingItem(token, tradingId, item, callback);
-            } else {
-                this.updateTradingItem(token, tradingId, item, callback);
-            }
-        };
-        AppClientImpl.prototype.deleteTradingItem = function (token, tradingId, itemId, callback) {
-            var url = this.url + '/api/v1/tradings/' + tradingId + '/items/' + itemId;
-            this.exec(url, 'DELETE', token, null, {
-                success: function (json) {
-                    callback.success(itemId);
-                },
-                error: function (status, body) {
-                    if (status == 404) {
-                        callback.success(itemId);
-                    } else {
-                        callback.error(body.msg);
-                    }
-                }
-            });
-        };
-
-        AppClientImpl.prototype.saveCompany = function (token, item, callback) {
-            if (item.id === null || item.id.length == 0) {
-                this.createCompany(token, item, callback);
-            } else {
-                this.updateCompany(token, item, callback);
-            }
-        };
-
-        AppClientImpl.prototype.createTrading = function (token, item, callback) {
-            var url = this.url + '/api/v1/tradings';
-            this.exec(url, 'POST', token, item, {
-                success: function (json) {
-                    callback.success(json.id);
-                },
-                error: function (status, body) {
-                    callback.error(body.msg);
-                }
-            });
-        };
-
-        AppClientImpl.prototype.updateTrading = function (token, item, callback) {
-            var url = this.url + '/api/v1/tradings/' + item.id;
-            this.exec(url, 'PUT', token, item, {
-                success: function (json) {
-                    callback.success(item.id);
-                },
-                error: function (status, body) {
-                    callback.error(body.msg);
-                }
-            });
-        };
-
-        AppClientImpl.prototype.createTradingItem = function (token, tradingId, item, callback) {
-            var url = this.url + '/api/v1/tradings/' + tradingId + '/items';
-            this.exec(url, 'POST', token, item, {
-                success: function (json) {
-                    callback.success(json.id);
-                },
-                error: function (status, body) {
-                    callback.error(body.msg);
-                }
-            });
-        };
-
-        AppClientImpl.prototype.updateTradingItem = function (token, tradingId, item, callback) {
-            var url = this.url + '/api/v1/tradings/' + tradingId + '/items/' + item.id;
-            this.exec(url, 'PUT', token, item, {
-                success: function (json) {
-                    callback.success(item.id);
-                },
-                error: function (status, body) {
-                    callback.error(body.msg);
-                }
-            });
-        };
-
-        AppClientImpl.prototype.createCompany = function (token, item, callback) {
-            var url = this.url + '/api/v1/companies';
-            this.exec(url, 'POST', token, item, {
-                success: function (json) {
-                    callback.success(json.id);
-                },
-                error: function (status, body) {
-                    callback.error(body.msg);
-                }
-            });
-        };
-
-        AppClientImpl.prototype.updateCompany = function (token, item, callback) {
-            var url = this.url + '/api/v1/companies/' + item.id;
-            this.exec(url, 'PUT', token, item, {
-                success: function (json) {
-                    callback.success(json.id);
-                },
-                error: function (status, body) {
-                    callback.error(body.msg);
-                }
-            });
-        };
-
-        AppClientImpl.prototype.exec = function (url, method, token, params, callback) {
-            var data = {
-                url: url,
-                type: method,
-                dataType: 'json',
-                scriptCharset: 'utf-8',
-                processData: false
-            };
-            if (token != null) {
-                data.headers = {
-                    authorization: 'bearer ' + token
-                };
-            }
-            if (params != null) {
-                data.data = JSON.stringify(params);
-            }
-            $.ajax(data).done(function (data_, status, data) {
-                if (data.status == 204) {
-                    callback.success({});
-                } else {
-                    callback.success(JSON.parse(data.responseText));
-                }
-            }).fail(function (data) {
-                callback.error(data.status, JSON.parse(data.responseText));
-            });
-        };
-        return AppClientImpl;
-    })();
-    Invoice.AppClientImpl = AppClientImpl;
-})(Invoice || (Invoice = {}));
-/// <reference path="./Client.ts"/>
-var $;
 var Invoice;
 (function (Invoice) {
     var MockClient = (function () {
@@ -255,7 +28,6 @@ var Invoice;
             }
             callback.success(tradings);
         };
-
         MockClient.prototype.getTradingItems = function (token, tradingId, callback) {
             var tradings = [];
             for (var i = 0; i < 10; ++i) {
@@ -272,7 +44,6 @@ var Invoice;
             }
             callback.success(tradings);
         };
-
         MockClient.prototype.getUsers = function (token, callback) {
             var list = [];
             for (var i = 0; i < 10; ++i) {
@@ -283,7 +54,6 @@ var Invoice;
             }
             callback.success(list);
         };
-
         MockClient.prototype.getCompanies = function (token, callback) {
             var list = [];
             for (var i = 0; i < 10; ++i) {
@@ -314,34 +84,56 @@ var Invoice;
     })();
     Invoice.MockClient = MockClient;
 })(Invoice || (Invoice = {}));
-var _this = this;
-/// <reference path="./ClientImpl.ts"/>
 /// <reference path="./MockClient.ts"/>
 /// <reference path="./ractive.d.ts"/>
-var $;
-var _;
-var Backbone;
-
-var TopApp = {
-    onCreate: function () {
-        console.log(_this);
-    },
-    login: function (username, password, r) {
-        r.set('loginInProgress', true);
-        app.client.login(username, password, {
+/// <reference path="./Page.ts"/>
+var Application = (function () {
+    function Application() {
+        this.client = new Invoice.MockClient();
+    }
+    return Application;
+})();
+/// <reference path="./Page.ts"/>
+var TopPage = (function () {
+    function TopPage() {
+    }
+    TopPage.prototype.onCreate = function (app) {
+        var _this = this;
+        this.app = app;
+        var r = app.ractive = new Ractive({
+            el: '#container',
+            template: '#topTemplate',
+            data: {
+                loginInProgress: false
+            }
+        });
+        r.on('login', function (e) {
+            _this.login(r.get('username'), r.get('password'));
+        });
+        console.log(this);
+    };
+    TopPage.prototype.login = function (username, password) {
+        var _this = this;
+        this.app.ractive.set('loginInProgress', true);
+        this.app.client.login(username, password, {
             success: function (token) {
-                r.set('loginInProgress', false);
-                app.token = token;
-                app.router.navigate('tradings', { trigger: true });
+                _this.app.ractive.set('loginInProgress', false);
+                _this.app.token = token;
+                _this.app.router.navigate('tradings', { trigger: true });
             },
             error: function (msg) {
-                r.set('loginInProgress', false);
+                _this.app.ractive.set('loginInProgress', false);
                 console.log('error ' + msg);
             }
         });
-    }
-};
-
+    };
+    return TopPage;
+})();
+/// <reference path="./ractive.d.ts"/>
+/// <reference path="./TopPage.ts"/>
+var $;
+var _;
+var Backbone;
 var TradingApp = {
     loadTradings: function (token) {
         app.client.getTradings(token, {
@@ -440,7 +232,6 @@ var TradingApp = {
         window.location.href = "/php/bill.php?access_token=" + app.token + "&trading_id=" + trading.id;
     }
 };
-
 var EditTradingApp = {
     loadTrading: function (token, id) {
         if (id == 'new') {
@@ -566,7 +357,6 @@ var EditTradingApp = {
             trading.quotation_date = new Date(r.get('quotationDate')).getTime();
             trading.bill_date = new Date(r.get('billDate')).getTime();
             trading.tax_rate = parseFloat(r.get('trading.tax_rate'));
-
             var items = r.get('tradingItems');
             var list = [];
             for (var i = 0; i < items.length; ++i) {
@@ -574,11 +364,9 @@ var EditTradingApp = {
                 item.unit_price = util.currencyToNum(item.unit_price);
                 item.amount = parseInt(item.amount);
                 item.tax_type = parseInt(item.tax_type);
-
                 list.push(item);
             }
             var deleteList = r.get('deleteList');
-
             EditTradingApp.save(trading, list, deleteList);
         });
     },
@@ -628,7 +416,6 @@ var EditTradingApp = {
         });
     }
 };
-
 var CompanyApp = {
     show: function () {
         app.router.r = new Ractive({
@@ -661,7 +448,6 @@ var CompanyApp = {
         app.router.navigate('companies/new', { trigger: true });
     }
 };
-
 var EditCompanyApp = {
     show: function (company) {
         app.router.r = new Ractive({
@@ -686,7 +472,6 @@ var EditCompanyApp = {
         });
     }
 };
-
 var AppRouter = Backbone.Router.extend({
     routes: {
         "": "top",
@@ -699,16 +484,8 @@ var AppRouter = Backbone.Router.extend({
         _.bindAll(this, 'top', 'tradings', 'editTrading', 'companies', 'editCompanies');
     },
     top: function () {
-        _this.r = new Ractive({
-            el: '#container',
-            template: '#topTemplate',
-            data: {
-                loginInProgress: false
-            }
-        });
-        _this.r.on('login', function (e) {
-            TopApp.login(_this.r.get('username'), _this.r.get('password'), _this.r);
-        });
+        app.page = new TopPage();
+        app.page.onCreate(app);
     },
     tradings: function () {
         if (app.token == null) {
@@ -757,17 +534,7 @@ var AppRouter = Backbone.Router.extend({
         EditCompanyApp.show(company);
     }
 });
-
-var App = (function () {
-    function App() {
-        //this.client = new Invoice.AppClientImpl('http://localhost:9001');
-        this.client = new Invoice.MockClient();
-    }
-    return App;
-})();
-
-var app = new App();
-
+var app = new Application();
 var util = {
     numToCurrency: function (val) {
         var n = parseInt(val);
@@ -778,10 +545,11 @@ var util = {
             n = Math.floor(n / 1000);
             if (n > 0) {
                 ret = c + "," + ret;
-            } else {
+            }
+            else {
                 ret = n1 + "," + ret;
             }
-        } while(n > 0);
+        } while (n > 0);
         return ret.substring(0, ret.length - 1);
     },
     currencyToNum: function (val) {
@@ -791,7 +559,6 @@ var util = {
         return parseInt(val.replace(",", ""));
     }
 };
-
 (function ($) {
     $(function () {
         app.router = new AppRouter();
