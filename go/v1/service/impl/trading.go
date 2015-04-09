@@ -220,16 +220,19 @@ func (s *tradingService) DeleteItem(token, id, tradingId string) s.Result {
 
 func (s *tradingService) toJson(t *m.Trading) map[string]interface{} {
 	return map[string]interface{}{
-		"id":             t.Id,
-		"company_id":     t.CompanyId,
-		"title_type":     t.TitleType,
-		"subject":        t.Subject,
-		"work_from":      t.WorkFrom,
-		"work_to":        t.WorkTo,
-		"quotation_date": t.QuotationDate,
-		"bill_date":      t.BillDate,
-		"tax_rate":       t.TaxRate,
-		"assignee":       t.AssigneeId,
-		"product":        t.Product,
+		"id":               t.Id,
+		"company_id":       t.CompanyId,
+		"title_type":       t.TitleType,
+		"subject":          t.Subject,
+		"work_from":        t.WorkFrom,
+		"work_to":          t.WorkTo,
+		"total":            t.Total,
+		"quotation_date":   t.QuotationDate,
+		"quotation_number": t.QuotationNumber,
+		"bill_date":        t.BillDate,
+		"bill_number":      t.BillNumber,
+		"tax_rate":         t.TaxRate,
+		"assignee":         t.AssigneeId,
+		"product":          t.Product,
 	}
 }
