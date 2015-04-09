@@ -24,6 +24,7 @@ func createTrading(trading s.TradingService) handler {
 		subject, _ := json.String("subject")
 		workFrom, _ := json.Long("work_from")
 		workTo, _ := json.Long("work_to")
+		total, _ := json.Long("total")
 		quotationDate, _ := json.Long("quotation_date")
 		billDate, _ := json.Long("bill_date")
 		taxRate, _ := json.Float("tax_rate")
@@ -31,7 +32,7 @@ func createTrading(trading s.TradingService) handler {
 
 		return trading.Create(token, date, companyId,
 			subject, product, titleType, workFrom, workTo,
-			quotationDate, billDate, float32(taxRate))
+			total, quotationDate, billDate, float32(taxRate))
 	})
 }
 
