@@ -10,7 +10,8 @@ import (
 
 const (
 	select_trading = "SELECT id,company_id,title_type,subject," +
-		"work_from,work_to,quotation_date,quotation_number," +
+		"work_from,work_to,total," +
+		"quotation_date,quotation_number," +
 		"bill_date,bill_number," +
 		"tax_rate,assignee,product," +
 		"created_time, modified_time FROM trading"
@@ -73,7 +74,7 @@ func (d *tradingDAO) GetById(id, userId string) (*m.Trading, error) {
 	return &item, nil
 }
 
-func (d *tradingDAO) Create(date, companyId, subject string, titleType int, workFrom, workTo, quotationDate, billDate int64, taxRate float32, assignee, product string) (*m.Trading, error) {
+func (d *tradingDAO) Create(date, companyId, subject string, titleType int, workFrom, workTo, total, quotationDate, billDate int64, taxRate float32, assignee, product string) (*m.Trading, error) {
 	tr, err := d.connection.Begin()
 	if err != nil {
 		return nil, err
@@ -87,12 +88,14 @@ func (d *tradingDAO) Create(date, companyId, subject string, titleType int, work
 
 	st, err := tr.Prepare("INSERT INTO trading(" +
 		"id,company_id,subject,title_type," +
-		"work_from,work_to,quotation_date,quotation_number," +
+		"work_from,work_to,total," +
+		"quotation_date,quotation_number," +
 		"bill_date,bill_number," +
 		"tax_rate,assignee,product," +
 		"created_time,modified_time,deleted)" +
 		"VALUES(?,?,?,?," +
-		"?,?,?,''," +
+		"?,?,?," +
+		"?,''," +
 		"?,''," +
 		"?,?,?," +
 		"unix_timestamp(now()),unix_timestamp(now()),0)")
@@ -102,7 +105,9 @@ func (d *tradingDAO) Create(date, companyId, subject string, titleType int, work
 	defer st.Close()
 
 	_, err = st.Exec(id, companyId, subject, titleType,
-		workFrom, workTo, quotationDate, billDate,
+		workFrom, workTo, total,
+		quotationDate,
+		billDate,
 		taxRate, assignee, product)
 	if err != nil {
 		return nil, err
@@ -401,27 +406,31 @@ func (d *tradingDAO) scanTrading(rows *sql.Rows) m.Trading {
 	var titleType int
 	var taxRate float32
 	var assignee, quotationNumber, billNumber string
-	var workFrom, workTo, quotationDate, billDate, created, modified int64
+	var workFrom, workTo, total, quotationDate, billDate, created, modified int64
 
 	rows.Scan(&id, &companyId, &titleType, &subject,
-		&workFrom, &workTo, &quotationDate, &quotationNumber,
+		&workFrom, &workTo, &total,
+		&quotationDate, &quotationNumber,
 		&billDate, &billNumber,
 		&taxRate, &assignee, &product,
 		&created, &modified)
 
 	return m.Trading{
-		Id:            id,
-		CompanyId:     companyId,
-		TitleType:     titleType,
-		Subject:       subject,
-		WorkFrom:      workFrom,
-		WorkTo:        workTo,
-		QuotationDate: quotationDate,
-		BillDate:      billDate,
-		TaxRate:       taxRate,
-		AssigneeId:    assignee,
-		Product:       product,
-		CreatedTime:   created,
-		ModifiedTime:  modified,
+		Id:              id,
+		CompanyId:       companyId,
+		TitleType:       titleType,
+		Subject:         subject,
+		WorkFrom:        workFrom,
+		WorkTo:          workTo,
+		Total:           total,
+		QuotationDate:   quotationDate,
+		QuotationNumber: quotationNumber,
+		BillDate:        billDate,
+		BillNumber:      billNumber,
+		TaxRate:         taxRate,
+		AssigneeId:      assignee,
+		Product:         product,
+		CreatedTime:     created,
+		ModifiedTime:    modified,
 	}
 }
