@@ -26,9 +26,15 @@ func deleteTradingId(db *sql.DB, date string) {
 func insertTrading(db *sql.DB, id, user, subject, product string) {
 	s, _ := db.Prepare("INSERT INTO trading(" +
 		"id,company_id,title_type,subject," +
-		"work_from,work_to,quotation_date,bill_date," +
+		"work_from,work_to,total," +
+		"quotation_date,quotation_number," +
+		"bill_date,bill_number," +
 		"tax_rate,assignee,product,deleted)" +
-		"VALUES(?,'company1',0,?,0,0,100,200,8.0,?,?,0)")
+		"VALUES(?,'company1',0,?," +
+		"0,0,1280," +
+		"100,''," +
+		"200,''," +
+		"8.0,?,?,0)")
 	defer s.Close()
 	s.Exec(id, subject, user, product)
 }

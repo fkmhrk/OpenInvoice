@@ -8,6 +8,14 @@ import (
 	"github.com/go-sql-driver/mysql"
 )
 
+const (
+	select_trading = "SELECT id,company_id,title_type,subject," +
+		"work_from,work_to,quotation_date,quotation_number," +
+		"bill_date,bill_number," +
+		"tax_rate,assignee,product," +
+		"created_time, modified_time FROM trading"
+)
+
 type tradingDAO struct {
 	connection *Connection
 }
@@ -20,11 +28,8 @@ func NewTradingDAO(connection *Connection) *tradingDAO {
 
 func (d *tradingDAO) GetListByUser(userId string) ([]*m.Trading, error) {
 	db := d.connection.Connect()
-	st, err := db.Prepare("SELECT id,company_id,title_type,subject," +
-		"work_from,work_to,quotation_date,bill_date," +
-		"tax_rate,product," +
-		"created_time, modified_time FROM trading " +
-		"WHERE assignee=? AND deleted <> 1 ORDER BY id ASC")
+	st, err := db.Prepare(select_trading +
+		" WHERE assignee=? AND deleted <> 1 ORDER BY id ASC")
 	if err != nil {
 		return nil, err
 	}
@@ -37,31 +42,9 @@ func (d *tradingDAO) GetListByUser(userId string) ([]*m.Trading, error) {
 	defer rows.Close()
 
 	var list []*m.Trading
-	var id, companyId, subject, product string
-	var titleType int
-	var taxRate float32
-	var workFrom, workTo, quotationDate, billDate, created, modified int64
 	for rows.Next() {
-		rows.Scan(&id, &companyId, &titleType, &subject,
-			&workFrom, &workTo, &quotationDate,
-			&billDate, &taxRate, &product,
-			&created, &modified)
-
-		list = append(list, &m.Trading{
-			Id:            id,
-			CompanyId:     companyId,
-			TitleType:     titleType,
-			Subject:       subject,
-			WorkFrom:      workFrom,
-			WorkTo:        workTo,
-			QuotationDate: quotationDate,
-			BillDate:      billDate,
-			TaxRate:       taxRate,
-			AssigneeId:    userId,
-			Product:       product,
-			CreatedTime:   created,
-			ModifiedTime:  modified,
-		})
+		item := d.scanTrading(rows)
+		list = append(list, &item)
 	}
 	return list, nil
 
@@ -69,11 +52,8 @@ func (d *tradingDAO) GetListByUser(userId string) ([]*m.Trading, error) {
 
 func (d *tradingDAO) GetById(id, userId string) (*m.Trading, error) {
 	db := d.connection.Connect()
-	st, err := db.Prepare("SELECT company_id,title_type,subject," +
-		"work_from,work_to,quotation_date,bill_date," +
-		"tax_rate,product," +
-		"created_time, modified_time FROM trading " +
-		"WHERE id=? AND assignee=? AND deleted <> 1 LIMIT 1")
+	st, err := db.Prepare(select_trading +
+		" WHERE id=? AND assignee=? AND deleted <> 1 LIMIT 1")
 	if err != nil {
 		return nil, err
 	}
@@ -89,28 +69,8 @@ func (d *tradingDAO) GetById(id, userId string) (*m.Trading, error) {
 		return nil, nil
 	}
 
-	var companyId, subject, product string
-	var titleType int
-	var taxRate float32
-	var workFrom, workTo, quotationDate, billDate, created, modified int64
-	rows.Scan(&companyId, &titleType, &subject, &workFrom, &workTo,
-		&quotationDate, &billDate, &taxRate, &product, &created, &modified)
-
-	return &m.Trading{
-		Id:            id,
-		CompanyId:     companyId,
-		TitleType:     titleType,
-		Subject:       subject,
-		WorkFrom:      workFrom,
-		WorkTo:        workTo,
-		QuotationDate: quotationDate,
-		BillDate:      billDate,
-		TaxRate:       taxRate,
-		AssigneeId:    userId,
-		Product:       product,
-		CreatedTime:   created,
-		ModifiedTime:  modified,
-	}, nil
+	item := d.scanTrading(rows)
+	return &item, nil
 }
 
 func (d *tradingDAO) Create(date, companyId, subject string, titleType int, workFrom, workTo, quotationDate, billDate int64, taxRate float32, assignee, product string) (*m.Trading, error) {
@@ -127,11 +87,13 @@ func (d *tradingDAO) Create(date, companyId, subject string, titleType int, work
 
 	st, err := tr.Prepare("INSERT INTO trading(" +
 		"id,company_id,subject,title_type," +
-		"work_from,work_to,quotation_date,bill_date," +
+		"work_from,work_to,quotation_date,quotation_number," +
+		"bill_date,bill_number," +
 		"tax_rate,assignee,product," +
 		"created_time,modified_time,deleted)" +
 		"VALUES(?,?,?,?," +
-		"?,?,?,?," +
+		"?,?,?,''," +
+		"?,''," +
 		"?,?,?," +
 		"unix_timestamp(now()),unix_timestamp(now()),0)")
 	if err != nil {
@@ -432,4 +394,34 @@ func (d *tradingDAO) updateId(tr *sql.Tx, date string, num int) error {
 
 	_, err = st.Exec(num, date)
 	return err
+}
+
+func (d *tradingDAO) scanTrading(rows *sql.Rows) m.Trading {
+	var id, companyId, subject, product string
+	var titleType int
+	var taxRate float32
+	var assignee, quotationNumber, billNumber string
+	var workFrom, workTo, quotationDate, billDate, created, modified int64
+
+	rows.Scan(&id, &companyId, &titleType, &subject,
+		&workFrom, &workTo, &quotationDate, &quotationNumber,
+		&billDate, &billNumber,
+		&taxRate, &assignee, &product,
+		&created, &modified)
+
+	return m.Trading{
+		Id:            id,
+		CompanyId:     companyId,
+		TitleType:     titleType,
+		Subject:       subject,
+		WorkFrom:      workFrom,
+		WorkTo:        workTo,
+		QuotationDate: quotationDate,
+		BillDate:      billDate,
+		TaxRate:       taxRate,
+		AssigneeId:    assignee,
+		Product:       product,
+		CreatedTime:   created,
+		ModifiedTime:  modified,
+	}
 }
