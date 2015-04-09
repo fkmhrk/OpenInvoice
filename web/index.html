@@ -24,52 +24,50 @@
 </script>
 
 <script id="tradingTemplate" type="text/ractive">
-  <section id="top">
-    <header>
-      <div class="inner">
-        <h1>サンプル株式会社</h1>
-        <ul class="actionBtn">
-          <li><a href="#" title="担当者の編集"><i class="fa fa-user"></i></a></li>
-          <li><a href="#" title="クライアントの編集"><i class="fa fa-building"></i></a></li>
-          <li><a href="#" title="自社の設定"><i class="fa fa-cog"></i></a></li>
-        </ul>
-      </div>
-    </header>
-    <section>
-      <p class="total">TOTAL<span>4,124,402</span></p>
-      <div class="list">
-        <table>
-          <tr>
-            <th>更新日</th>
-            <th>会社名</th>
-            <th>合計金額</th>
-            <th>見積書 No.</th>
-            <th>請求書 No.</th>
-            <th></th>
-          </tr>
-      {{#tradings:i}}          
-          <tr on-click="itemClick:{{i}}">
-            <td>2015.05.25</td>
-            <td>株式会社ABC<span>{{subject}}</span></td>
-            <td>650,000</td>
-            <td>E0124</td>
-            <td></td>
-            <td>
-              <a href="#" class="btn" title="削除"><i class="fa fa-trash-o"></i></a>
-              <a href="#" class="btn" title="コピー"><i class="fa fa-copy"></i></a>
-              <i class="btn fa fa-copy" on-click="printQuotation:{{i}}"></i>
-              <i class="btn fa fa-copy" on-click="printBill:{{i}}"></i>
-            </td>
-          </tr>
-      {{/}}          
-        </table>
-      </div>
-    </section>
-  </section>  
-  <section class="wrapper">
-    <input type="text" value="{{newId}}"/><button on-click="newTrading">新規作成</button>
-    <button on-click="company">会社</button>
-    <!--
+    <section id="top">
+      <header>
+	<div class="inner">
+	  <h1>サンプル株式会社</h1>
+	  <ul class="actionBtn">
+	    <li><a href="#" title="担当者の編集"><i class="fa fa-user"></i></a></li>
+	    <li><a href="#" title="クライアントの編集"><i class="fa fa-building"></i></a></li>
+	    <li><a href="#" title="自社の設定"><i class="fa fa-cog"></i></a></li>
+	  </ul>
+	</div>
+      </header>
+      <section>
+	<p class="total">TOTAL<span>4,124,402</span></p>
+	<div class="list">
+	  <table>
+	    <tr>
+	      <th>更新日</th>
+	      <th>会社名</th>
+	      <th>合計金額</th>
+	      <th>見積書 No.</th>
+	      <th>請求書 No.</th>
+	      <th></th>
+	    </tr>
+            {{#tradings}}
+	    <tr on-click="showSheet">
+	      <td>{{modified_time}}</td>
+	      <td>{{company_name}}<span>{{subject}}</span></td>
+	      <td>{{total}}</td>
+	      <td>{{quotation_number}}</td>
+	      <td>{{bill_number}}</td>
+	      <td>
+		<a href="#" class="btn" title="削除"><i class="fa fa-trash-o"></i></a>
+		<a href="#" class="btn" title="コピー"><i class="fa fa-copy"></i></a>
+	      </td>
+	    </tr>
+            {{/}}
+	  </table>
+	</div>
+      </section>
+    </section>  
+    <section class="wrapper">
+      <input type="text" value="{{newId}}"/><button on-click="newTrading">新規作成</button>
+      <button on-click="company">会社</button>
+      <!--
     <table class="wrapper">
       {{#tradings:i}}
       <tr>

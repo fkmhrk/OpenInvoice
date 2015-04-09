@@ -15,6 +15,7 @@ class Application {
     tradingItems : Array<Invoice.TradingItem>;
     company : Invoice.Company;
     companies : Array<Invoice.Company>;
+    companyMap : any;
     
     constructor() {
         this.client = new Invoice.MockClient();

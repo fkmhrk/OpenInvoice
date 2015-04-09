@@ -14,7 +14,9 @@ var Invoice;
                 tradings.push({
                     id: 'trade1122' + i,
                     date: 'trade1122' + i,
-                    company_id: "会社ID" + i,
+                    modified_time: 1432542408000,
+                    company_id: "company" + i,
+                    company_name: '',
                     title_type: 0,
                     subject: "件名" + i,
                     work_from: 1122,
@@ -23,7 +25,8 @@ var Invoice;
                     bill_date: 5555,
                     tax_rate: 8,
                     assignee: "担当者ID" + i,
-                    product: "成果物" + i
+                    product: "成果物" + i,
+                    total: i * 1000
                 });
             }
             callback.success(tradings);
@@ -196,6 +199,15 @@ var TradingListPage = (function () {
         this.app.client.getCompanies(this.app.token, {
             success: function (list) {
                 _this.app.companies = list;
+                _this.app.companyMap = {};
+                _.each(list, function (item) {
+                    _this.app.companyMap[item.id] = item;
+                });
+                // set company name
+                _.each(_this.app.tradings, function (item) {
+                    var company = _this.app.companyMap[item.company_id];
+                    item.company_name = (company === undefined) ? '' : company.name;
+                });
                 _this.show();
             },
             error: function (msg) {
@@ -215,7 +227,9 @@ var TradingListPage = (function () {
         app.trading = {
             id: null,
             date: id,
+            modified_time: 0,
             company_id: '',
+            company_name: '',
             title_type: 0,
             subject: '',
             work_from: new Date().getTime(),
@@ -224,7 +238,8 @@ var TradingListPage = (function () {
             bill_date: new Date().getTime(),
             tax_rate: 8,
             assignee: '',
-            product: ''
+            product: '',
+            total: 0
         };
         app.tradingMap['new'] = app.trading;
         app.router.navigate('tradings/new', { trigger: true });

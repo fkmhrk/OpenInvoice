@@ -61,6 +61,15 @@ class TradingListPage implements Page {
         this.app.client.getCompanies(this.app.token, {
             success : (list : Array<Invoice.Company>) => {
                 this.app.companies = list;
+                this.app.companyMap = {};
+                _.each(list, (item) => {
+                    this.app.companyMap[item.id] = item;
+                });
+                // set company name
+                _.each(this.app.tradings, (item) => {
+                    var company = this.app.companyMap[item.company_id];
+                    item.company_name = (company === undefined) ? '' : company.name;
+                });
                 this.show();
             },
             error : (msg : string) => {
@@ -80,7 +89,9 @@ class TradingListPage implements Page {
         app.trading = {
             id : null,
             date : id,
+            modified_time : 0,
             company_id : '',
+            company_name : '',
             title_type : 0,
             subject : '',
             work_from : new Date().getTime(),
@@ -90,6 +101,7 @@ class TradingListPage implements Page {
             tax_rate : 8,
             assignee : '',
             product : '',
+            total : 0,
         };
         app.tradingMap['new'] = app.trading;
         app.router.navigate('tradings/new', {trigger:true})

@@ -33,6 +33,7 @@ module Invoice {
         id : string;
         date : string;
         company_id : string;
+        company_name : string;
         title_type : number;
         subject : string;
         work_from : number;
@@ -42,6 +43,8 @@ module Invoice {
         tax_rate : number;
         assignee : string;
         product : string;
+        total : number;
+        modified_time : number;
     }
 
     export interface TradingItem {
