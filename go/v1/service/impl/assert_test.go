@@ -30,6 +30,27 @@ func assertCompany(t *testing.T, item rj.RawJsonObject, id, name, zip, address, 
 	}
 }
 
+func assertTrading(t *testing.T, item rj.RawJsonObject,
+	id, companyId, subject string, titleType int,
+	workFrom, workTo, total, quotationDate int64, quotationNumber string,
+	billDate int64, billNumber string,
+	taxRate float64, assignee, product string) {
+	assertString(t, item, "id", id)
+	assertString(t, item, "company_id", companyId)
+	assertString(t, item, "subject", subject)
+	assertInt(t, item, "title_type", titleType)
+	assertLong(t, item, "work_from", workFrom)
+	assertLong(t, item, "work_to", workTo)
+	assertLong(t, item, "total", total)
+	assertLong(t, item, "quotation_date", quotationDate)
+	assertString(t, item, "quotation_number", quotationNumber)
+	assertLong(t, item, "bill_date", billDate)
+	assertString(t, item, "bill_number", billNumber)
+	assertFloat(t, item, "tax_rate", taxRate)
+	assertString(t, item, "assignee", assignee)
+	assertString(t, item, "product", product)
+}
+
 func getCaller() string {
 	_, caller, line, _ := runtime.Caller(2)
 	path := strings.SplitN(caller, "/", -1)

@@ -222,8 +222,8 @@ func (s *tradingService) toJson(t *m.Trading) map[string]interface{} {
 	return map[string]interface{}{
 		"id":               t.Id,
 		"company_id":       t.CompanyId,
-		"title_type":       t.TitleType,
 		"subject":          t.Subject,
+		"title_type":       t.TitleType,
 		"work_from":        t.WorkFrom,
 		"work_to":          t.WorkTo,
 		"total":            t.Total,
