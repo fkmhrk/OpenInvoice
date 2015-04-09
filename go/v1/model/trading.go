@@ -17,19 +17,22 @@ type TradingDAO interface {
 }
 
 type Trading struct {
-	Id            string
-	CompanyId     string
-	Subject       string
-	TitleType     int
-	WorkFrom      int64
-	WorkTo        int64
-	QuotationDate int64
-	BillDate      int64
-	TaxRate       float32
-	AssigneeId    string
-	Product       string
-	CreatedTime   int64
-	ModifiedTime  int64
+	Id              string
+	CompanyId       string
+	Subject         string
+	TitleType       int
+	WorkFrom        int64
+	WorkTo          int64
+	Total           int64
+	QuotationDate   int64
+	QuotationNumber string
+	BillDate        int64
+	BillNumber      string
+	TaxRate         float32
+	AssigneeId      string
+	Product         string
+	CreatedTime     int64
+	ModifiedTime    int64
 }
 
 type TradingItem struct {
