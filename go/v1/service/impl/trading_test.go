@@ -15,14 +15,20 @@ func TestTrading0000_GetListByUser(t *testing.T) {
 	}
 	var list []*model.Trading
 	list = append(list, &model.Trading{
-		Id:         "trade1111",
-		CompanyId:  "company2233",
-		TitleType:  1,
-		Subject:    "subject3344",
-		WorkFrom:   1122,
-		WorkTo:     3344,
-		AssigneeId: "user2233",
-		Product:    "product",
+		Id:              "trade1111",
+		CompanyId:       "company2233",
+		TitleType:       1,
+		Subject:         "subject3344",
+		Total:           1980,
+		WorkFrom:        1122,
+		WorkTo:          3344,
+		QuotationDate:   100,
+		QuotationNumber: "A100",
+		BillDate:        200,
+		BillNumber:      "B200",
+		TaxRate:         8.0,
+		AssigneeId:      "user2233",
+		Product:         "product",
 	})
 	list = append(list, &model.Trading{
 		Id: "trade2222",
@@ -51,27 +57,11 @@ func TestTrading0000_GetListByUser(t *testing.T) {
 		return
 	}
 	item, _ := tradings.Object(0)
-	if v, _ := item.String("id"); v != "trade1111" {
-		t.Errorf("Wrong id : %s", v)
-	}
-	if v, _ := item.String("company_id"); v != "company2233" {
-		t.Errorf("Wrong company id : %s", v)
-	}
-	if v, _ := item.Int("title_type"); v != 1 {
-		t.Errorf("Wrong title_type : %d", v)
-	}
-	if v, _ := item.String("subject"); v != "subject3344" {
-		t.Errorf("Wrong subject : %s", v)
-	}
-	if v, _ := item.Int("work_from"); v != 1122 {
-		t.Errorf("Wrong work from : %d", v)
-	}
-	if v, _ := item.Int("work_to"); v != 3344 {
-		t.Errorf("Wrong work to : %d", v)
-	}
-	if v, _ := item.String("assignee"); v != "user2233" {
-		t.Errorf("Wrong assignee : %d", v)
-	}
+	assertTrading(t, item, "trade1111", "company2233",
+		"subject3344", 1, 1122, 3344, 1980,
+		100, "A100",
+		200, "B200",
+		8.0, "user2233", "product")
 }
 
 func TestTrading0100_Create(t *testing.T) {
@@ -103,11 +93,12 @@ func TestTrading0100_Create(t *testing.T) {
 	product := "product4455"
 	workFrom := int64(100)
 	workTo := int64(200)
+	total := int64(1980)
 	quotationDate := int64(300)
 	billDate := int64(400)
 	taxRate := float32(8)
 
-	r := s.Create(token, date, companyId, subject, product, titleType, workFrom, workTo, quotationDate, billDate, taxRate)
+	r := s.Create(token, date, companyId, subject, product, titleType, workFrom, workTo, total, quotationDate, billDate, taxRate)
 	if r == nil {
 		t.Errorf("Result must not be nil")
 		return

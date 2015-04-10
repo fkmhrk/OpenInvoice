@@ -5,13 +5,15 @@ module Invoice {
         login(username : string, password : string, callback : LoginCallback) {
             callback.success('token1122');
         }
-        getTradings(token : string, callback : TradingCallback) {
+        getTradings(token : string, callback : ItemListCallback<Trading>) {
             var tradings : Array<Trading> = [];
             for (var i = 0 ; i < 10 ; ++i) {
                 tradings.push({
                     id : 'trade1122' + i,
                     date : 'trade1122' + i,
-                    company_id : "会社ID" + i,
+                    modified_time : 1432542408000,
+                    company_id : "company" + i,
+                    company_name : '',
                     title_type : 0,
                     subject : "件名" + i,  
                     work_from : 1122,
@@ -21,6 +23,7 @@ module Invoice {
                     tax_rate : 8,
                     assignee : "担当者ID" + i,   
                     product : "成果物" + i,
+                    total : i * 1000,
                 });
             }
             callback.success(tradings);

@@ -30,7 +30,7 @@ var Invoice;
                     }));
                 },
                 error: function (status, body) {
-                    callback.error(body.msg);
+                    callback.error(status, body.msg);
                 }
             });
         };

@@ -33,19 +33,7 @@ func (s *tradingService) GetListByUser(token string) s.Result {
 	}
 	list := make([]interface{}, 0)
 	for _, t := range tradings {
-		list = append(list, map[string]interface{}{
-			"id":             t.Id,
-			"company_id":     t.CompanyId,
-			"title_type":     t.TitleType,
-			"subject":        t.Subject,
-			"work_from":      t.WorkFrom,
-			"work_to":        t.WorkTo,
-			"quotation_date": t.QuotationDate,
-			"bill_date":      t.BillDate,
-			"tax_rate":       t.TaxRate,
-			"assignee":       t.AssigneeId,
-			"product":        t.Product,
-		})
+		list = append(list, s.toJson(t))
 	}
 	body := map[string]interface{}{
 		"tradings": list,
@@ -53,7 +41,7 @@ func (s *tradingService) GetListByUser(token string) s.Result {
 	return jsonResult(200, body)
 }
 
-func (s *tradingService) Create(token, date, companyId, subject, product string, titleType int, workFrom, workTo, quotationDate, billDate int64, taxRate float32) s.Result {
+func (s *tradingService) Create(token, date, companyId, subject, product string, titleType int, workFrom, workTo, total, quotationDate, billDate int64, taxRate float32) s.Result {
 	// input check
 	if len(date) == 0 {
 		return errorResult(400, MSG_ERR_DATE_EMPTY)
@@ -77,7 +65,7 @@ func (s *tradingService) Create(token, date, companyId, subject, product string,
 		return errorResult(400, MSG_WRONG_TOKEN)
 	}
 	// create
-	item, err := s.tradingDAO.Create(date, companyId, subject, titleType, workFrom, workTo, quotationDate, billDate, taxRate, session.UserId, product)
+	item, err := s.tradingDAO.Create(date, companyId, subject, titleType, workFrom, workTo, total, quotationDate, billDate, taxRate, session.UserId, product)
 	if err != nil {
 		return errorResult(500, MSG_SERVER_ERROR)
 	}
@@ -227,5 +215,24 @@ func (s *tradingService) DeleteItem(token, id, tradingId string) s.Result {
 	return &result{
 		status: 204,
 		body:   "",
+	}
+}
+
+func (s *tradingService) toJson(t *m.Trading) map[string]interface{} {
+	return map[string]interface{}{
+		"id":               t.Id,
+		"company_id":       t.CompanyId,
+		"subject":          t.Subject,
+		"title_type":       t.TitleType,
+		"work_from":        t.WorkFrom,
+		"work_to":          t.WorkTo,
+		"total":            t.Total,
+		"quotation_date":   t.QuotationDate,
+		"quotation_number": t.QuotationNumber,
+		"bill_date":        t.BillDate,
+		"bill_number":      t.BillNumber,
+		"tax_rate":         t.TaxRate,
+		"assignee":         t.AssigneeId,
+		"product":          t.Product,
 	}
 }

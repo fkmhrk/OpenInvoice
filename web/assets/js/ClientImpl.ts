@@ -23,7 +23,7 @@ module Invoice {
                 }
             });
         }
-        getTradings(token : string, callback : TradingCallback) {
+        getTradings(token : string, callback : ItemListCallback<Trading>) {
             this.exec(this.url + '/api/v1/tradings', 'GET', token, null, {
                 success : (json : any) => {
                     callback.success(_.map(json.tradings, (item) => {
@@ -32,7 +32,7 @@ module Invoice {
                     }));
                 },
                 error : (status : any, body : any) => {
-                    callback.error(body.msg);
+                    callback.error(status, body.msg);
                 }
             });            
         }

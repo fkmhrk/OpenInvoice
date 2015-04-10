@@ -3,7 +3,7 @@
 <head>
   <meta charset='utf-8'>
   <title>OpenInvoice</title>
-  <link rel="stylesheet" type="text/css" href="assets/style.css">
+  <link rel="stylesheet" type="text/css" href="assets/style2.css">
   <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
   <link href="lib/easyselectbox/easyselectbox.css" rel="stylesheet">  
 </head>
@@ -24,12 +24,50 @@
 </script>
 
 <script id="tradingTemplate" type="text/ractive">
-  <header>
-    <p>List</p>
-  </header>
-  <section class="wrapper">
-    <input type="text" value="{{newId}}"/><button on-click="newTrading">新規作成</button>
-    <button on-click="company">会社</button>
+    <section id="top">
+      <header>
+	<div class="inner">
+	  <h1>サンプル株式会社</h1>
+	  <ul class="actionBtn">
+	    <li><a href="#" title="担当者の編集"><i class="fa fa-user"></i></a></li>
+	    <li><a href="#" title="クライアントの編集"><i class="fa fa-building"></i></a></li>
+	    <li><a href="#" title="自社の設定"><i class="fa fa-cog"></i></a></li>
+	  </ul>
+	</div>
+      </header>
+      <section>
+	<p class="total">TOTAL<span>4,124,402</span></p>
+	<div class="list">
+	  <table>
+	    <tr>
+	      <th>更新日</th>
+	      <th>会社名</th>
+	      <th>合計金額</th>
+	      <th>見積書 No.</th>
+	      <th>請求書 No.</th>
+	      <th></th>
+	    </tr>
+            {{#tradings}}
+	    <tr on-click="showSheet">
+	      <td>{{modified_time}}</td>
+	      <td>{{company_name}}<span>{{subject}}</span></td>
+	      <td>{{total}}</td>
+	      <td>{{quotation_number}}</td>
+	      <td>{{bill_number}}</td>
+	      <td>
+		<a href="#" class="btn" title="削除"><i class="fa fa-trash-o"></i></a>
+		<a href="#" class="btn" title="コピー"><i class="fa fa-copy"></i></a>
+	      </td>
+	    </tr>
+            {{/}}
+	  </table>
+	</div>
+      </section>
+    </section>  
+    <section class="wrapper">
+      <input type="text" value="{{newId}}"/><button on-click="newTrading">新規作成</button>
+      <button on-click="company">会社</button>
+      <!--
     <table class="wrapper">
       {{#tradings:i}}
       <tr>
@@ -40,6 +78,7 @@
       </tr>
       {{/}}
     </table>
+    -->
   </section>
 </script>
 
@@ -54,32 +93,32 @@
           <input type="text" placeholder="ID" value="{{trading.date}}" readonly/>
         </p>
         <p>
-	  <select id="company" value="{{trading.company_id}}" decorator="easyselect">
+    <select id="company" value="{{trading.company_id}}" decorator="easyselect">
             {{#companies}}
-	    <option value="{{id}}">{{name}}</option>
+      <option value="{{id}}">{{name}}</option>
             {{/}}
-	  </select>
+    </select>
           
-	  <select id="titleType" value="{{trading.title_type}}" decorator="easyselect">
-	    <option value="0">御中</option>
-	    <option value="1">様</option>
-	  </select>
+    <select id="titleType" value="{{trading.title_type}}" decorator="easyselect">
+      <option value="0">御中</option>
+      <option value="1">様</option>
+    </select>
         </p>
         <ul>
-	  <li><input type="text" placeholder="件名" value="{{trading.subject}}" /></li>
-	  <li><span>作業期間</span><input type="date" value="{{workFrom}}">〜<input type="date" value="{{workTo}}"></li>
-	  <li><span>見積書発行日</span><input type="date" value="{{quotationDate}}"></li>
-	  <li><span>請求書発行日</span><input type="date" value="{{billDate}}"></li>
-	  <li><span>消費税率</span><input type="number" value="{{trading.tax_rate}}">%</li>          
-	  <li><textarea placeholder="成果物" value="{{trading.product}}"></textarea></li>
-	  <li>
-	    <span>担当者</span>
-	    <select id="assignee" value="{{selectedAssignee}}" decorator="easyselect">
+    <li><input type="text" placeholder="件名" value="{{trading.subject}}" /></li>
+    <li><span>作業期間</span><input type="date" value="{{workFrom}}">〜<input type="date" value="{{workTo}}"></li>
+    <li><span>見積書発行日</span><input type="date" value="{{quotationDate}}"></li>
+    <li><span>請求書発行日</span><input type="date" value="{{billDate}}"></li>
+    <li><span>消費税率</span><input type="number" value="{{trading.tax_rate}}">%</li>          
+    <li><textarea placeholder="成果物" value="{{trading.product}}"></textarea></li>
+    <li>
+      <span>担当者</span>
+      <select id="assignee" value="{{selectedAssignee}}" decorator="easyselect">
             {{#users}}
               <option value="{{id}}">{{display_name}}</option>
             {{/}}
-	    </select>
-	  </li>
+      </select>
+    </li>
           <li>
             <button on-click="save">保存</button>
           </li>
@@ -89,30 +128,30 @@
       <section id="inputArea">
         <div class="inputBox">
           {{#tradingItems:i}}
-	  <article>
-	    <ul class="table">
-	      <li><input type="text" placeholder="項目名" value="{{subject}}"></li>
+    <article>
+      <ul class="table">
+        <li><input type="text" placeholder="項目名" value="{{subject}}"></li>
               <li>&yen;<input on-focus="numFocus:{{unit_price}}" on-blur="sumBlur:{{unit_price}},{{i}}" type="text" placeholder="50,000" value="{{unit_price}}"></li>
               <li><input type="text" on-blur="amountBlur" placeholder="1" value="{{amount}}"></li>
               <li><input type="text" placeholder="人日" value="{{degree}}"></li><li>&yen;<input type="text" placeholder="小計" value="{{numToCurrency(sum)}}" readonly></li>
-	    </ul>
-	    <p class="note"><textarea placeholder="備考" value="{{memo}}"></textarea></p>
-	    <ul class="tax">
-	      <li>
-	        <input type="radio" name="{{tax_type}}" id="taxoff" value="1" checked="checked" />
-	        <label for="taxoff" data-label="税抜">税抜</label>
-	      </li>
-	      <li>
-	        <input type="radio" name="{{tax_type}}" id="taxon" value="2" />
-	        <label for="taxon" data-label="税込">税込</label>
-	      </li>
-	      <li>
-	        <input type="radio" name="{{tax_type}}" id="taxno" value="0" />
-	        <label for="taxno" data-label="非課税">非課税</label>
-	      </li>
-	    </ul>
+      </ul>
+      <p class="note"><textarea placeholder="備考" value="{{memo}}"></textarea></p>
+      <ul class="tax">
+        <li>
+          <input type="radio" name="{{tax_type}}" id="taxoff" value="1" checked="checked" />
+          <label for="taxoff" data-label="税抜">税抜</label>
+        </li>
+        <li>
+          <input type="radio" name="{{tax_type}}" id="taxon" value="2" />
+          <label for="taxon" data-label="税込">税込</label>
+        </li>
+        <li>
+          <input type="radio" name="{{tax_type}}" id="taxno" value="0" />
+          <label for="taxno" data-label="非課税">非課税</label>
+        </li>
+      </ul>
             <button on-click="deleteItem:{{i}}">この項目を削除</button>
-	  </article>
+    </article>
           {{/}}
         </div>
 <p class="addInput" on-click="addItem"><i class="fa fa-plus-circle"></i></p>          
@@ -159,12 +198,10 @@
   </section>
 </script>  
 
-<script src="https://cdn.ractivejs.org/latest/ractive.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ractive/0.7.1/ractive.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.7.0/underscore-min.js" type="text/javascript"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.1.2/backbone-min.js" type="text/javascript"></script>
-<script src="./assets/js/MockClient.js"></script>
-<script src="./assets/js/ClientImpl.js"></script>
 <script src="./assets/js/app.js"></script>
 
 <script type="text/javascript" src="./lib/easyselectbox/easyselectbox.min.js"></script>
