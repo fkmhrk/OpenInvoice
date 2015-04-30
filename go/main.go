@@ -2,6 +2,7 @@ package main
 
 import (
 	"./v1"
+	"flag"
 	"fmt"
 	"github.com/gorilla/mux"
 	"net"
@@ -15,6 +16,12 @@ func main() {
 		fmt.Printf("Failed to init server : %s", err)
 		return
 	}
+	var standalone *bool = flag.Bool("standalone", false, "if true, runs standalone mode")
+	flag.Parse()
+
+	if *standalone {
+		initStandalone(r)
+	}
 	l, err := net.Listen("tcp", ":9001")
 	if err != nil {
 		fmt.Printf("Failed to call net.Listen : %s", err)
@@ -25,4 +32,8 @@ func main() {
 	if err != nil {
 		fmt.Printf("failed to stop : %s", err)
 	}
+}
+
+func initStandalone(r *mux.Router) {
+	r.PathPrefix("/web/").Handler(http.StripPrefix("/web/", http.FileServer(http.Dir("../web/"))))
 }
