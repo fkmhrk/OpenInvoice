@@ -1,100 +1,67 @@
-module Invoice {
-    export interface AppClient {
-        login(username : string, password : string, callback : LoginCallback);
-        getTradings(token : string, callback : ItemListCallback<Trading>);
-        getTradingItems(token : string, tradingId : string, callback : TradingItemCallback)
-        getUsers(token : string, callback : UserListCallback);
-        getCompanies(token : string, callback : CompanyListCallback);
 
-        saveTrading(token : string, item : Trading, callback : SaveCallback);
-        saveTradingItem(token : string, tradingId : string,
-                        item : TradingItem, callback : SaveCallback);
-        deleteTradingItem(token : string, tradingId : string,
-                        itemId : string, callback : SaveCallback);
-        
-        saveCompany(token : string, item : Company, callback : SaveCallback);
-    }
+interface Client {
+    /**
+     * Logs in with username and password.
+     */
+    login(username : string, password : string, callback : ItemCallback<string>);
 
-    export interface User {
-        id : string;
-        display_name : string;
-    }
+   /**
+     * Gets all users
+     */
+    getUsers(token : string, callback : ItemListCallback<User>);
 
-    export interface Company {
-        id : string;
-        name : string;
-        zip : string;
-        address : string;
-        phone : string;
-        unit : string;
-    }
+    /**
+     * Gets all companies
+     */
+    getCompanies(token : string, callback : ItemListCallback<Company>);
 
-    export interface Trading {
-        id : string;
-        date : string;
-        company_id : string;
-        company_name : string;
-        title_type : number;
-        subject : string;
-        work_from : number;
-        work_to : number;
-        quotation_date : number;
-        bill_date : number;
-        tax_rate : number;
-        assignee : string;
-        product : string;
-        total : number;
-        modified_time : number;
-    }
-
-    export interface TradingItem {
-        id : string;
-        subject : string;
-        unit_price : number;
-        amount : number;
-        degree : string;
-        tax_type : number;
-        memo : string;
-        sum : number;
-    }
-
-    export interface ItemCallback<T> {
-        success : (item : T) => void;
-        error : (status : number, msg : string) => void;
-    }
-
-    export interface ItemListCallback<T> {
-        success : (item : Array<T>) => void;
-        error : (status : number, msg : string) => void;
-    }
+    /**
+     * Saves company
+     * @return item is Company ID
+     */
+    saveCompany(token : string, item : Company, callback : ItemCallback<string>);    
     
-    export interface UserListCallback {
-        success : (list : Array<User>) => void;
-        error : (msg : string) => void;        
-    }
+    /**
+     * Gets Tradings
+     */
+    getTradings(token : string, callback : ItemListCallback<Trading>);
 
-    export interface LoginCallback {
-        success : (token : string) => void;
-        error : (msg : string) => void;
-    }
+    /**
+     * Gets trading items of specified Trading
+     */
+    getTradingItems(token : string, tradingId : string, callback : ItemListCallback<TradingItem>);
 
-    export interface CompanyListCallback {
-        success : (list : Array<Company>) => void;
-        error : (msg : string) => void;                
-    }
+    /**
+     * Saves Trading
+     * @return item is trading ID
+     */
+    saveTrading(token : string, item : Trading, callback : ItemCallback<string>);
+    
+    /**
+     * Saves Trading item of specified Trading
+     * @return item is item ID
+     */
+    saveTradingItem(token : string, tradingId : string,
+                    item : TradingItem, callback : ItemCallback<string>);
 
-    export interface TradingCallback {
-        success : (list : Array<Trading>) => void;
-        error : (msg : string) => void;        
-    }
+    /**
+     * Deltes Trading item of specified Trading
+     */
+    deleteTradingItem(token : string, tradingId : string,
+                      itemId : string, callback : ItemCallback<string>);
+}
 
-    export interface TradingItemCallback {
-        success : (list : Array<TradingItem>) => void;
-        error : (msg : string) => void;        
-    }
+interface Callback {
+    success : () => void;
+    error : (status : number, msg : string) => void;
+}
 
-   export interface SaveCallback {
-        success : (id : string) => void;
-        error : (msg : string) => void;        
-    }        
+interface ItemCallback<T> {
+    success : (item : T) => void;
+    error : (status : number, msg : string) => void;
+}
+
+interface ItemListCallback<T> {
+    success : (item : Array<T>) => void;
+    error : (status : number, msg : string) => void;
 }

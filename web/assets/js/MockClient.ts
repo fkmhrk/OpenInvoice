@@ -1,89 +1,60 @@
 /// <reference path="./Client.ts"/>
-var $;
-module Invoice {
-    export class MockClient implements AppClient {
-        login(username : string, password : string, callback : LoginCallback) {
-            callback.success('token1122');
-        }
-        getTradings(token : string, callback : ItemListCallback<Trading>) {
-            var tradings : Array<Trading> = [];
-            for (var i = 0 ; i < 10 ; ++i) {
-                tradings.push({
-                    id : 'trade1122' + i,
-                    date : 'trade1122' + i,
-                    modified_time : 1432542408000,
-                    company_id : "company" + i,
-                    company_name : '',
-                    title_type : 0,
-                    subject : "件名" + i,  
-                    work_from : 1122,
-                    work_to : 2233,
-                    quotation_date : 1423502769379,
-                    bill_date : 5555,
-                    tax_rate : 8,
-                    assignee : "担当者ID" + i,   
-                    product : "成果物" + i,
-                    total : i * 1000,
-                });
-            }
-            callback.success(tradings);
-        }
 
-        getTradingItems(token : string, tradingId : string, callback : TradingItemCallback) {
-            var tradings : Array<TradingItem> = [];
-            for (var i = 0 ; i < 10 ; ++i) {
-                tradings.push({
-                    id : 'item111' + i,
-                    subject : "件名" + i,
-                    unit_price : i * 100 + 200,
-                    amount : i * 3 + 2,
-                    degree : "人月",
-                    tax_type : 1,
-                    memo : "備考" + i,
-                    sum : 1000,
-               });
-            }
-            callback.success(tradings);
-        }
-        
-        getUsers(token : string, callback : UserListCallback) {
-            var list : Array<User> = [];
-            for (var i = 0 ; i < 10 ; ++i) {
-                list.push({
-                    id : "担当者ID" + i,
-                    display_name : '担当' + i,
-                });
-            }
-            callback.success(list);
-        }
+class MockClient implements Client {
+    /**
+     * Logs in with username and password.
+     */
+    login(username : string, password : string, callback : ItemCallback<string>) { }
 
-        getCompanies(token : string, callback : CompanyListCallback) {
-            var list : Array<Company> = [];
-            for (var i = 0 ; i < 10 ; ++i) {
-                list.push({
-                    id : "company" + i,
-                    name : "会社" + i,
-                    zip : "111-222" + i,
-                    address : "日本の" + i,
-                    phone : "03-1111-222" + i,
-                    unit : "第" + i + "開発部",
-                });
-            }
-            callback.success(list);
-        }
-        saveTrading(token : string, item : Trading, callback : SaveCallback) {
-            callback.success('id1122');
-        }
-        saveTradingItem(token : string, tradingId : string,
-                        item : TradingItem, callback : SaveCallback) {
-            callback.success('item1122');
-        }
-        deleteTradingItem(token : string, tradingId : string,
-                          itemId : string, callback : SaveCallback) {
-            callback.success(itemId);
-        }
-        saveCompany(token : string, item : Company, callback : SaveCallback) {
-            callback.success('company1122');
-        }
+   /**
+     * Gets all users
+     */
+    getUsers(token : string, callback : ItemListCallback<User>) { }
+
+    /**
+     * Gets all companies
+     */
+    getCompanies(token : string, callback : ItemListCallback<Company>) { }
+
+    /**
+     * Saves company
+     * @return item is Company ID
+     */
+    saveCompany(token : string, item : Company, callback : ItemCallback<string>) { }    
+    
+    /**
+     * Gets Tradings
+     */
+    getTradings(token : string, callback : ItemListCallback<Trading>) {
+        callback.success(sheetList);
     }
+
+    /**
+     * Gets trading items of specified Trading
+     */
+    getTradingItems(token : string, tradingId : string, callback : ItemListCallback<TradingItem>) {
+    }
+
+    /**
+     * Saves Trading
+     * @return item is trading ID
+     */
+    saveTrading(token : string, item : Trading, callback : ItemCallback<string>) { }
+    
+    /**
+     * Saves Trading item of specified Trading
+     * @return item is item ID
+     */
+    saveTradingItem(token : string, tradingId : string,
+                    item : TradingItem, callback : ItemCallback<string>) { }
+
+    /**
+     * Deltes Trading item of specified Trading
+     */
+    deleteTradingItem(token : string, tradingId : string,
+                      itemId : string, callback : ItemCallback<string>) { }
+}
+
+function createClient() {
+    return new MockClient();
 }

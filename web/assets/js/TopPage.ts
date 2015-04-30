@@ -1,33 +1,50 @@
-/// <reference path="./Page.ts"/>
+///<reference path="./app.ts"/>
+///<reference path="./Page.ts"/>
+///<reference path="./UserListDialog.ts"/>
+///<reference path="./CompanyListDialog.ts"/>
+///<reference path="./SettingsDialog.ts"/>
+
 class TopPage implements Page {
-    app : Application
-    onCreate(app : Application) {
-        this.app = app;
-        var r = app.ractive = new Ractive({
-            el : '#container',
-            template : '#topTemplate',
-            data : {
-                loginInProgress : false,
-            }
-        });
-        r.on('login', (e : any) => {
-            this.login(r.get('username'),
-                       r.get('password'));
-        });            
-        console.log(this);
-    }
-    login(username : string, password : string){
-        this.app.ractive.set('loginInProgress', true);
-        this.app.client.login(username, password, {
-            success : (token : string) => {
-                this.app.ractive.set('loginInProgress', false);
-                this.app.token = token;
-                this.app.router.navigate('tradings', {trigger:true})
+    onCreate(app : App) {
+        app.loadData({
+            done : () => {
+                this.show(app);
             },
-            error : (msg : string) => {
-                this.app.ractive.set('loginInProgress', false);
-                console.log('error ' + msg);
+            error : () => {
+                // nop
             }
         });
+    }
+    private show(app : App) {
+        // Racriveオブジェクトを作る
+        app.ractive = new Ractive({
+            // どの箱に入れるかをIDで指定
+            el : '#container',
+            // 指定した箱に、どのHTMLを入れるかをIDで指定
+            template : '#topTemplate',
+            // データを設定。テンプレートで使います。
+            data : {
+                'sheets' : app.tradings
+            }
+        });
+
+        tooltipster();
+
+        app.ractive.on({
+            'showSheet' : (e : any, item : Trading) => {
+                // #sheetに遷移する
+                app.router.navigate('sheets/' + item.id, {trigger:true});
+            },
+            'showUserList' : () => {
+                app.showDialog(new UserListDialog());                
+            },            
+            'showCompanyList' : () => {
+                app.showDialog(new CompanyListDialog());                
+            },
+            'showSetting' : (e : any) => {
+                // #settingに遷移する
+                app.showDialog(new SettingsDialog());
+            },            
+        });        
     }
 }

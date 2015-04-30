@@ -1,3 +1,3 @@
 interface Page {
-    onCreate(app : Application);
+    onCreate(app : App);    
 }
