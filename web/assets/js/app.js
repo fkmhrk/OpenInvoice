@@ -682,6 +682,12 @@ var TopPage = (function () {
                 // #sheetに遷移する
                 app.router.navigate('sheets/' + item.id, { trigger: true });
             },
+            'printQuotation': function (e, item) {
+                window.location.href = "/php/quotation.php?access_token=" + app.accessToken + "&trading_id=" + item.id;
+            },
+            'printBill': function (e, item) {
+                window.location.href = "/php/bill.php?access_token=" + app.accessToken + "&trading_id=" + item.id;
+            },
             'showUserList': function () {
                 app.showDialog(new UserListDialog());
             },

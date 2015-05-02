@@ -36,6 +36,12 @@ class TopPage implements Page {
                 // #sheetに遷移する
                 app.router.navigate('sheets/' + item.id, {trigger:true});
             },
+            'printQuotation' : (e : any, item : Trading) => {
+                window.location.href = "/php/quotation.php?access_token=" + app.accessToken + "&trading_id=" + item.id;
+            },
+            'printBill' : (e : any, item : Trading) => {
+                window.location.href = "/php/bill.php?access_token=" + app.accessToken + "&trading_id=" + item.id;
+            },            
             'showUserList' : () => {
                 app.showDialog(new UserListDialog());                
             },            
