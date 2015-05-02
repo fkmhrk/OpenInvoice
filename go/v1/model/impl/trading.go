@@ -74,7 +74,7 @@ func (d *tradingDAO) GetById(id, userId string) (*m.Trading, error) {
 	return &item, nil
 }
 
-func (d *tradingDAO) Create(date, companyId, subject string, titleType int, workFrom, workTo, total, quotationDate, billDate int64, taxRate float32, assignee, product string) (*m.Trading, error) {
+func (d *tradingDAO) Create(companyId, subject string, titleType int, workFrom, workTo, total, quotationDate, billDate int64, taxRate float32, assignee, product string) (*m.Trading, error) {
 	tr, err := d.connection.Begin()
 	if err != nil {
 		return nil, err

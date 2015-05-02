@@ -65,7 +65,7 @@ func (s *tradingService) Create(token, date, companyId, subject, product string,
 		return errorResult(400, MSG_WRONG_TOKEN)
 	}
 	// create
-	item, err := s.tradingDAO.Create(date, companyId, subject, titleType, workFrom, workTo, total, quotationDate, billDate, taxRate, session.UserId, product)
+	item, err := s.tradingDAO.Create(companyId, subject, titleType, workFrom, workTo, total, quotationDate, billDate, taxRate, session.UserId, product)
 	if err != nil {
 		return errorResult(500, MSG_SERVER_ERROR)
 	}

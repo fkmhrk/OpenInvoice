@@ -149,16 +149,14 @@ func TestTrading0100_Create(t *testing.T) {
 	}
 	defer db.Close()
 	// prepare
-	date := "20150203"
 	userId := "user1122"
 	quotationDate := int64(1111)
 	billDate := int64(2222)
 	taxRate := float32(8)
 	deleteTradingByUser(db, userId)
-	deleteTradingId(db, date)
 
 	dao := createTradingDAO(db)
-	item, err := dao.Create(date, "company1111", "subject2222", 1,
+	item, err := dao.Create("company1111", "subject2222", 1,
 		1234, 5678, 1280, quotationDate, billDate, taxRate, userId, "product3333")
 	if err != nil {
 		t.Errorf("Failed to create tradings : %s", err)
@@ -176,16 +174,14 @@ func TestTrading0101_Create_2(t *testing.T) {
 	}
 	defer db.Close()
 	// prepare
-	date := "20150203"
 	userId := "user1122"
 	quotationDate := int64(1111)
 	billDate := int64(2222)
 	taxRate := float32(8)
 	deleteTradingByUser(db, userId)
-	deleteTradingId(db, date)
 
 	dao := createTradingDAO(db)
-	item, err := dao.Create(date, "company1111", "subject2222", 1,
+	item, err := dao.Create("company1111", "subject2222", 1,
 		1234, 5678, 2980, quotationDate, billDate, taxRate, userId, "product3333")
 	if err != nil {
 		t.Errorf("Failed to create tradings : %s", err)
@@ -193,7 +189,7 @@ func TestTrading0101_Create_2(t *testing.T) {
 	}
 
 	// again
-	item, err = dao.Create(date, "company4444", "subject5555", 1,
+	item, err = dao.Create("company4444", "subject5555", 1,
 		1234, 5678, 3980, quotationDate, billDate, taxRate, userId, "product6666")
 	if err != nil {
 		t.Errorf("Failed to create tradings : %s", err)
@@ -218,16 +214,14 @@ func TestTrading0300_Update(t *testing.T) {
 	}
 	defer db.Close()
 	// prepare
-	date := "20150203"
 	userId := "user1122"
 	quotationDate := int64(1111)
 	billDate := int64(2222)
 	taxRate := float32(8)
 	deleteTradingByUser(db, userId)
-	deleteTradingId(db, date)
 
 	dao := createTradingDAO(db)
-	item, err := dao.Create(date, "company1111", "subject2222", 1,
+	item, err := dao.Create("company1111", "subject2222", 1,
 		1234, 5678, 4980, quotationDate, billDate, taxRate, userId, "product3333")
 	if err != nil {
 		t.Errorf("Failed to create tradings : %s", err)
