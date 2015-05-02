@@ -90,3 +90,12 @@ create table if not exists trading_id(
   num int,
   primary key(date)
 ) engine=InnoDB;
+
+create table if not exists env(
+  id varchar(32),
+  value text,
+  created_time bigint,
+  modified_time bigint,
+  deleted tinyint,
+  primary key(id)
+) engine=InnoDB;
