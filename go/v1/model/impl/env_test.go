@@ -86,3 +86,56 @@ func TestEnv_All(t *testing.T) {
 		return
 	}
 }
+
+func TestEnv_GetList(t *testing.T) {
+	db, err := connect()
+	if err != nil {
+		t.Errorf("Failed to connect")
+		return
+	}
+	defer db.Close()
+
+	dao := createEnvDAO(db)
+
+	hardDeleteEnv(db, "key1")
+	hardDeleteEnv(db, "key2")
+
+	item, err := dao.Create("key1", "value1")
+	if err != nil {
+		t.Errorf("Failed to Create : %s", err)
+		return
+	}
+	assertEnv(t, &item, "key1", "value1")
+
+	item, err = dao.Create("key2", "value2")
+	if err != nil {
+		t.Errorf("Failed to Create : %s", err)
+		return
+	}
+	assertEnv(t, &item, "key2", "value2")
+
+	// get List
+	list1, err := dao.GetList()
+	if err != nil {
+		t.Errorf("Failed to Get List : %s", err)
+		return
+	}
+
+	// Add
+	item, err = dao.Create("key3", "value3")
+	if err != nil {
+		t.Errorf("Failed to Create : %s", err)
+		return
+	}
+	assertEnv(t, &item, "key3", "value3")
+
+	list2, err := dao.GetList()
+	if err != nil {
+		t.Errorf("Failed to Get List : %s", err)
+		return
+	}
+	if len(list2) != len(list1)+1 {
+		t.Errorf("Unexpected length list1=%d list2=%d", len(list1), len(list2))
+	}
+
+}

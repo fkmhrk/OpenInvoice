@@ -5,6 +5,10 @@ import (
 	"database/sql"
 )
 
+const (
+	select_env = "SELECT id,value FROM env "
+)
+
 type envDAO struct {
 	connection *Connection
 }
@@ -43,7 +47,7 @@ func (d *envDAO) Create(key, value string) (m.Env, error) {
 
 func (d *envDAO) Get(key string) (m.Env, error) {
 	db := d.connection.Connect()
-	st, err := db.Prepare("SELECT id,value FROM env WHERE id=? AND deleted <> 1")
+	st, err := db.Prepare(select_env + "WHERE id=? AND deleted <> 1")
 	if err != nil {
 		return m.Env{}, err
 	}
@@ -60,6 +64,29 @@ func (d *envDAO) Get(key string) (m.Env, error) {
 	}
 
 	return d.scan(rows), nil
+}
+
+func (d *envDAO) GetList() ([]*m.Env, error) {
+	db := d.connection.Connect()
+	st, err := db.Prepare(select_env + "WHERE deleted <> 1")
+	if err != nil {
+		return nil, err
+	}
+	defer st.Close()
+
+	rows, err := st.Query()
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	list := make([]*m.Env, 0)
+	for rows.Next() {
+		item := d.scan(rows)
+		list = append(list, &item)
+	}
+
+	return list, nil
 }
 
 func (d *envDAO) Update(key, value string) (m.Env, error) {
