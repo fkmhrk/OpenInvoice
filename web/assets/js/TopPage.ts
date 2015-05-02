@@ -24,7 +24,8 @@ class TopPage implements Page {
             template : '#topTemplate',
             // データを設定。テンプレートで使います。
             data : {
-                'sheets' : app.tradings
+                'company' : app.companyMap,
+                'sheets' : app.tradings,
             }
         });
 

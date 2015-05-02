@@ -39,8 +39,10 @@ class SheetPage implements Page {
                 'trading' : this.trading,
                 'workFrom' : Utils.toDateStr(this.trading.work_from),
                 'workTo' : Utils.toDateStr(this.trading.work_to),
-                'companies' : companyList,
-                'users' : userList,
+                'quotationDate' : Utils.toDateStr(this.trading.quotation_date),
+                'billDate' : Utils.toDateStr(this.trading.bill_date),
+                'companies' : app.companies,
+                'users' : app.users,
                 'tradingItems' : tradingItemList
             }
         });
@@ -104,11 +106,12 @@ class SheetPage implements Page {
         });
         r.on('deleteItem', function(e, index) {
             itemObserver.cancel();
-            r.splice('tradingItems', index, 1);
+            var a = r.splice('tradingItems', index, 1);
+            console.log(a);
             itemObserver = observeItem();
         });
-        r.on('save', function() {
-            window.history.back();
+        r.on('save', () => {
+            this.save(app);
         });
         r.observe('trading.tax_rate', function(newValue, oldValue, keypath) {
             updateSum();
@@ -123,5 +126,30 @@ class SheetPage implements Page {
     }
     private showAddUserDialog(app : App) {
         app.showDialog(new AddUserDialog());
+    }
+    private save(app : App) {
+        var trading = app.ractive.get('trading');
+        var companyId = $('#company').val();
+        var titleType = $('#titleType').val();
+        var workFrom = app.ractive.get('workFrom');
+        var workTo = app.ractive.get('workTo');
+        var tradingItems = app.ractive.get('tradingItems');
+
+        // modify type
+        trading.company_id = companyId;
+        trading.title_type = Number(titleType);
+        trading.work_from = new Date(workFrom).getTime();
+        trading.work_to = new Date(workTo).getTime();
+        trading.tax_rate = Number(trading.tax_rate);
+        console.log(trading);
+        app.client.saveTrading(app.accessToken, trading, {
+            success : (id : string) => {
+                window.history.back();               
+            },
+            error : (status : number, msg : string) => {
+                console.log('Failed to save trading status=' + status);
+            }
+        });
+
     }
 }

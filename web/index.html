@@ -21,6 +21,22 @@
     <section id="dialog{{i}}" class="dialog" on-click="closeClick"></section>
     {{/}}
   </script>
+
+  <script id="signInTemplate" type="text/ractive">
+    <section id="top">
+      <header>
+		<div class="inner">
+		  <h1>株式会社サンプル</h1>
+		</div>
+      </header>
+      <section style="margin-top:68px">
+      <label>username</label>
+      <input type="text" value="{{username}}"/>
+      <label>password</label>
+      <input type="password" value="{{password}}"/>
+      <button on-click="signIn">Sign in</button>
+      </section>      
+  </script>
   
   <script id="topTemplate" type="text/ractive">
     <section id="top">
@@ -52,7 +68,7 @@
             {{#sheets}}
 	    <tr on-click="showSheet:{{.}}">
 	      <td>{{modified_time}}</td>
-	      <td>{{company_name}}<span>{{subject}}</span></td>
+	      <td>{{company[company_id].name}}<span>{{subject}}</span></td>
 	      <td>{{total}}</td>
 	      <td>{{quotation_number}}</td>
 	      <td>{{bill_number}}</td>
@@ -85,14 +101,14 @@
       	<div class="wrapper">
       	  <section id="basicInfo">
 	    <p>
-	      <select value="{{trading.company_id}}" decorator="easyselect">
+	      <select id="company" value="{{trading.company_id}}" decorator="easyselect">
 		<option id="">会社名</option>
                 {{#companies}}
                 <option value="{{id}}">{{name}}</option>
                 {{/}}
 	      </select>
               
-	      <select value="{{trading.title_type}}" decorator="easyselect">
+	      <select id="titleType" value="{{trading.title_type}}" decorator="easyselect">
 		<option value="0">御中</option>
 		<option value="1">様</option>
 	      </select>
@@ -116,8 +132,10 @@
 	  </section>
 	  <section id="sum">
 	    <dl>
-	      <dt>発行日</dt>
-	      <dd><input type="date"></dd>
+	      <dt>見積書発行日</dt>
+	      <dd><input type="date" value="{{quotationDate}}"></dd>
+	      <dt>請求書発行日</dt>
+	      <dd><input type="date" value="{{billDate}}"></dd>
 	      <dt>小計　&yen;</dt>
 	      <dd><input type="text" disabled value="{{trading.sum}}"></dd>
 	      <dt>消費税 <input type="text" value="{{trading.tax_rate}}" class="inputS"> ％　&yen;</dt>

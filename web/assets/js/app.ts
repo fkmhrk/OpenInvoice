@@ -3,6 +3,7 @@
 ///<reference path="./Application.ts"/>
 ///<reference path="./Page.ts"/>
 
+///<reference path="./SignInPage.ts"/>
 ///<reference path="./TopPage.ts"/>
 ///<reference path="./SheetPage.ts"/>
 var $;
@@ -15,11 +16,16 @@ var AppRouter = Backbone.Router.extend({
     routes : {
         // ここに、ページ毎に呼ぶ関数名を記述していく
         // index.htmlを開いた直後は、topという関数を実行する        
-        "" : "top",
+        "" : "signIn",
+        "top" : "top",        
         // index.html#sheetの場合は、sheetという関数を実行する
         "sheets(/:id)" : "sheet",
         "setting" : "setting"
         //"signup" : "signUp",
+    },
+    signIn : function() {
+        app.page = new SignInPage();
+        app.page.onCreate(app);
     },
     top : function() {
         app.page = new TopPage();

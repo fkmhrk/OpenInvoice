@@ -4,7 +4,9 @@ class MockClient implements Client {
     /**
      * Logs in with username and password.
      */
-    login(username : string, password : string, callback : ItemCallback<string>) { }
+    login(username : string, password : string, callback : ItemCallback<string>) {
+        callback.success('token1122');
+    }
 
    /**
      * Gets all users
@@ -14,7 +16,9 @@ class MockClient implements Client {
     /**
      * Gets all companies
      */
-    getCompanies(token : string, callback : ItemListCallback<Company>) { }
+    getCompanies(token : string, callback : ItemListCallback<Company>) {
+        callback.success(companyList);
+    }
 
     /**
      * Saves company

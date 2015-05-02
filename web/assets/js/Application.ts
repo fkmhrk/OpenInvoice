@@ -9,6 +9,7 @@ class App {
     page : Page;
 
     accessToken : string;
+    users : Array<User>;
     tradings : Array<Trading>;
     tradingsMap : any;    
     trading : any;
@@ -61,7 +62,23 @@ class App {
         });            
     }
     loadData(callback : LoadCallback) {
-        this.loadTradings(callback);
+        this.loadUsers(callback);
+    }
+    private loadUsers(callback : LoadCallback) {
+        if (this.users != null) {
+            this.loadTradings(callback);
+            return;
+        }
+        this.client.getUsers(this.accessToken, {
+            success : (list : Array<User>) => {
+                this.users = list;
+                this.loadTradings(callback);
+            },
+            error : (status : number, msg : string) => {
+                console.log('Failed to get users status=' + status);
+                callback.error();
+            }
+        });
     }
     private loadTradings(callback : LoadCallback) {
         if (this.tradings != null) {
@@ -88,12 +105,20 @@ class App {
             callback.done();
             return;
         }
-        this.companies = companyList;
-        this.companyMap = {};
-        _.each(this.companies, (item : Company) => {
-            this.companyMap[item.id] = item;
+        this.client.getCompanies(this.accessToken, {
+            success : (list : Array<Company>) => {
+                this.companies = list;
+                this.companyMap = {};
+                _.each(this.companies, (item : Company) => {
+                    this.companyMap[item.id] = item;
+                });
+                callback.done();                
+            },
+            error : (status : number, msg : string) => {
+                console.log('Failed to get companies status=' + status);
+                callback.error();
+            }            
         });
-        callback.done();
     }
 }
 

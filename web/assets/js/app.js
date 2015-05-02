@@ -1,53 +1,214 @@
 /// <reference path="./Client.ts"/>
-var MockClient = (function () {
-    function MockClient() {
+var $;
+var _;
+var baseURL = '';
+var AppClientImpl = (function () {
+    function AppClientImpl(url) {
+        this.url = url;
     }
-    /**
-     * Logs in with username and password.
-     */
-    MockClient.prototype.login = function (username, password, callback) { };
-    /**
-      * Gets all users
-      */
-    MockClient.prototype.getUsers = function (token, callback) { };
-    /**
-     * Gets all companies
-     */
-    MockClient.prototype.getCompanies = function (token, callback) { };
-    /**
-     * Saves company
-     * @return item is Company ID
-     */
-    MockClient.prototype.saveCompany = function (token, item, callback) { };
-    /**
-     * Gets Tradings
-     */
-    MockClient.prototype.getTradings = function (token, callback) {
-        callback.success(sheetList);
+    AppClientImpl.prototype.login = function (username, password, callback) {
+        var params = {
+            username: username,
+            password: password
+        };
+        this.exec(this.url + '/api/v1/token', 'POST', null, params, {
+            success: function (json) {
+                callback.success(json.access_token);
+            },
+            error: function (status, body) {
+                callback.error(status, body.msg);
+            }
+        });
     };
-    /**
-     * Gets trading items of specified Trading
-     */
-    MockClient.prototype.getTradingItems = function (token, tradingId, callback) {
+    AppClientImpl.prototype.getTradings = function (token, callback) {
+        this.exec(this.url + '/api/v1/tradings', 'GET', token, null, {
+            success: function (json) {
+                callback.success(_.map(json.tradings, function (item) {
+                    item.date = item.id;
+                    return item;
+                }));
+            },
+            error: function (status, body) {
+                callback.error(status, body.msg);
+            }
+        });
     };
-    /**
-     * Saves Trading
-     * @return item is trading ID
-     */
-    MockClient.prototype.saveTrading = function (token, item, callback) { };
-    /**
-     * Saves Trading item of specified Trading
-     * @return item is item ID
-     */
-    MockClient.prototype.saveTradingItem = function (token, tradingId, item, callback) { };
-    /**
-     * Deltes Trading item of specified Trading
-     */
-    MockClient.prototype.deleteTradingItem = function (token, tradingId, itemId, callback) { };
-    return MockClient;
+    AppClientImpl.prototype.getTradingItems = function (token, tradingId, callback) {
+        var url = this.url + '/api/v1/tradings/' + tradingId + '/items';
+        this.exec(url, 'GET', token, null, {
+            success: function (json) {
+                callback.success(_.map(json.items, function (item) {
+                    item.sum = item.unit_price * item.amount;
+                    return item;
+                }));
+            },
+            error: function (status, body) {
+                callback.error(status, body.msg);
+            }
+        });
+    };
+    AppClientImpl.prototype.getUsers = function (token, callback) {
+        var url = this.url + '/api/v1/users';
+        this.exec(url, 'GET', token, null, {
+            success: function (json) {
+                callback.success(json.users);
+            },
+            error: function (status, body) {
+                callback.error(status, body.msg);
+            }
+        });
+    };
+    AppClientImpl.prototype.getCompanies = function (token, callback) {
+        var url = this.url + '/api/v1/companies';
+        this.exec(url, 'GET', token, null, {
+            success: function (json) {
+                callback.success(json.companies);
+            },
+            error: function (status, body) {
+                callback.error(status, body.msg);
+            }
+        });
+    };
+    AppClientImpl.prototype.saveTrading = function (token, item, callback) {
+        if (item.id === null) {
+            this.createTrading(token, item, callback);
+        }
+        else {
+            this.updateTrading(token, item, callback);
+        }
+    };
+    AppClientImpl.prototype.saveTradingItem = function (token, tradingId, item, callback) {
+        if (item.id === null) {
+            this.createTradingItem(token, tradingId, item, callback);
+        }
+        else {
+            this.updateTradingItem(token, tradingId, item, callback);
+        }
+    };
+    AppClientImpl.prototype.deleteTradingItem = function (token, tradingId, itemId, callback) {
+        var url = this.url + '/api/v1/tradings/' + tradingId +
+            '/items/' + itemId;
+        this.exec(url, 'DELETE', token, null, {
+            success: function (json) {
+                callback.success(itemId);
+            },
+            error: function (status, body) {
+                if (status == 404) {
+                    callback.success(itemId);
+                }
+                else {
+                    callback.error(status, body.msg);
+                }
+            }
+        });
+    };
+    AppClientImpl.prototype.saveCompany = function (token, item, callback) {
+        if (item.id === null || item.id.length == 0) {
+            this.createCompany(token, item, callback);
+        }
+        else {
+            this.updateCompany(token, item, callback);
+        }
+    };
+    AppClientImpl.prototype.createTrading = function (token, item, callback) {
+        var url = this.url + '/api/v1/tradings';
+        this.exec(url, 'POST', token, item, {
+            success: function (json) {
+                callback.success(json.id);
+            },
+            error: function (status, body) {
+                callback.error(status, body.msg);
+            }
+        });
+    };
+    AppClientImpl.prototype.updateTrading = function (token, item, callback) {
+        var url = this.url + '/api/v1/tradings/' + item.id;
+        this.exec(url, 'PUT', token, item, {
+            success: function (json) {
+                callback.success(item.id);
+            },
+            error: function (status, body) {
+                callback.error(status, body.msg);
+            }
+        });
+    };
+    AppClientImpl.prototype.createTradingItem = function (token, tradingId, item, callback) {
+        var url = this.url + '/api/v1/tradings/' + tradingId + '/items';
+        this.exec(url, 'POST', token, item, {
+            success: function (json) {
+                callback.success(json.id);
+            },
+            error: function (status, body) {
+                callback.error(status, body.msg);
+            }
+        });
+    };
+    AppClientImpl.prototype.updateTradingItem = function (token, tradingId, item, callback) {
+        var url = this.url + '/api/v1/tradings/' + tradingId +
+            '/items/' + item.id;
+        this.exec(url, 'PUT', token, item, {
+            success: function (json) {
+                callback.success(item.id);
+            },
+            error: function (status, body) {
+                callback.error(status, body.msg);
+            }
+        });
+    };
+    AppClientImpl.prototype.createCompany = function (token, item, callback) {
+        var url = this.url + '/api/v1/companies';
+        this.exec(url, 'POST', token, item, {
+            success: function (json) {
+                callback.success(json.id);
+            },
+            error: function (status, body) {
+                callback.error(status, body.msg);
+            }
+        });
+    };
+    AppClientImpl.prototype.updateCompany = function (token, item, callback) {
+        var url = this.url + '/api/v1/companies/' + item.id;
+        this.exec(url, 'PUT', token, item, {
+            success: function (json) {
+                callback.success(json.id);
+            },
+            error: function (status, body) {
+                callback.error(status, body.msg);
+            }
+        });
+    };
+    AppClientImpl.prototype.exec = function (url, method, token, params, callback) {
+        var data = {
+            url: url,
+            type: method,
+            dataType: 'json',
+            scriptCharset: 'utf-8',
+            processData: false
+        };
+        if (token != null) {
+            data.headers = {
+                authorization: 'bearer ' + token
+            };
+        }
+        if (params != null) {
+            data.data = JSON.stringify(params);
+        }
+        $.ajax(data)
+            .done(function (data_, status, data) {
+            if (data.status == 204) {
+                callback.success({});
+            }
+            else {
+                callback.success(JSON.parse(data.responseText));
+            }
+        }).fail(function (data) {
+            callback.error(data.status, JSON.parse(data.responseText));
+        });
+    };
+    return AppClientImpl;
 })();
 function createClient() {
-    return new MockClient();
+    return new AppClientImpl(baseURL);
 }
 var User = (function () {
     function User() {
@@ -211,7 +372,24 @@ var App = (function () {
         });
     };
     App.prototype.loadData = function (callback) {
-        this.loadTradings(callback);
+        this.loadUsers(callback);
+    };
+    App.prototype.loadUsers = function (callback) {
+        var _this = this;
+        if (this.users != null) {
+            this.loadTradings(callback);
+            return;
+        }
+        this.client.getUsers(this.accessToken, {
+            success: function (list) {
+                _this.users = list;
+                _this.loadTradings(callback);
+            },
+            error: function (status, msg) {
+                console.log('Failed to get users status=' + status);
+                callback.error();
+            }
+        });
     };
     App.prototype.loadTradings = function (callback) {
         var _this = this;
@@ -240,12 +418,20 @@ var App = (function () {
             callback.done();
             return;
         }
-        this.companies = companyList;
-        this.companyMap = {};
-        _.each(this.companies, function (item) {
-            _this.companyMap[item.id] = item;
+        this.client.getCompanies(this.accessToken, {
+            success: function (list) {
+                _this.companies = list;
+                _this.companyMap = {};
+                _.each(_this.companies, function (item) {
+                    _this.companyMap[item.id] = item;
+                });
+                callback.done();
+            },
+            error: function (status, msg) {
+                console.log('Failed to get companies status=' + status);
+                callback.error();
+            }
         });
-        callback.done();
     };
     return App;
 })();
@@ -369,6 +555,52 @@ var SettingsDialog = (function () {
 ///<reference path="./UserListDialog.ts"/>
 ///<reference path="./CompanyListDialog.ts"/>
 ///<reference path="./SettingsDialog.ts"/>
+var SignInPage = (function () {
+    function SignInPage() {
+    }
+    SignInPage.prototype.onCreate = function (app) {
+        var _this = this;
+        // Racriveオブジェクトを作る
+        var r = app.ractive = new Ractive({
+            // どの箱に入れるかをIDで指定
+            el: '#container',
+            // 指定した箱に、どのHTMLを入れるかをIDで指定
+            template: '#signInTemplate',
+            // データを設定。テンプレートで使います。
+            data: {
+                inProgress: false
+            }
+        });
+        app.ractive.on({
+            'signIn': function (e, item) {
+                var username = r.get('username');
+                var password = r.get('password');
+                _this.signIn(app, username, password);
+            }
+        });
+    };
+    SignInPage.prototype.signIn = function (app, username, password) {
+        app.ractive.set('inProgress', true);
+        app.ractive.update();
+        app.client.login(username, password, {
+            success: function (token) {
+                app.accessToken = token;
+                app.router.navigate('top', { trigger: true });
+            },
+            error: function (status, msg) {
+                app.ractive.set('inProgress', false);
+                app.ractive.update();
+                console.log('failed to login status=' + status);
+            }
+        });
+    };
+    return SignInPage;
+})();
+///<reference path="./app.ts"/>
+///<reference path="./Page.ts"/>
+///<reference path="./UserListDialog.ts"/>
+///<reference path="./CompanyListDialog.ts"/>
+///<reference path="./SettingsDialog.ts"/>
 var TopPage = (function () {
     function TopPage() {
     }
@@ -392,6 +624,7 @@ var TopPage = (function () {
             template: '#topTemplate',
             // データを設定。テンプレートで使います。
             data: {
+                'company': app.companyMap,
                 'sheets': app.tradings
             }
         });
@@ -506,8 +739,10 @@ var SheetPage = (function () {
                 'trading': this.trading,
                 'workFrom': Utils.toDateStr(this.trading.work_from),
                 'workTo': Utils.toDateStr(this.trading.work_to),
-                'companies': companyList,
-                'users': userList,
+                'quotationDate': Utils.toDateStr(this.trading.quotation_date),
+                'billDate': Utils.toDateStr(this.trading.bill_date),
+                'companies': app.companies,
+                'users': app.users,
                 'tradingItems': tradingItemList
             }
         });
@@ -571,11 +806,12 @@ var SheetPage = (function () {
         });
         r.on('deleteItem', function (e, index) {
             itemObserver.cancel();
-            r.splice('tradingItems', index, 1);
+            var a = r.splice('tradingItems', index, 1);
+            console.log(a);
             itemObserver = observeItem();
         });
         r.on('save', function () {
-            window.history.back();
+            _this.save(app);
         });
         r.observe('trading.tax_rate', function (newValue, oldValue, keypath) {
             updateSum();
@@ -591,12 +827,36 @@ var SheetPage = (function () {
     SheetPage.prototype.showAddUserDialog = function (app) {
         app.showDialog(new AddUserDialog());
     };
+    SheetPage.prototype.save = function (app) {
+        var trading = app.ractive.get('trading');
+        var companyId = $('#company').val();
+        var titleType = $('#titleType').val();
+        var workFrom = app.ractive.get('workFrom');
+        var workTo = app.ractive.get('workTo');
+        var tradingItems = app.ractive.get('tradingItems');
+        // modify type
+        trading.company_id = companyId;
+        trading.title_type = Number(titleType);
+        trading.work_from = new Date(workFrom).getTime();
+        trading.work_to = new Date(workTo).getTime();
+        trading.tax_rate = Number(trading.tax_rate);
+        console.log(trading);
+        app.client.saveTrading(app.accessToken, trading, {
+            success: function (id) {
+                window.history.back();
+            },
+            error: function (status, msg) {
+                console.log('Failed to save trading status=' + status);
+            }
+        });
+    };
     return SheetPage;
 })();
 ///<reference path="./ractive.d.ts"/>
 ///<reference path="./data.ts"/>
 ///<reference path="./Application.ts"/>
 ///<reference path="./Page.ts"/>
+///<reference path="./SignInPage.ts"/>
 ///<reference path="./TopPage.ts"/>
 ///<reference path="./SheetPage.ts"/>
 var $;
@@ -607,10 +867,15 @@ var AppRouter = Backbone.Router.extend({
     routes: {
         // ここに、ページ毎に呼ぶ関数名を記述していく
         // index.htmlを開いた直後は、topという関数を実行する        
-        "": "top",
+        "": "signIn",
+        "top": "top",
         // index.html#sheetの場合は、sheetという関数を実行する
         "sheets(/:id)": "sheet",
         "setting": "setting"
+    },
+    signIn: function () {
+        app.page = new SignInPage();
+        app.page.onCreate(app);
     },
     top: function () {
         app.page = new TopPage();
