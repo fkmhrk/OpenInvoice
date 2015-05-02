@@ -1,41 +1,56 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset='utf-8'>
-  <title>OpenInvoice</title>
-  <link rel="stylesheet" type="text/css" href="assets/style2.css">
-  <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
-  <link href="lib/easyselectbox/easyselectbox.css" rel="stylesheet">  
+	<meta charset="UTF-8">
+	<meta name="robots" content="noindex,nofollow">
+	<title>請求書システム｜株式会社サンプル</title>
+	<link rel="stylesheet" href="./assets/style.css">
+	<link rel="stylesheet" href="./assets/tooltipster.css" />
+	<link rel="stylesheet" href="./lib/easyselectbox/easyselectbox.css">
+	
 </head>
 <body>
-<section id="container"></section>
+  <!-- 箱を用意する。JSでこの箱に指定したHTMLをいれる -->
+  <section id="container"></section>
+  <section id="dialogs"></section>
 
-<script id="topTemplate" type="text/ractive">
-  <header>
-    <p>OpenInvoice</p>
-  </header>
-  <section class="wrapper">
-    <label>Username</label><br/>
-    <input type="text" value="{{username}}"/><br/>
-    <label>Password</label><br/>
-    <input type="password" value="{{password}}"/><br/>
-    <button on-click="login" disabled="{{loginInProgress}}">Log in</button>
-  </section>
-</script>
+  <!-- 画面毎のHTMLはこんな感じで、type="text/ractive"な
+       scriptタグにいれます -->
+  <script id="dialogsTemplate" type="text/ractive">
+    {{#dialogs:i}}
+    <section id="dialog{{i}}" class="dialog" on-click="closeClick"></section>
+    {{/}}
+  </script>
 
-<script id="tradingTemplate" type="text/ractive">
+  <script id="signInTemplate" type="text/ractive">
     <section id="top">
       <header>
-	<div class="inner">
-	  <h1>サンプル株式会社</h1>
-	  <ul class="actionBtn">
-	    <li><a href="#" title="担当者の編集"><i class="fa fa-user"></i></a></li>
-	    <li><a href="#" title="クライアントの編集"><i class="fa fa-building"></i></a></li>
-	    <li><a href="#" title="自社の設定"><i class="fa fa-cog"></i></a></li>
-	  </ul>
-	</div>
+		<div class="inner">
+		  <h1>株式会社サンプル</h1>
+		</div>
       </header>
-      <section>
+      <section style="margin-top:68px">
+      <label>username</label>
+      <input type="text" value="{{username}}"/>
+      <label>password</label>
+      <input type="password" value="{{password}}"/>
+      <button on-click="signIn">Sign in</button>
+      </section>      
+  </script>
+  
+  <script id="topTemplate" type="text/ractive">
+    <section id="top">
+      <header>
+		<div class="inner">
+		  <h1>株式会社サンプル</h1>
+		  <ul class="actionBtn">
+		    <li on-click="showUserList"><a title="担当者の編集"><i class="fa fa-user"></i></a></li>
+		    <li on-click="showCompanyList"><a title="クライアントの編集"><i class="fa fa-building"></i></a></li>
+		    <li on-click="showSetting"><a title="自社の設定"><i class="fa fa-cog"></i></a></li>
+		  </ul>
+		</div>
+      </header>
+    <section>
 	<p class="total">TOTAL<span>4,124,402</span></p>
 	<div class="list">
 	  <table>
@@ -47,163 +62,334 @@
 	      <th>請求書 No.</th>
 	      <th></th>
 	    </tr>
-            {{#tradings}}
-	    <tr on-click="showSheet">
+            <!-- 繰り返しで表示 -->
+            <!-- sheetsという配列をぐるぐるまわす -->
+            <!-- 1つ1つのフィールドの内容を出すには、{{フィールド名}} -->
+            {{#sheets}}
+	    <tr on-click="showSheet:{{.}}">
 	      <td>{{modified_time}}</td>
-	      <td>{{company_name}}<span>{{subject}}</span></td>
+	      <td>{{company[company_id].name}}<span>{{subject}}</span></td>
 	      <td>{{total}}</td>
 	      <td>{{quotation_number}}</td>
 	      <td>{{bill_number}}</td>
 	      <td>
 		<a href="#" class="btn" title="削除"><i class="fa fa-trash-o"></i></a>
 		<a href="#" class="btn" title="コピー"><i class="fa fa-copy"></i></a>
+                <a on-click="printQuotation:{{.}}" class="btn" title="見積書印刷"><i class="fa fa-copy"></i></a>
+                <a on-click="printBill:{{.}}" class="btn" title="請求書印刷"><i class="fa fa-copy"></i></a>
 	      </td>
 	    </tr>
+            <!-- 繰り返しの終わり -->
             {{/}}
 	  </table>
 	</div>
       </section>
-    </section>  
-    <section class="wrapper">
-      <input type="text" value="{{newId}}"/><button on-click="newTrading">新規作成</button>
-      <button on-click="company">会社</button>
-      <!--
-    <table class="wrapper">
-      {{#tradings:i}}
-      <tr>
-        <th>{{subject}}</th>
-        <td><button on-click="itemClick:{{i}}">編集</button></td>
-        <td><button on-click="printQuotation:{{i}}">見積書発行</button></td>
-        <td><button on-click="printBill:{{i}}">請求書発行</button></td>
-      </tr>
-      {{/}}
-    </table>
-    -->
-  </section>
-</script>
+    </section>
+  </script>
 
-<script id="editTradingTemplate" type="text/ractive">
-  <section class="sheet">
-    <header>
-      <p><i class="fa fa-chevron-left"></i>シート</p>    
-    </header>
-    <div class="wrapper">
-      <section id="basicInfo">
-        <p>
-          <input type="text" placeholder="ID" value="{{trading.date}}" readonly/>
-        </p>
-        <p>
-    <select id="company" value="{{trading.company_id}}" decorator="easyselect">
-            {{#companies}}
-      <option value="{{id}}">{{name}}</option>
-            {{/}}
-    </select>
+
+  <script id="sheetTemplate" type="text/ractive">    
+    <section id="sheet">
+      <header>
+	<div class="inner">
+	  <h1>株式会社サンプル</h1>
+	  <ul class="actionBtn">
+	    <li><a href="#" title="閉じる"><i class="fa fa-remove"></i></a></li>
+	  </ul>
+	  <p class="save" on-click="save"><i class="fa fa-check"></i>保存</p>
+	</div>
+      </header>
+      <section>
+      	<div class="wrapper">
+      	  <section id="basicInfo">
+	    <p>
+	      <select id="company" value="{{trading.company_id}}" decorator="easyselect">
+		<option id="">会社名</option>
+                {{#companies}}
+                <option value="{{id}}">{{name}}</option>
+                {{/}}
+	      </select>
+              
+	      <select id="titleType" value="{{trading.title_type}}" decorator="easyselect">
+		<option value="0">御中</option>
+		<option value="1">様</option>
+	      </select>
+	      <span class="addList" on-click="addCompany"><i class="fa fa-plus-circle"></i>クライアント追加</span>
+	    </p>
+	    <ul>
+	      <li><input type="text" placeholder="件名" value="{{trading.subject}}"></li>
+	      <li><span>作業期間</span><input type="date" value="{{workFrom}}">〜<input type="date" value="{{workTo}}"></li>
+	      <li><textarea placeholder="成果物" value="{{trading.product}}"></textarea></li>
+	      <li><textarea placeholder="備考"></textarea></li>
+	      <li>
+		<span>担当者</span>
+		<select value="{{trading.assignee}}" decorator="easyselect">
+                  {{#users}}
+                  <option value="{{id}}">{{display_name}}</option>
+                  {{/}}
+		</select>
+		<span class="addList" on-click="addUser"><i class="fa fa-plus-circle"></i>担当者追加</span>
+	      </li>
+	    </ul>
+	  </section>
+	  <section id="sum">
+	    <dl>
+	      <dt>見積書発行日</dt>
+	      <dd><input type="date" value="{{quotationDate}}"></dd>
+	      <dt>請求書発行日</dt>
+	      <dd><input type="date" value="{{billDate}}"></dd>
+	      <dt>小計　&yen;</dt>
+	      <dd><input type="text" disabled value="{{trading.sum}}"></dd>
+	      <dt>消費税 <input type="text" value="{{trading.tax_rate}}" class="inputS"> ％　&yen;</dt>
+	      <dd><input type="text" disabled value="{{trading.tax}}"></dd>
+	      <dt>合計金額　&yen;</dt>
+	      <dd><input type="text" disabled value="{{trading.total}}"></dd>
+	    </dl>
+	  </section>
           
-    <select id="titleType" value="{{trading.title_type}}" decorator="easyselect">
-      <option value="0">御中</option>
-      <option value="1">様</option>
-    </select>
-        </p>
-        <ul>
-    <li><input type="text" placeholder="件名" value="{{trading.subject}}" /></li>
-    <li><span>作業期間</span><input type="date" value="{{workFrom}}">〜<input type="date" value="{{workTo}}"></li>
-    <li><span>見積書発行日</span><input type="date" value="{{quotationDate}}"></li>
-    <li><span>請求書発行日</span><input type="date" value="{{billDate}}"></li>
-    <li><span>消費税率</span><input type="number" value="{{trading.tax_rate}}">%</li>          
-    <li><textarea placeholder="成果物" value="{{trading.product}}"></textarea></li>
-    <li>
-      <span>担当者</span>
-      <select id="assignee" value="{{selectedAssignee}}" decorator="easyselect">
-            {{#users}}
-              <option value="{{id}}">{{display_name}}</option>
+      	</div>
+
+      	<section id="inputArea">
+      	  <div class="inner">
+	    <div class="inputBox">
+              {{#tradingItems:i}}
+	      <article>
+		<ul class="table">
+                  <li><input type="text" placeholder="項目名" value="{{tradingItems[i].subject}}"></li>
+                  <li><input type="text" placeholder="単価" value="{{tradingItems[i].unit_price}}"></li>
+                  <li><input type="text" placeholder="数量" value="{{tradingItems[i].amount}}"></li>
+                  <li><input type="text" placeholder="単位" value="{{tradingItems[i].degree}}"></li>
+                  <li><input type="text" value="{{tradingItems[i].sum}}" disabled></li>
+		</ul>
+		<p class="note"><textarea placeholder="備考" value="{{tradingItems[i].memo}}"></textarea></p>
+		<p class="tax">
+		  <select id="tax_type{{i}}" decorator="easyselect">
+		    <option value="1">税抜</option>
+		    <option value="2">税込</option>
+		    <option value="0">非課税</option>
+		  </select>
+		</p>
+		<p class="delete" title="項目削除" on-click="deleteItem:{{i}}"><i class="fa fa-trash"></i></p>
+                
+	      </article>
+              {{/}}
+
+	    </div>
+	  </div>
+	  <p class="addInput" on-click="addItem"><i class="fa fa-plus-circle"></i>項目追加</p>
+
+		</section>
+      	
+      </section>
+
+    </section>
+  </script>
+
+  <script id="settingTemplate" type="text/ractive">    
+    <section id="setting" on-click="windowClicked">
+      <header>
+        <h1>設定</h1>
+        <ul class="actionBtn">
+	      <li on-click="close"><a title="閉じる"><i class="fa fa-remove"></i></a></li>
+	    </ul>
+	    <p class="save" on-click="save"><i class="fa fa-check"></i>保存</p>
+      </header>
+      <div class="inner">
+        <section id="basicSetting">
+          <table>
+            <tr>
+              <th>消費税率</th>
+              <td><input type="text" value="8">%</td>
+              <th>お見積り期限</th>
+              <td>発行日から<input type="text" value="7">日間</td>
+            </tr>
+        	<tr>
+              <th>決算月</th>
+              <td><input type="text" value="3">月</td>
+              <th>お支払期限</th>
+              <td>
+                <select>
+                  <option>翌月末</option>
+                  <option>翌々月末</option>
+                </select>
+              </td>
+            </tr>
+          </table>
+        </section>
+        <section id="inputSetting">
+          <div class="companySetting">
+            <h2>会社の基本情報</h2>
+            <ul>
+              <li><input type="text" placeholder="会社名"></li>
+              <li><input type="text" placeholder="郵便番号"></li>
+              <li><input type="text" placeholder="住所"></li>
+              <li><input type="text" placeholder="TEL"></li>
+              <li><input type="text" placeholder="FAX"></li>
+            </ul>
+          </div>
+          <div class="bankSetting">
+            <h2>口座情報</h2>
+            <p>
+              <input type="text" placeholder="銀行名">
+              <select>
+                <option>普通</option>
+                <option>当座</option>
+                <option>定期</option>
+              </select>
+              <input type="text" placeholder="口座番号">
+            </p>
+            <p class="name"><input type="text" placeholder="名義"></p>
+          </div>
+        </section>
+      </div>
+    </section>
+  </script>
+
+  <script id="userListTemplate" type="text/ractive">
+    <section id="setting" class="listTemplate" on-click="windowClicked">
+      <header>
+        <h1>担当者情報</h1>
+        <ul class="actionBtn">
+	        <li on-click="close"><a title="閉じる"><i class="fa fa-remove"></i></a></li>
+	      </ul>
+	      <p class="save" on-click="save"><i class="fa fa-check"></i>保存</p>
+      </header>
+      <div class="inner">
+        <section id="addUser">
+          <p><input type="text" placeholder="担当者名"></p>
+          <p><input type="text" placeholder="TEL"></p>
+          <p class="addBtn"><i class="fa fa-plus"></i>追加</p>
+        </section>
+        <section class="list">
+          <table>
+            <tr>
+              <th>担当者名</th>
+              <th>TEL</th>
+              <th></th>
+            </tr>
+            <tr>
+              <td>担当者1</td>
+              <td>080-1111-2222</td>
+              <td><a href="#" class="btn" title="削除"><i class="fa fa-trash-o"></i></a></td>
+            </tr>
+            <tr>
+              <td>担当者2</td>
+              <td>080-2222-3333</td>
+              <td><a href="#" class="btn" title="削除"><i class="fa fa-trash-o"></i></a></td>
+            </tr>
+          </table>
+        </section>
+      </div>
+    </section>
+  </script>
+
+  <script id="addUserTemplate" type="text/ractive">
+    <section id="setting" class="listTemplate addDialog" on-click="windowClicked">
+      <header>
+        <h1>担当者の追加・編集</h1>
+        <ul class="actionBtn">
+	      <li on-click="close"><a title="閉じる"><i class="fa fa-remove"></i></a></li>
+	    </ul>
+	    <p class="save" on-click="save"><i class="fa fa-check"></i>保存</p>
+      </header>
+      <div class="inner">
+        <section id="addUser">
+          <p><input type="text" placeholder="担当者名"></p>
+          <p><input type="text" placeholder="TEL"></p>
+          <p class="addBtn"><i class="fa fa-plus"></i>追加</p>
+        </section>
+      </div>
+    </section>
+  </script>        
+    
+  <script id="companyListTemplate" type="text/ractive">
+    <section id="setting" class="listTemplate" on-click="windowClicked">
+      <header>
+        <h1>クライアント情報</h1>
+        <ul class="actionBtn">
+	      <li on-click="close"><a title="閉じる"><i class="fa fa-remove"></i></a></li>
+	    </ul>
+	    <p class="save" on-click="save"><i class="fa fa-check"></i>保存</p>
+      </header>
+      <div class="inner">
+        <section id="addCompany">
+          <div class="wrapper">
+            <div class="names">
+              <p><input type="text" placeholder="クライアント会社名" value="{{name}}"></p>
+              <p><input type="text" placeholder="部署名" value="{{unit}}"></p>
+              <p><input type="text" placeholder="担当者" value="{{assignee}}"></p>
+            </div>
+            <div class="infos">
+              <p><input type="text" placeholder="郵便番号" value="{{zip}}"><input type="text" placeholder="住所" value="{{address}}"></p>
+              <p><input type="text" placeholder="TEL" value="{{tel}}"></p>
+              <p><input type="text" placeholder="FAX" value="{{fax}}"></p>
+            </div>
+          </div>
+          <p class="addBtn" on-click="submit"><i class="fa fa-plus"></i>追加</p>
+        </section>
+        <section class="list">
+          <table>
+            <tr>
+              <th>会社名</th>
+              <th>部署名</th>
+              <th>担当者名</th>
+              <th>住所</th>
+              <th></th>
+            </tr>
+            {{#companyList}}
+            <tr on-click="showEdit:{{.}}">
+              <td>{{name}}</td>
+              <td>{{unit}}</td>
+              <td>{{assignee}}</td>
+              <td>{{address}}</td>
+              <td><a href="#" class="btn" title="削除"><i class="fa fa-trash-o"></i></a></td>
+            </tr>
             {{/}}
-      </select>
-    </li>
-          <li>
-            <button on-click="save">保存</button>
-          </li>
-        </ul>
-      </section>
-      
-      <section id="inputArea">
-        <div class="inputBox">
-          {{#tradingItems:i}}
-    <article>
-      <ul class="table">
-        <li><input type="text" placeholder="項目名" value="{{subject}}"></li>
-              <li>&yen;<input on-focus="numFocus:{{unit_price}}" on-blur="sumBlur:{{unit_price}},{{i}}" type="text" placeholder="50,000" value="{{unit_price}}"></li>
-              <li><input type="text" on-blur="amountBlur" placeholder="1" value="{{amount}}"></li>
-              <li><input type="text" placeholder="人日" value="{{degree}}"></li><li>&yen;<input type="text" placeholder="小計" value="{{numToCurrency(sum)}}" readonly></li>
-      </ul>
-      <p class="note"><textarea placeholder="備考" value="{{memo}}"></textarea></p>
-      <ul class="tax">
-        <li>
-          <input type="radio" name="{{tax_type}}" id="taxoff" value="1" checked="checked" />
-          <label for="taxoff" data-label="税抜">税抜</label>
-        </li>
-        <li>
-          <input type="radio" name="{{tax_type}}" id="taxon" value="2" />
-          <label for="taxon" data-label="税込">税込</label>
-        </li>
-        <li>
-          <input type="radio" name="{{tax_type}}" id="taxno" value="0" />
-          <label for="taxno" data-label="非課税">非課税</label>
-        </li>
-      </ul>
-            <button on-click="deleteItem:{{i}}">この項目を削除</button>
-    </article>
-          {{/}}
-        </div>
-<p class="addInput" on-click="addItem"><i class="fa fa-plus-circle"></i></p>          
-      </section>
-      
-    </div><!-- class="wrapper" -->
-  </section>
-</script>
+          </table>
+        </section>
+      </div>
+    </section>
+  </script>
+    
+  <script id="addCompanyTemplate" type="text/ractive">
+    <section id="setting" class="listTemplate addDialog" on-click="windowClicked">
+      <header>
+        <h1>クライアントの追加・編集</h1>
+        <ul class="actionBtn">
+	      <li on-click="close"><a title="閉じる"><i class="fa fa-remove"></i></a></li>
+	    </ul>
+	    <p class="save" on-click="save"><i class="fa fa-check"></i>保存</p>
+      </header>
+      <div class="inner">
+        <section id="addCompany">
+          <div class="wrapper">
+            <div class="names">
+              <p><input type="text" placeholder="クライアント会社名"></p>
+              <p><input type="text" placeholder="部署名"></p>
+              <p><input type="text" placeholder="担当者"></p>
+            </div>
+            <div class="infos">
+              <p><input type="text" placeholder="郵便番号"><input type="text" placeholder="住所"></p>
+              <p><input type="text" placeholder="TEL"></p>
+              <p><input type="text" placeholder="FAX"></p>
+            </div>
+          </div>
+          <p class="addBtn"><i class="fa fa-plus"></i>追加</p>
+        </section>
+      </div>
+    </section>
+  </script>      
+  
 
-<script id="companyTemplate" type="text/ractive">
-  <section class="sheet">
-    <header>
-      <p><i class="fa fa-chevron-left"></i>シート</p>    
-    </header>
-    <div class="wrapper">
-      <button on-click="newCompany">新規作成</button>
-      <table>
-        {{#companies:i}}
-        <tr on-click="itemClick:{{i}}">
-          <th>{{name}}</th>
-        </tr>
-        {{/}}
-      </table>      
-    </div>
-  </section>
-</script>
 
-<script id="editCompanyTemplate" type="text/ractive">
-  <section class="sheet">
-    <header>
-      <p><i class="fa fa-chevron-left"></i>シート</p>    
-    </header>
-    <div class="wrapper">
-      <section id="basicInfo">
-        <p><input type="text" placeholder="ID" value="{{company.id}}" readonly/></p>
-        <p><input type="text" placeholder="会社名" value="{{company.name}}"/></p>
-        <p><input type="text" placeholder="郵便番号" value="{{company.zip}}"/></p>
-        <p><input type="text" placeholder="住所" value="{{company.address}}"/></p>
-        <p><input type="text" placeholder="電話番号" value="{{company.phone}}"/></p>
-        <p><input type="text" placeholder="部署" value="{{company.unit}}"/></p>
-        <p><button on-click="save">保存</button></p>
-        </ul>
-      </section>      
-  </section>
-</script>  
+  <script src="http://code.jquery.com/jquery-1.9.0.min.js"></script>
+  <script src="./assets/js/jquery.tooltipster.min.js"></script>
+  <script src="./lib/easyselectbox/easyselectbox.min.js"></script>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/ractive/0.7.1/ractive.js"></script>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.7.0/underscore-min.js" type="text/javascript"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.1.2/backbone-min.js" type="text/javascript"></script>
-<script src="./assets/js/app.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ractive/0.7.1/ractive.js"></script>        
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.7.0/underscore-min.js" type="text/javascript"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.1.2/backbone-min.js" type="text/javascript"></script>
+  <script src="./assets/js/app.js"></script>
 
-<script type="text/javascript" src="./lib/easyselectbox/easyselectbox.min.js"></script>
 </body>
 </html>

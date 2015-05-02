@@ -1,162 +1,79 @@
-/// <reference path="./ractive.d.ts"/>
-/// <reference path="./TopPage.ts"/>
-/// <reference path="./TradingListPage.ts"/>
-/// <reference path="./EditTradingPage.ts"/>
+///<reference path="./ractive.d.ts"/>
+///<reference path="./data.ts"/>
+///<reference path="./Application.ts"/>
+///<reference path="./Page.ts"/>
 
+///<reference path="./SignInPage.ts"/>
+///<reference path="./TopPage.ts"/>
+///<reference path="./SheetPage.ts"/>
 var $;
 var _;
 var Backbone;
 
-var CompanyApp = {
-    show : () => {
-        app.router.r = new Ractive({
-            el : '#container',
-            template : '#companyTemplate',
-            data : {
-                companies : app.companies,
-            }
-        });
-        app.router.r.on('itemClick', (e : any, i : any) => {
-            CompanyApp.edit(i);
-        });
-        app.router.r.on('newCompany', (e : any) => {
-            CompanyApp.newCompany();
-        });
-    },
-    edit : (i : any) => {
-        app.company = app.companies[i];
-        app.router.navigate('companies/' + app.companies[i].id, {trigger:true})
-    },
-    newCompany : () => {
-        app.company = {
-            id : null,
-            name : '',
-            zip : '',
-            address : '',
-            phone : '',
-            unit : '',
-        };
-        app.router.navigate('companies/new', {trigger:true})
-    }
-}
-
-var EditCompanyApp = {
-    show : (company : any) => {
-        app.router.r = new Ractive({
-            el : '#container',
-            template : '#editCompanyTemplate',
-            data : {
-                company : company
-            }
-        });
-        app.router.r.on('save', (e : any) => {
-            var company = app.router.r.get('company');
-            EditCompanyApp.save(company);
-        });
-    },
-    save : (company : any) => {
-        app.client.saveCompany(app.token, company, {
-            success : (id : string) => {
-                window.history.back();
-            },
-            error : (msg : string) =>{
-            }
-        });
-    }
-}
+var app : App = new App();
 
 var AppRouter = Backbone.Router.extend({
     routes : {
-        "" : "top",
-        "tradings" : "tradings",
-        "tradings(/:id)" : "editTrading",
-        "companies" : "companies",
-        "companies(/:id)" : "editCompanies",
+        // ここに、ページ毎に呼ぶ関数名を記述していく
+        // index.htmlを開いた直後は、topという関数を実行する        
+        "" : "signIn",
+        "top" : "top",        
+        // index.html#sheetの場合は、sheetという関数を実行する
+        "sheets(/:id)" : "sheet",
+        "setting" : "setting"
+        //"signup" : "signUp",
     },
-    initialize : function() {
-        _.bindAll(this, 'top', 'tradings', 'editTrading', 'companies', 'editCompanies');
+    signIn : function() {
+        app.page = new SignInPage();
+        app.page.onCreate(app);
     },
-    top : () => {
+    top : function() {
         app.page = new TopPage();
         app.page.onCreate(app);
     },
-    tradings : () => {
-        if (app.token == null) {
-            app.router.navigate('', {trigger:true})           
-            return;
-        }
-        app.page = new TradingListPage();
+    sheet : (id : string) => {
+        app.page = new SheetPage(id);
         app.page.onCreate(app);
     },
-    editTrading : (id : any) => {
-        if (app.token == null) {
-            app.router.navigate('', {trigger:true})           
-            return;
-        }
-        app.page = new EditTradingPage(id);
-        app.page.onCreate(app);        
-    },
-    companies : () => {
-        if (app.token == null) {
-            app.router.navigate('', {trigger:true})           
-            return;
-        }
-        CompanyApp.show();
-    },
-    editCompanies : (id : any) => {
-        if (app.token == null) {
-            app.router.navigate('', {trigger:true})           
-            return;
-        }
-        var company : any = null;
-        if (id === 'new') {
-            company = {
-                id : null
-            };
-            EditCompanyApp.show(company);        
-            return;
-        }
-        for (var i = 0 ; i < app.companies.length ; ++i) {
-            if (app.companies[i].id === id) {
-                company = app.companies[i];
-                break;
-            }
-        }
-        if (company === null) {
-            app.router.navigate('', {trigger:true})           
-            return;
-        }        
-        EditCompanyApp.show(company);        
-    }
+    setting : () => {
+        // ダイアログ用の要素を作る
+        var dialog = document.createElement('section');
+        document.querySelector('#dialogs').appendChild(dialog);
+        // Racriveオブジェクトを作る
+        app.ractive = new Ractive({
+            // どの箱に入れるかをIDで指定
+            el : dialog,
+            // 指定した箱に、どのHTMLを入れるかをIDで指定
+            template : '#settingTemplate'
+            // データを設定。テンプレートで使います。
+            /*data : {
+                'sheets' : sheetList
+            }*/
+        });        
+    }, 
 });
 
-var app : Application = new Application();
+$(function() {
+    app.start();
+    // Backboneのおまじない
+    app.router = new AppRouter();
+    Backbone.history.start();
+});
 
-var util : any = {
-    numToCurrency : (val : any) => {
-        var n = parseInt(val);
-        var ret = '';
-        do {
-            var n1 = (n % 1000);
-            var c = ("00" + n1).slice(-3);
-            n = Math.floor(n / 1000);
-            if (n > 0) {
-                ret = c + "," + ret;
-            } else {
-                ret = n1 + "," + ret;
-            }
-        } while (n > 0);
-        return ret.substring(0, ret.length - 1);
-    },
-    currencyToNum : (val : any) => {
-        if (typeof(val) === 'number') { return val; }
-        return parseInt(val.replace(",", ""));
-    },    
-};
-
-(($) => {
-    $(() => {
-        app.router = new AppRouter();
-        Backbone.history.start();
+// [common] for plugins
+function tooltipster(){
+    $('.actionBtn li a').tooltipster({
+        theme: 'tooltipster-actionBtn'
     });
-})($);
+    $('.btn, .delete').tooltipster({
+        theme: 'tooltipster-btn',
+        //arrow: false,
+        offsetY: -3
+    });
+}
+function selectbox(){
+    //select box customize
+    //$('select').easySelectBox({speed: 200});
+}
+
+

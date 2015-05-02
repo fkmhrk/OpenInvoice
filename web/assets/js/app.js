@@ -1,272 +1,791 @@
 /// <reference path="./Client.ts"/>
 var $;
-var Invoice;
-(function (Invoice) {
-    var MockClient = (function () {
-        function MockClient() {
-        }
-        MockClient.prototype.login = function (username, password, callback) {
-            callback.success('token1122');
-        };
-        MockClient.prototype.getTradings = function (token, callback) {
-            var tradings = [];
-            for (var i = 0; i < 10; ++i) {
-                tradings.push({
-                    id: 'trade1122' + i,
-                    date: 'trade1122' + i,
-                    modified_time: 1432542408000,
-                    company_id: "company" + i,
-                    company_name: '',
-                    title_type: 0,
-                    subject: "件名" + i,
-                    work_from: 1122,
-                    work_to: 2233,
-                    quotation_date: 1423502769379,
-                    bill_date: 5555,
-                    tax_rate: 8,
-                    assignee: "担当者ID" + i,
-                    product: "成果物" + i,
-                    total: i * 1000
-                });
-            }
-            callback.success(tradings);
-        };
-        MockClient.prototype.getTradingItems = function (token, tradingId, callback) {
-            var tradings = [];
-            for (var i = 0; i < 10; ++i) {
-                tradings.push({
-                    id: 'item111' + i,
-                    subject: "件名" + i,
-                    unit_price: i * 100 + 200,
-                    amount: i * 3 + 2,
-                    degree: "人月",
-                    tax_type: 1,
-                    memo: "備考" + i,
-                    sum: 1000
-                });
-            }
-            callback.success(tradings);
-        };
-        MockClient.prototype.getUsers = function (token, callback) {
-            var list = [];
-            for (var i = 0; i < 10; ++i) {
-                list.push({
-                    id: "担当者ID" + i,
-                    display_name: '担当' + i
-                });
-            }
-            callback.success(list);
-        };
-        MockClient.prototype.getCompanies = function (token, callback) {
-            var list = [];
-            for (var i = 0; i < 10; ++i) {
-                list.push({
-                    id: "company" + i,
-                    name: "会社" + i,
-                    zip: "111-222" + i,
-                    address: "日本の" + i,
-                    phone: "03-1111-222" + i,
-                    unit: "第" + i + "開発部"
-                });
-            }
-            callback.success(list);
-        };
-        MockClient.prototype.saveTrading = function (token, item, callback) {
-            callback.success('id1122');
-        };
-        MockClient.prototype.saveTradingItem = function (token, tradingId, item, callback) {
-            callback.success('item1122');
-        };
-        MockClient.prototype.deleteTradingItem = function (token, tradingId, itemId, callback) {
-            callback.success(itemId);
-        };
-        MockClient.prototype.saveCompany = function (token, item, callback) {
-            callback.success('company1122');
-        };
-        return MockClient;
-    })();
-    Invoice.MockClient = MockClient;
-})(Invoice || (Invoice = {}));
-/// <reference path="./MockClient.ts"/>
-/// <reference path="./ractive.d.ts"/>
-/// <reference path="./Page.ts"/>
-var Application = (function () {
-    function Application() {
-        this.client = new Invoice.MockClient();
+var _;
+var baseURL = '';
+var AppClientImpl = (function () {
+    function AppClientImpl(url) {
+        this.url = url;
     }
-    return Application;
+    AppClientImpl.prototype.login = function (username, password, callback) {
+        var params = {
+            username: username,
+            password: password
+        };
+        this.exec(this.url + '/api/v1/token', 'POST', null, params, {
+            success: function (json) {
+                callback.success(json.access_token);
+            },
+            error: function (status, body) {
+                callback.error(status, body.msg);
+            }
+        });
+    };
+    AppClientImpl.prototype.getTradings = function (token, callback) {
+        this.exec(this.url + '/api/v1/tradings', 'GET', token, null, {
+            success: function (json) {
+                callback.success(_.map(json.tradings, function (item) {
+                    item.date = item.id;
+                    return item;
+                }));
+            },
+            error: function (status, body) {
+                callback.error(status, body.msg);
+            }
+        });
+    };
+    AppClientImpl.prototype.getTradingItems = function (token, tradingId, callback) {
+        var url = this.url + '/api/v1/tradings/' + tradingId + '/items';
+        this.exec(url, 'GET', token, null, {
+            success: function (json) {
+                callback.success(_.map(json.items, function (item) {
+                    item.sum = item.unit_price * item.amount;
+                    return item;
+                }));
+            },
+            error: function (status, body) {
+                callback.error(status, body.msg);
+            }
+        });
+    };
+    AppClientImpl.prototype.getUsers = function (token, callback) {
+        var url = this.url + '/api/v1/users';
+        this.exec(url, 'GET', token, null, {
+            success: function (json) {
+                callback.success(json.users);
+            },
+            error: function (status, body) {
+                callback.error(status, body.msg);
+            }
+        });
+    };
+    AppClientImpl.prototype.getCompanies = function (token, callback) {
+        var url = this.url + '/api/v1/companies';
+        this.exec(url, 'GET', token, null, {
+            success: function (json) {
+                callback.success(json.companies);
+            },
+            error: function (status, body) {
+                callback.error(status, body.msg);
+            }
+        });
+    };
+    AppClientImpl.prototype.saveTrading = function (token, item, callback) {
+        if (item.id === null) {
+            this.createTrading(token, item, callback);
+        }
+        else {
+            this.updateTrading(token, item, callback);
+        }
+    };
+    AppClientImpl.prototype.saveTradingItem = function (token, tradingId, item, callback) {
+        if (item.id === null) {
+            this.createTradingItem(token, tradingId, item, callback);
+        }
+        else {
+            this.updateTradingItem(token, tradingId, item, callback);
+        }
+    };
+    AppClientImpl.prototype.deleteTradingItem = function (token, tradingId, itemId, callback) {
+        var url = this.url + '/api/v1/tradings/' + tradingId +
+            '/items/' + itemId;
+        this.exec(url, 'DELETE', token, null, {
+            success: function (json) {
+                callback.success(itemId);
+            },
+            error: function (status, body) {
+                if (status == 404) {
+                    callback.success(itemId);
+                }
+                else {
+                    callback.error(status, body.msg);
+                }
+            }
+        });
+    };
+    AppClientImpl.prototype.saveCompany = function (token, item, callback) {
+        if (item.id === null || item.id.length == 0) {
+            this.createCompany(token, item, callback);
+        }
+        else {
+            this.updateCompany(token, item, callback);
+        }
+    };
+    AppClientImpl.prototype.createTrading = function (token, item, callback) {
+        var url = this.url + '/api/v1/tradings';
+        this.exec(url, 'POST', token, item, {
+            success: function (json) {
+                callback.success(json.id);
+            },
+            error: function (status, body) {
+                callback.error(status, body.msg);
+            }
+        });
+    };
+    AppClientImpl.prototype.updateTrading = function (token, item, callback) {
+        var url = this.url + '/api/v1/tradings/' + item.id;
+        this.exec(url, 'PUT', token, item, {
+            success: function (json) {
+                callback.success(item.id);
+            },
+            error: function (status, body) {
+                callback.error(status, body.msg);
+            }
+        });
+    };
+    AppClientImpl.prototype.createTradingItem = function (token, tradingId, item, callback) {
+        var url = this.url + '/api/v1/tradings/' + tradingId + '/items';
+        this.exec(url, 'POST', token, item, {
+            success: function (json) {
+                callback.success(json.id);
+            },
+            error: function (status, body) {
+                callback.error(status, body.msg);
+            }
+        });
+    };
+    AppClientImpl.prototype.updateTradingItem = function (token, tradingId, item, callback) {
+        var url = this.url + '/api/v1/tradings/' + tradingId +
+            '/items/' + item.id;
+        this.exec(url, 'PUT', token, item, {
+            success: function (json) {
+                callback.success(item.id);
+            },
+            error: function (status, body) {
+                callback.error(status, body.msg);
+            }
+        });
+    };
+    AppClientImpl.prototype.createCompany = function (token, item, callback) {
+        var url = this.url + '/api/v1/companies';
+        this.exec(url, 'POST', token, item, {
+            success: function (json) {
+                callback.success(json.id);
+            },
+            error: function (status, body) {
+                callback.error(status, body.msg);
+            }
+        });
+    };
+    AppClientImpl.prototype.updateCompany = function (token, item, callback) {
+        var url = this.url + '/api/v1/companies/' + item.id;
+        this.exec(url, 'PUT', token, item, {
+            success: function (json) {
+                callback.success(json.id);
+            },
+            error: function (status, body) {
+                callback.error(status, body.msg);
+            }
+        });
+    };
+    AppClientImpl.prototype.exec = function (url, method, token, params, callback) {
+        var data = {
+            url: url,
+            type: method,
+            dataType: 'json',
+            scriptCharset: 'utf-8',
+            processData: false
+        };
+        if (token != null) {
+            data.headers = {
+                authorization: 'bearer ' + token
+            };
+        }
+        if (params != null) {
+            data.data = JSON.stringify(params);
+        }
+        $.ajax(data)
+            .done(function (data_, status, data) {
+            if (data.status == 204) {
+                callback.success({});
+            }
+            else {
+                callback.success(JSON.parse(data.responseText));
+            }
+        }).fail(function (data) {
+            if (data.status == 204) {
+                callback.success({});
+            }
+            else {
+                callback.error(data.status, JSON.parse(data.responseText));
+            }
+        });
+    };
+    return AppClientImpl;
 })();
-/// <reference path="./Page.ts"/>
+function createClient() {
+    return new AppClientImpl(baseURL);
+}
+var User = (function () {
+    function User() {
+    }
+    return User;
+})();
+var Company = (function () {
+    function Company() {
+    }
+    return Company;
+})();
+var Trading = (function () {
+    function Trading() {
+    }
+    return Trading;
+})();
+var TradingItem = (function () {
+    function TradingItem() {
+    }
+    return TradingItem;
+})();
+var userList = [];
+userList.push({
+    'id': 'user1',
+    'display_name': '秋葉 秀樹'
+});
+userList.push({
+    'id': 'user2',
+    'display_name': '秋葉 ちひろ'
+});
+var companyList = [];
+var company = new Company();
+company.id = 'company1';
+company.name = '株式会社NRI';
+company.unit = '生産革新部';
+company.zip = '111-2222';
+company.address = '東京都新宿区新宿2-2-4';
+company.phone = '090-1111-2222';
+company.assignee = '東山 正二';
+companyList.push(company);
+company = new Company();
+company.id = 'company2';
+company.name = '株式会社カルチャー';
+company.unit = '';
+company.zip = '111-2222';
+company.address = '東京都渋谷区神宮前4-8-10';
+company.phone = '090-3333-4444';
+company.assignee = '';
+companyList.push(company);
+company = new Company();
+company.id = 'company3';
+company.name = '株式会社忍者';
+company.unit = '';
+company.zip = '111-2222';
+company.address = '東京都三鷹市一丁目3-5-95';
+company.phone = '090-3333-4444';
+company.assignee = '';
+companyList.push(company);
+company = new Company();
+company.id = 'company4';
+company.name = 'ツクロウ';
+company.unit = '';
+company.zip = '111-2222';
+company.address = '広島県福山市鞆の浦4154-5';
+company.phone = '090-3333-4444';
+company.assignee = '';
+companyList.push(company);
+var sheetList = [];
+for (var i = 0; i < 10; ++i) {
+    sheetList.push({
+        'id': 'idA' + i,
+        'date': '1432542408000',
+        'company_id': 'company1',
+        'company_name': '株式会社ABC',
+        'title_type': 0,
+        'subject': '画面作成',
+        'work_from': 1432542408000,
+        'work_to': 1432542408000,
+        'quotation_date': 1432542408000,
+        'bill_date': 1432542408000,
+        'tax_rate': 8,
+        'assignee': 'user1',
+        'product': '成果物A',
+        'total': 650000,
+        'modified_time': 1432542408000,
+        'quotation_number': 'E0124',
+        'bill_number': ''
+    });
+    sheetList.push({
+        'id': 'idB' + i,
+        'date': '1432542408000',
+        'company_id': 'company2',
+        'company_name': '株式会社NRI',
+        'title_type': 1,
+        'subject': '【コンサルツールモック】デザイン画面作成',
+        'work_from': 1431505608,
+        'work_to': 1431505608,
+        'quotation_date': 1431505608,
+        'bill_date': 1431505608,
+        'tax_rate': 10,
+        'assignee': 'user2',
+        'product': '成果物B',
+        'total': 1030875,
+        'modified_time': 1431505608,
+        'quotation_number': 'E0123',
+        'bill_number': 'V0238'
+    });
+}
+var tradingItemList = [];
+///<reference path="./Dialog.ts"/>
+///<reference path="./Client.ts"/>
+var App = (function () {
+    function App() {
+    }
+    App.prototype.showDialog = function (dialog) {
+        document.querySelector('#dialogs').style.display = 'block';
+        app.dialogs.push('dialogs', dialog).then(function () {
+            var list = app.dialogs.get('dialogs');
+            app.updateDialogs(list);
+        });
+        $('#container').addClass('dialogOpened');
+    };
+    App.prototype.updateDialogs = function (list) {
+        for (var i = 0; i < list.length; ++i) {
+            var s = document.querySelector('#dialog' + i);
+            list[i].attach(this, s);
+        }
+    };
+    App.prototype.closeDialog = function () {
+        var _this = this;
+        this.dialogs.pop('dialogs').then(function () {
+            // hide overlay
+            var list = _this.dialogs.get('dialogs');
+            if (list.length == 0) {
+                document.querySelector('#dialogs').style.display = 'none';
+                $('#container').removeClass('dialogOpened');
+            }
+            else {
+                _this.updateDialogs(list);
+            }
+        });
+    };
+    App.prototype.start = function () {
+        this.client = createClient();
+        this.initDialog();
+    };
+    App.prototype.initDialog = function () {
+        var _this = this;
+        // dialogの準備
+        this.dialogs = new Ractive({
+            el: '#dialogs',
+            template: '#dialogsTemplate',
+            data: {
+                dialogs: []
+            }
+        });
+        this.dialogs.on({
+            'closeClick': function () {
+                _this.closeDialog();
+            }
+        });
+    };
+    App.prototype.loadData = function (callback) {
+        this.loadUsers(callback);
+    };
+    App.prototype.loadUsers = function (callback) {
+        var _this = this;
+        if (this.users != null) {
+            this.loadTradings(callback);
+            return;
+        }
+        this.client.getUsers(this.accessToken, {
+            success: function (list) {
+                _this.users = list;
+                _this.loadTradings(callback);
+            },
+            error: function (status, msg) {
+                console.log('Failed to get users status=' + status);
+                callback.error();
+            }
+        });
+    };
+    App.prototype.loadTradings = function (callback) {
+        var _this = this;
+        if (this.tradings != null) {
+            this.loadCompanies(callback);
+            return;
+        }
+        this.client.getTradings(this.accessToken, {
+            success: function (list) {
+                _this.tradings = list;
+                _this.tradingsMap = {};
+                _.each(_this.tradings, function (item) {
+                    _this.tradingsMap[item.id] = item;
+                });
+                _this.loadCompanies(callback);
+            },
+            error: function (status, msg) {
+                console.log('Failed to get tradings status=' + status);
+                callback.error();
+            }
+        });
+    };
+    App.prototype.loadCompanies = function (callback) {
+        var _this = this;
+        if (this.companies != null) {
+            callback.done();
+            return;
+        }
+        this.client.getCompanies(this.accessToken, {
+            success: function (list) {
+                _this.companies = list;
+                _this.companyMap = {};
+                _.each(_this.companies, function (item) {
+                    _this.companyMap[item.id] = item;
+                });
+                callback.done();
+            },
+            error: function (status, msg) {
+                console.log('Failed to get companies status=' + status);
+                callback.error();
+            }
+        });
+    };
+    return App;
+})();
+///<reference path="./Application.ts"/>
+///<reference path="./Dialog.ts"/>
+var UserListDialog = (function () {
+    function UserListDialog() {
+    }
+    UserListDialog.prototype.attach = function (app, el) {
+        app.ractive = new Ractive({
+            // どの箱に入れるかをIDで指定
+            el: el,
+            // 指定した箱に、どのHTMLを入れるかをIDで指定
+            template: '#userListTemplate'
+        });
+        app.ractive.on({
+            'windowClicked': function () {
+                return false;
+            },
+            'close': function () {
+                app.closeDialog();
+                return false;
+            }
+        });
+        //dialog内だけスクロールするように調整
+        var listUserHeight = $('.listTemplate').height();
+        $('.listTemplate .list').css('height', listUserHeight - 330);
+    };
+    return UserListDialog;
+})();
+///<reference path="./Application.ts"/>
+///<reference path="./Dialog.ts"/>
+var AddCompanyDialog = (function () {
+    function AddCompanyDialog() {
+    }
+    AddCompanyDialog.prototype.attach = function (app, el) {
+        app.ractive = new Ractive({
+            // どの箱に入れるかをIDで指定
+            el: el,
+            // 指定した箱に、どのHTMLを入れるかをIDで指定
+            template: '#addCompanyTemplate'
+        });
+        app.ractive.on({
+            'windowClicked': function () {
+                return false;
+            },
+            'close': function () {
+                app.closeDialog();
+                return false;
+            }
+        });
+    };
+    return AddCompanyDialog;
+})();
+///<reference path="./Application.ts"/>
+///<reference path="./Dialog.ts"/>
+///<reference path="./AddCompanyDialog.ts"/>
+var CompanyListDialog = (function () {
+    function CompanyListDialog() {
+    }
+    CompanyListDialog.prototype.attach = function (app, el) {
+        var _this = this;
+        this.ractive = new Ractive({
+            // どの箱に入れるかをIDで指定
+            el: el,
+            // 指定した箱に、どのHTMLを入れるかをIDで指定
+            template: '#companyListTemplate',
+            data: {
+                companyList: app.companies
+            }
+        });
+        this.ractive.on({
+            'windowClicked': function () {
+                return false;
+            },
+            'close': function () {
+                app.closeDialog();
+                return false;
+            },
+            'showEdit': function (e, item) {
+                console.log('clickEvent');
+                _this.showEditDialog(app, item);
+                return false;
+            },
+            'submit': function () {
+                _this.save(app);
+            }
+        });
+        //dialog内だけスクロールするように調整
+        var listUserHeight = $('.listTemplate').height();
+        $('.listTemplate .list').css('height', listUserHeight - 370);
+    };
+    CompanyListDialog.prototype.showEditDialog = function (app, item) {
+        app.showDialog(new AddCompanyDialog());
+    };
+    CompanyListDialog.prototype.save = function (app) {
+        var _this = this;
+        var name = this.ractive.get('name');
+        var unit = this.ractive.get('unit');
+        var assignee = this.ractive.get('assignee');
+        var zip = this.ractive.get('zip');
+        var address = this.ractive.get('address');
+        var tel = this.ractive.get('tel');
+        var fax = this.ractive.get('fax');
+        var company = new Company();
+        company.id = null;
+        company.name = name;
+        company.zip = zip;
+        company.address = address;
+        company.phone = tel;
+        company.fax = fax;
+        company.unit = unit;
+        company.assignee = assignee;
+        app.client.saveCompany(app.accessToken, company, {
+            success: function (id) {
+                company.id = id;
+                app.companyMap[id] = company;
+                _this.ractive.unshift('companyList', company);
+                _this.clearForm(app);
+            },
+            error: function (status, msg) {
+                console.log('Failed to create company status=' + status);
+            }
+        });
+        console.log(company);
+    };
+    CompanyListDialog.prototype.clearForm = function (app) {
+        this.ractive.set('name', '');
+        this.ractive.set('unit', '');
+        this.ractive.set('assignee', '');
+        this.ractive.set('zip', '');
+        this.ractive.set('address', '');
+        this.ractive.set('tel', '');
+        this.ractive.set('fax', '');
+    };
+    return CompanyListDialog;
+})();
+///<reference path="./Application.ts"/>
+///<reference path="./Dialog.ts"/>
+var SettingsDialog = (function () {
+    function SettingsDialog() {
+    }
+    SettingsDialog.prototype.attach = function (app, el) {
+        app.ractive = new Ractive({
+            // どの箱に入れるかをIDで指定
+            el: el,
+            // 指定した箱に、どのHTMLを入れるかをIDで指定
+            template: '#settingTemplate'
+        });
+        app.ractive.on({
+            'windowClicked': function () {
+                return false;
+            },
+            'close': function () {
+                app.closeDialog();
+                return false;
+            }
+        });
+    };
+    return SettingsDialog;
+})();
+///<reference path="./app.ts"/>
+///<reference path="./Page.ts"/>
+///<reference path="./UserListDialog.ts"/>
+///<reference path="./CompanyListDialog.ts"/>
+///<reference path="./SettingsDialog.ts"/>
+var SignInPage = (function () {
+    function SignInPage() {
+    }
+    SignInPage.prototype.onCreate = function (app) {
+        var _this = this;
+        // Racriveオブジェクトを作る
+        var r = app.ractive = new Ractive({
+            // どの箱に入れるかをIDで指定
+            el: '#container',
+            // 指定した箱に、どのHTMLを入れるかをIDで指定
+            template: '#signInTemplate',
+            // データを設定。テンプレートで使います。
+            data: {
+                inProgress: false
+            }
+        });
+        app.ractive.on({
+            'signIn': function (e, item) {
+                var username = r.get('username');
+                var password = r.get('password');
+                _this.signIn(app, username, password);
+            }
+        });
+    };
+    SignInPage.prototype.signIn = function (app, username, password) {
+        app.ractive.set('inProgress', true);
+        app.ractive.update();
+        app.client.login(username, password, {
+            success: function (token) {
+                app.accessToken = token;
+                app.router.navigate('top', { trigger: true });
+            },
+            error: function (status, msg) {
+                app.ractive.set('inProgress', false);
+                app.ractive.update();
+                console.log('failed to login status=' + status);
+            }
+        });
+    };
+    return SignInPage;
+})();
+///<reference path="./app.ts"/>
+///<reference path="./Page.ts"/>
+///<reference path="./UserListDialog.ts"/>
+///<reference path="./CompanyListDialog.ts"/>
+///<reference path="./SettingsDialog.ts"/>
 var TopPage = (function () {
     function TopPage() {
     }
     TopPage.prototype.onCreate = function (app) {
         var _this = this;
-        this.app = app;
-        var r = app.ractive = new Ractive({
-            el: '#container',
-            template: '#topTemplate',
-            data: {
-                loginInProgress: false
+        app.loadData({
+            done: function () {
+                _this.show(app);
+            },
+            error: function () {
+                // nop
             }
         });
-        r.on('login', function (e) {
-            _this.login(r.get('username'), r.get('password'));
-        });
-        console.log(this);
     };
-    TopPage.prototype.login = function (username, password) {
-        var _this = this;
-        this.app.ractive.set('loginInProgress', true);
-        this.app.client.login(username, password, {
-            success: function (token) {
-                _this.app.ractive.set('loginInProgress', false);
-                _this.app.token = token;
-                _this.app.router.navigate('tradings', { trigger: true });
+    TopPage.prototype.show = function (app) {
+        // Racriveオブジェクトを作る
+        app.ractive = new Ractive({
+            // どの箱に入れるかをIDで指定
+            el: '#container',
+            // 指定した箱に、どのHTMLを入れるかをIDで指定
+            template: '#topTemplate',
+            // データを設定。テンプレートで使います。
+            data: {
+                'company': app.companyMap,
+                'sheets': app.tradings
+            }
+        });
+        tooltipster();
+        app.ractive.on({
+            'showSheet': function (e, item) {
+                // #sheetに遷移する
+                app.router.navigate('sheets/' + item.id, { trigger: true });
             },
-            error: function (msg) {
-                _this.app.ractive.set('loginInProgress', false);
-                console.log('error ' + msg);
+            'printQuotation': function (e, item) {
+                window.location.href = "/php/quotation.php?access_token=" + app.accessToken + "&trading_id=" + item.id;
+            },
+            'printBill': function (e, item) {
+                window.location.href = "/php/bill.php?access_token=" + app.accessToken + "&trading_id=" + item.id;
+            },
+            'showUserList': function () {
+                app.showDialog(new UserListDialog());
+            },
+            'showCompanyList': function () {
+                app.showDialog(new CompanyListDialog());
+            },
+            'showSetting': function (e) {
+                // #settingに遷移する
+                app.showDialog(new SettingsDialog());
             }
         });
     };
     return TopPage;
 })();
-/// <reference path="./Page.ts"/>
-var TradingListPage = (function () {
-    function TradingListPage() {
+var Utils;
+(function (Utils) {
+    function toNumber(source) {
+        var num = Number(String(source).replace(",", ""));
+        return isNaN(num) ? 0 : num;
     }
-    TradingListPage.prototype.onCreate = function (app) {
-        var _this = this;
-        this.app = app;
-        var r = app.ractive = new Ractive({
-            el: '#container',
-            template: '#tradingTemplate',
-            data: {
-                tradings: app.tradings,
-                token: app.token
-            }
-        });
-        r.on({
-            itemClick: function (e, i) {
-                _this.edit(i);
-            },
-            printQuotation: function (e, i) {
-                _this.printQuotation(i);
-            },
-            printBill: function (e, i) {
-                _this.printBill(i);
-            },
-            newTrading: function (e) {
-                _this.newTrading(r.get('newId'));
-            },
-            company: function (e) {
-                _this.app.router.navigate('companies', { trigger: true });
-            }
-        });
-        this.loadTradings();
-    };
-    TradingListPage.prototype.loadTradings = function () {
-        var _this = this;
-        this.app.client.getTradings(this.app.token, {
-            success: function (list) {
-                _this.app.tradings = list;
-                _this.app.tradingMap = {};
-                _.each(list, function (item) {
-                    _this.app.tradingMap[item.id] = item;
-                });
-                _this.loadUsers();
-            },
-            error: function (statuc, msg) {
-                console.log('error ' + msg);
-            }
-        });
-    };
-    TradingListPage.prototype.loadUsers = function () {
-        var _this = this;
-        this.app.client.getUsers(this.app.token, {
-            success: function (list) {
-                _this.app.users = list;
-                _this.loadCompanies();
-            },
-            error: function (msg) {
-                console.log('error getUsers ' + msg);
-            }
-        });
-    };
-    TradingListPage.prototype.loadCompanies = function () {
-        var _this = this;
-        this.app.client.getCompanies(this.app.token, {
-            success: function (list) {
-                _this.app.companies = list;
-                _this.app.companyMap = {};
-                _.each(list, function (item) {
-                    _this.app.companyMap[item.id] = item;
-                });
-                // set company name
-                _.each(_this.app.tradings, function (item) {
-                    var company = _this.app.companyMap[item.company_id];
-                    item.company_name = (company === undefined) ? '' : company.name;
-                });
-                _this.show();
-            },
-            error: function (msg) {
-                console.log('error getCompanies ' + msg);
-            }
-        });
-    };
-    TradingListPage.prototype.show = function () {
-        this.app.ractive.set('tradings', this.app.tradings);
-        this.app.ractive.set('token', this.app.token);
-        this.app.ractive.update();
-    };
-    TradingListPage.prototype.newTrading = function (id) {
-        if (id == null || id.length == 0) {
-            return;
+    Utils.toNumber = toNumber;
+    function toDateStr(time) {
+        var date = new Date(time);
+        var m = date.getMonth() + 1;
+        var d = date.getDate();
+        if (m < 10) {
+            m = "0" + m;
         }
-        app.trading = {
-            id: null,
-            date: id,
-            modified_time: 0,
-            company_id: '',
-            company_name: '',
-            title_type: 0,
-            subject: '',
-            work_from: new Date().getTime(),
-            work_to: new Date().getTime(),
-            quotation_date: new Date().getTime(),
-            bill_date: new Date().getTime(),
-            tax_rate: 8,
-            assignee: '',
-            product: '',
-            total: 0
-        };
-        app.tradingMap['new'] = app.trading;
-        app.router.navigate('tradings/new', { trigger: true });
+        if (d < 10) {
+            d = "0" + d;
+        }
+        return date.getFullYear() + "-" + m + "-" + d;
+    }
+    Utils.toDateStr = toDateStr;
+    function clone(source) {
+        var dest = {};
+        for (var k in source) {
+            dest[k] = source[k];
+        }
+        return dest;
+    }
+    Utils.clone = clone;
+})(Utils || (Utils = {}));
+///<reference path="./Application.ts"/>
+///<reference path="./Dialog.ts"/>
+var AddUserDialog = (function () {
+    function AddUserDialog() {
+    }
+    AddUserDialog.prototype.attach = function (app, el) {
+        app.ractive = new Ractive({
+            // どの箱に入れるかをIDで指定
+            el: el,
+            // 指定した箱に、どのHTMLを入れるかをIDで指定
+            template: '#addUserTemplate'
+        });
+        app.ractive.on({
+            'windowClicked': function () {
+                return false;
+            },
+            'close': function () {
+                app.closeDialog();
+                return false;
+            }
+        });
     };
-    TradingListPage.prototype.edit = function (i) {
-        console.log(app.tradings[i]);
-        app.trading = app.tradings[i];
-        app.router.navigate('tradings/' + app.tradings[i].id, { trigger: true });
-    };
-    TradingListPage.prototype.printQuotation = function (i) {
-        var trading = app.tradings[i];
-        window.location.href = "/php/quotation.php?access_token=" + app.token + "&trading_id=" + trading.id;
-    };
-    TradingListPage.prototype.printBill = function (i) {
-        var trading = app.tradings[i];
-        window.location.href = "/php/bill.php?access_token=" + app.token + "&trading_id=" + trading.id;
-    };
-    return TradingListPage;
+    return AddUserDialog;
 })();
-/// <reference path="./Page.ts"/>
-var EditTradingPage = (function () {
-    function EditTradingPage(id) {
+///<reference path="./Application.ts"/>
+///<reference path="./Page.ts"/>
+///<reference path="./Functions.ts"/>
+///<reference path="./AddCompanyDialog.ts"/>
+///<reference path="./AddUserDialog.ts"/>
+var SheetPage = (function () {
+    function SheetPage(id) {
         this.id = id;
     }
-    EditTradingPage.prototype.onCreate = function (app) {
+    SheetPage.prototype.onCreate = function (app) {
+        var item;
+        if (app.tradingsMap === undefined || (item = app.tradingsMap[this.id]) === null) {
+            window.history.back();
+            return;
+        }
+        this.loadItems(app, Utils.clone(item));
+    };
+    SheetPage.prototype.loadItems = function (app, trading) {
         var _this = this;
-        this.app = app;
+        app.client.getTradingItems(app.accessToken, trading.id, {
+            success: function (list) {
+                _this.show(app, trading, list);
+            },
+            error: function (status, msg) {
+                console.log('Failed to get items status=' + status);
+                window.history.back();
+            }
+        });
+    };
+    SheetPage.prototype.show = function (app, trading, itemList) {
+        var _this = this;
         var es = function (node) {
             $(node).easySelectBox({ speed: 200 });
             return {
@@ -275,345 +794,254 @@ var EditTradingPage = (function () {
                 }
             };
         };
-        var toDateStr = function (date) {
-            var m = date.getMonth() + 1;
-            var d = date.getDate();
-            if (m < 10) {
-                m = "0" + m;
-            }
-            if (d < 10) {
-                d = "0" + d;
-            }
-            return date.getFullYear() + "-" + m + "-" + d;
-        };
-        var item = app.tradingMap[this.id];
-        var workFrom = toDateStr(new Date(item.work_from));
-        var workTo = toDateStr(new Date(item.work_to));
-        var quotationDate = toDateStr(new Date(item.quotation_date));
-        var billDate = toDateStr(new Date(item.bill_date));
+        // Racriveオブジェクトを作る
         var r = app.ractive = new Ractive({
+            // どの箱に入れるかをIDで指定
             el: '#container',
-            template: '#editTradingTemplate',
+            // 指定した箱に、どのHTMLを入れるかをIDで指定
+            template: '#sheetTemplate',
             decorators: {
                 easyselect: es
             },
             data: {
-                trading: item,
-                users: app.users,
-                companies: app.companies,
-                workFrom: workFrom,
-                workTo: workTo,
-                quotationDate: quotationDate,
-                billDate: billDate,
-                deleteList: [],
-                numToCurrency: function (val) {
-                    return util.numToCurrency(val);
-                }
+                'trading': trading,
+                'workFrom': Utils.toDateStr(trading.work_from),
+                'workTo': Utils.toDateStr(trading.work_to),
+                'quotationDate': Utils.toDateStr(trading.quotation_date),
+                'billDate': Utils.toDateStr(trading.bill_date),
+                'companies': app.companies,
+                'users': app.users,
+                'tradingItems': itemList,
+                'deletedItems': []
             }
         });
+        var updateItemSum = function (keypath) {
+            var unitPrice = Utils.toNumber(r.get(keypath + 'unit_price'));
+            var amount = Utils.toNumber(r.get(keypath + 'amount'));
+            r.set(keypath + 'sum', unitPrice * amount);
+        };
+        var updateSum = function () {
+            var itemList = r.get('tradingItems');
+            var sum = 0;
+            var tax = 0;
+            var taxRate = Number(r.get('trading.tax_rate'));
+            for (var i = 0; i < itemList.length; ++i) {
+                var item = itemList[i];
+                var taxType = Number($('#tax_type' + i).val());
+                if (taxType == 1) {
+                    sum += item.sum;
+                    tax += item.sum * taxRate / 100;
+                }
+                else if (taxType == 2) {
+                    var body = item.sum * 100 / (100 + taxRate);
+                    var taxTmp = Math.ceil(item.sum - body);
+                    sum += item.sum - taxTmp;
+                    tax += taxTmp;
+                }
+            }
+            r.set('trading.sum', sum);
+            r.set('trading.tax', tax);
+            r.set('trading.total', sum + tax);
+            r.update();
+        };
+        var observeItem = function () {
+            return r.observe({
+                'tradingItems.*.unit_price': function (newValue, oldValue, keypath) {
+                    updateItemSum(keypath.replace('unit_price', ''));
+                },
+                'tradingItems.*.amount': function (newValue, oldValue, keypath) {
+                    updateItemSum(keypath.replace('amount', ''));
+                },
+                'tradingItems.*.sum': function (newValue, oldValue, keypath) {
+                    updateSum();
+                }
+            });
+        };
+        var itemObserver = observeItem();
         r.on({
-            numFocus: function (e, val) {
-                e.node.value = util.currencyToNum(val);
-                r.updateModel();
-            },
-            'sumBlur': function (e, val, index) {
-                e.node.value = util.numToCurrency(val);
-                r.updateModel();
-                var item = e.context;
-                item.sum = util.currencyToNum(item.unit_price) * item.amount;
-                r.update();
-            },
-            amountBlur: function (e) {
-                var item = e.context;
-                item.sum = util.currencyToNum(item.unit_price) * item.amount;
-                r.update();
-            },
-            deleteItem: function (e, index) {
-                if (!confirm('この項目を削除しますか？')) {
-                    return;
-                }
-                var tradings = r.get('tradingItems');
-                var trading = tradings[index];
-                if (trading.id != null) {
-                    var list = r.get('deleteList');
-                    list.push(trading.id);
-                    r.set('deleteList', list);
-                }
-                tradings.splice(index, 1);
-                r.set('tradingItems', tradings);
-                r.update();
-            },
-            addItem: function (e) {
-                var list = r.get('tradingItems');
-                list.push({
+            'addItem': function () {
+                r.push('tradingItems', {
                     id: null,
-                    subject: "",
+                    subject: '',
                     unit_price: 0,
                     amount: 0,
-                    degree: "人月",
+                    degree: '',
+                    memo: '',
                     tax_type: 1,
-                    memo: "",
                     sum: 0
                 });
-                r.set('tradingItems', list);
-                r.update();
             },
-            save: function () {
-                var company = r.get('companies')[$('#company').prop('selectedIndex')];
-                var assignee = r.get('users')[$('#assignee').prop('selectedIndex')];
-                var trading = r.get('trading');
-                trading.company_id = company.id;
-                trading.title_type = $('#titleType').prop('selectedIndex');
-                trading.assignee = assignee.id;
-                trading.work_from = new Date(r.get('workFrom')).getTime();
-                trading.work_to = new Date(r.get('workTo')).getTime();
-                trading.quotation_date = new Date(r.get('quotationDate')).getTime();
-                trading.bill_date = new Date(r.get('billDate')).getTime();
-                trading.tax_rate = parseFloat(r.get('trading.tax_rate'));
-                var items = r.get('tradingItems');
-                var list = [];
-                for (var i = 0; i < items.length; ++i) {
-                    var item = items[i];
-                    item.unit_price = util.currencyToNum(item.unit_price);
-                    item.amount = parseInt(item.amount);
-                    item.tax_type = parseInt(item.tax_type);
-                    list.push(item);
-                }
-                var deleteList = r.get('deleteList');
-                _this.save(trading, list, deleteList);
+            'addCompany': function () {
+                _this.showAddCompanyDialog(app);
+            },
+            'addUser': function () {
+                _this.showAddUserDialog(app);
             }
         });
-        this.loadTrading();
+        r.on('deleteItem', function (e, index) {
+            itemObserver.cancel();
+            var item = r.get('tradingItems')[index];
+            r.splice('tradingItems', index, 1);
+            if (item.id != null) {
+                r.push('deletedItems', item);
+            }
+            itemObserver = observeItem();
+        });
+        r.on('save', function () {
+            _this.save(app);
+        });
+        r.observe('trading.tax_rate', function (newValue, oldValue, keypath) {
+            updateSum();
+        });
+        // この下にjQuery関連のコードおねがいしやす
+        tooltipster();
+        //selectbox();
+        //sheet();
     };
-    EditTradingPage.prototype.loadTrading = function () {
+    SheetPage.prototype.showAddCompanyDialog = function (app) {
+        app.showDialog(new AddCompanyDialog());
+    };
+    SheetPage.prototype.showAddUserDialog = function (app) {
+        app.showDialog(new AddUserDialog());
+    };
+    SheetPage.prototype.save = function (app) {
         var _this = this;
-        if (this.id == 'new') {
-            app.tradingItems = [];
-            this.show();
+        var trading = app.ractive.get('trading');
+        var companyId = $('#company').val();
+        var titleType = $('#titleType').val();
+        var workFrom = app.ractive.get('workFrom');
+        var workTo = app.ractive.get('workTo');
+        var quotationDate = app.ractive.get('quotationDate');
+        var billDate = app.ractive.get('billDate');
+        var tradingItems = app.ractive.get('tradingItems');
+        // modify type
+        trading.company_id = companyId;
+        trading.title_type = Number(titleType);
+        trading.work_from = new Date(workFrom).getTime();
+        trading.work_to = new Date(workTo).getTime();
+        trading.quotation_date = new Date(quotationDate).getTime();
+        trading.bill_date = new Date(billDate).getTime();
+        trading.tax_rate = Number(trading.tax_rate);
+        console.log(trading);
+        app.client.saveTrading(app.accessToken, trading, {
+            success: function (id) {
+                var deleted = app.ractive.get('deletedItems');
+                _this.deleteItems(app, id, deleted);
+            },
+            error: function (status, msg) {
+                console.log('Failed to save trading status=' + status);
+            }
+        });
+    };
+    SheetPage.prototype.deleteItems = function (app, id, list) {
+        var _this = this;
+        if (list.length == 0) {
+            var list3 = [];
+            _.each(app.ractive.get('tradingItems'), function (item, index) {
+                item.sort_order = index;
+                item.unit_price = Number(item.unit_price);
+                item.amount = Number(item.amount);
+                item.tax_type = Number($('#tax_type' + index).val());
+                list3.push(item);
+            });
+            this.saveItems(app, id, list3);
             return;
         }
-        this.app.client.getTradingItems(this.app.token, this.id, {
-            success: function (list) {
-                _this.app.tradingItems = _.map(list, function (item) {
-                    item.unit_price = util.numToCurrency(item.unit_price);
-                    return item;
-                });
-                _this.show();
+        var item = list[0];
+        app.client.deleteTradingItem(app.accessToken, id, item.id, {
+            success: function (itemId) {
+                list.splice(0, 1);
+                _this.deleteItems(app, id, list);
             },
-            error: function (msg) {
-                console.log('error ' + msg);
+            error: function (status, msg) {
+                console.log('Failed to delete items status=' + status);
             }
         });
     };
-    EditTradingPage.prototype.show = function () {
-        this.app.ractive.set('tradingItems', this.app.tradingItems);
-        this.app.ractive.update();
-    };
-    EditTradingPage.prototype.save = function (trading, items, deleteList) {
+    SheetPage.prototype.saveItems = function (app, id, list) {
         var _this = this;
-        this.deleteItems(trading, items, deleteList);
-        this.app.client.saveTrading(this.app.token, trading, {
-            success: function (id) {
-                console.log('ok');
-                _this.saveItems(id, items);
-            },
-            error: function (msg) {
-                console.log('failed to save ' + msg);
-            }
-        });
-    };
-    EditTradingPage.prototype.deleteItems = function (trading, items, deleteList) {
-        var _this = this;
-        if (deleteList.length == 0) {
-            this.saveTrading(trading, items);
-            return;
-        }
-        this.app.client.deleteTradingItem(this.app.token, trading.id, deleteList[0], {
-            success: function (id) {
-                deleteList.shift();
-                _this.deleteItems(trading, items, deleteList);
-            },
-            error: function (msg) {
-                console.log('failed to delete ' + msg);
-            }
-        });
-    };
-    EditTradingPage.prototype.saveTrading = function (trading, items) {
-    };
-    EditTradingPage.prototype.saveItems = function (tradingId, items) {
-        var _this = this;
-        if (items.length == 0) {
+        if (list.length == 0) {
             window.history.back();
             return;
         }
-        this.app.client.saveTradingItem(this.app.token, tradingId, items[0], {
-            success: function (id) {
-                console.log('ok');
-                items.shift();
-                _this.saveItems(tradingId, items);
+        var item = list[0];
+        app.client.saveTradingItem(app.accessToken, id, item, {
+            success: function (itemId) {
+                item.id = itemId;
+                list.splice(0, 1);
+                _this.saveItems(app, id, list);
             },
-            error: function (msg) {
-                console.log('failed to save ' + msg);
+            error: function (status, msg) {
+                console.log('Failed to save items status=' + status);
             }
         });
     };
-    return EditTradingPage;
+    return SheetPage;
 })();
-/// <reference path="./ractive.d.ts"/>
-/// <reference path="./TopPage.ts"/>
-/// <reference path="./TradingListPage.ts"/>
-/// <reference path="./EditTradingPage.ts"/>
+///<reference path="./ractive.d.ts"/>
+///<reference path="./data.ts"/>
+///<reference path="./Application.ts"/>
+///<reference path="./Page.ts"/>
+///<reference path="./SignInPage.ts"/>
+///<reference path="./TopPage.ts"/>
+///<reference path="./SheetPage.ts"/>
 var $;
 var _;
 var Backbone;
-var CompanyApp = {
-    show: function () {
-        app.router.r = new Ractive({
-            el: '#container',
-            template: '#companyTemplate',
-            data: {
-                companies: app.companies
-            }
-        });
-        app.router.r.on('itemClick', function (e, i) {
-            CompanyApp.edit(i);
-        });
-        app.router.r.on('newCompany', function (e) {
-            CompanyApp.newCompany();
-        });
-    },
-    edit: function (i) {
-        app.company = app.companies[i];
-        app.router.navigate('companies/' + app.companies[i].id, { trigger: true });
-    },
-    newCompany: function () {
-        app.company = {
-            id: null,
-            name: '',
-            zip: '',
-            address: '',
-            phone: '',
-            unit: ''
-        };
-        app.router.navigate('companies/new', { trigger: true });
-    }
-};
-var EditCompanyApp = {
-    show: function (company) {
-        app.router.r = new Ractive({
-            el: '#container',
-            template: '#editCompanyTemplate',
-            data: {
-                company: company
-            }
-        });
-        app.router.r.on('save', function (e) {
-            var company = app.router.r.get('company');
-            EditCompanyApp.save(company);
-        });
-    },
-    save: function (company) {
-        app.client.saveCompany(app.token, company, {
-            success: function (id) {
-                window.history.back();
-            },
-            error: function (msg) {
-            }
-        });
-    }
-};
+var app = new App();
 var AppRouter = Backbone.Router.extend({
     routes: {
-        "": "top",
-        "tradings": "tradings",
-        "tradings(/:id)": "editTrading",
-        "companies": "companies",
-        "companies(/:id)": "editCompanies"
+        // ここに、ページ毎に呼ぶ関数名を記述していく
+        // index.htmlを開いた直後は、topという関数を実行する        
+        "": "signIn",
+        "top": "top",
+        // index.html#sheetの場合は、sheetという関数を実行する
+        "sheets(/:id)": "sheet",
+        "setting": "setting"
     },
-    initialize: function () {
-        _.bindAll(this, 'top', 'tradings', 'editTrading', 'companies', 'editCompanies');
+    signIn: function () {
+        app.page = new SignInPage();
+        app.page.onCreate(app);
     },
     top: function () {
         app.page = new TopPage();
         app.page.onCreate(app);
     },
-    tradings: function () {
-        if (app.token == null) {
-            app.router.navigate('', { trigger: true });
-            return;
-        }
-        app.page = new TradingListPage();
+    sheet: function (id) {
+        app.page = new SheetPage(id);
         app.page.onCreate(app);
     },
-    editTrading: function (id) {
-        if (app.token == null) {
-            app.router.navigate('', { trigger: true });
-            return;
-        }
-        app.page = new EditTradingPage(id);
-        app.page.onCreate(app);
-    },
-    companies: function () {
-        if (app.token == null) {
-            app.router.navigate('', { trigger: true });
-            return;
-        }
-        CompanyApp.show();
-    },
-    editCompanies: function (id) {
-        if (app.token == null) {
-            app.router.navigate('', { trigger: true });
-            return;
-        }
-        var company = null;
-        if (id === 'new') {
-            company = {
-                id: null
-            };
-            EditCompanyApp.show(company);
-            return;
-        }
-        for (var i = 0; i < app.companies.length; ++i) {
-            if (app.companies[i].id === id) {
-                company = app.companies[i];
-                break;
-            }
-        }
-        if (company === null) {
-            app.router.navigate('', { trigger: true });
-            return;
-        }
-        EditCompanyApp.show(company);
+    setting: function () {
+        // ダイアログ用の要素を作る
+        var dialog = document.createElement('section');
+        document.querySelector('#dialogs').appendChild(dialog);
+        // Racriveオブジェクトを作る
+        app.ractive = new Ractive({
+            // どの箱に入れるかをIDで指定
+            el: dialog,
+            // 指定した箱に、どのHTMLを入れるかをIDで指定
+            template: '#settingTemplate'
+        });
     }
 });
-var app = new Application();
-var util = {
-    numToCurrency: function (val) {
-        var n = parseInt(val);
-        var ret = '';
-        do {
-            var n1 = (n % 1000);
-            var c = ("00" + n1).slice(-3);
-            n = Math.floor(n / 1000);
-            if (n > 0) {
-                ret = c + "," + ret;
-            }
-            else {
-                ret = n1 + "," + ret;
-            }
-        } while (n > 0);
-        return ret.substring(0, ret.length - 1);
-    },
-    currencyToNum: function (val) {
-        if (typeof (val) === 'number') {
-            return val;
-        }
-        return parseInt(val.replace(",", ""));
-    }
-};
-(function ($) {
-    $(function () {
-        app.router = new AppRouter();
-        Backbone.history.start();
+$(function () {
+    app.start();
+    // Backboneのおまじない
+    app.router = new AppRouter();
+    Backbone.history.start();
+});
+// [common] for plugins
+function tooltipster() {
+    $('.actionBtn li a').tooltipster({
+        theme: 'tooltipster-actionBtn'
     });
-})($);
+    $('.btn, .delete').tooltipster({
+        theme: 'tooltipster-btn',
+        //arrow: false,
+        offsetY: -3
+    });
+}
+function selectbox() {
+    //select box customize
+    //$('select').easySelectBox({speed: 200});
+}

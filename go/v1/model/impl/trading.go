@@ -19,11 +19,13 @@ const (
 
 type tradingDAO struct {
 	connection *Connection
+	logger     m.Logger
 }
 
-func NewTradingDAO(connection *Connection) *tradingDAO {
+func NewTradingDAO(connection *Connection, logger m.Logger) *tradingDAO {
 	return &tradingDAO{
 		connection: connection,
+		logger:     logger,
 	}
 }
 
@@ -74,17 +76,12 @@ func (d *tradingDAO) GetById(id, userId string) (*m.Trading, error) {
 	return &item, nil
 }
 
-func (d *tradingDAO) Create(date, companyId, subject string, titleType int, workFrom, workTo, total, quotationDate, billDate int64, taxRate float32, assignee, product string) (*m.Trading, error) {
+func (d *tradingDAO) Create(companyId, subject string, titleType int, workFrom, workTo, total, quotationDate, billDate int64, taxRate float32, assignee, product string) (*m.Trading, error) {
 	tr, err := d.connection.Begin()
 	if err != nil {
 		return nil, err
 	}
 	defer tr.Rollback()
-	// generate ID
-	id, err := d.generateNextId(tr, date)
-	if err != nil {
-		return nil, err
-	}
 
 	st, err := tr.Prepare("INSERT INTO trading(" +
 		"id,company_id,subject,title_type," +
@@ -104,11 +101,14 @@ func (d *tradingDAO) Create(date, companyId, subject string, titleType int, work
 	}
 	defer st.Close()
 
-	_, err = st.Exec(id, companyId, subject, titleType,
-		workFrom, workTo, total,
-		quotationDate,
-		billDate,
-		taxRate, assignee, product)
+	id, err := insertWithUUID(32, func(id string) error {
+		_, err = st.Exec(id, companyId, subject, titleType,
+			workFrom, workTo, total,
+			quotationDate,
+			billDate,
+			taxRate, assignee, product)
+		return err
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -130,7 +130,7 @@ func (d *tradingDAO) Create(date, companyId, subject string, titleType int, work
 	}, nil
 }
 
-func (d *tradingDAO) Update(id, companyId, subject string, titleType int, workFrom, workTo, quotationDate, billDate int64, taxRate float32, assignee, product string) (*m.Trading, error) {
+func (d *tradingDAO) Update(id, companyId, subject string, titleType int, workFrom, workTo, total, quotationDate, billDate int64, taxRate float32, assignee, product string) (*m.Trading, error) {
 	tr, err := d.connection.Begin()
 	if err != nil {
 		return nil, err
@@ -139,7 +139,7 @@ func (d *tradingDAO) Update(id, companyId, subject string, titleType int, workFr
 
 	st, err := tr.Prepare("UPDATE trading SET " +
 		"company_id=?,title_type=?,subject=?," +
-		"work_from=?,work_to=?,quotation_date=?,bill_date=?," +
+		"work_from=?,work_to=?,total=?,quotation_date=?,bill_date=?," +
 		"tax_rate=?,assignee=?,product=?," +
 		"modified_time=unix_timestamp(now()) " +
 		"WHERE id=? AND deleted <> 1")
@@ -148,7 +148,7 @@ func (d *tradingDAO) Update(id, companyId, subject string, titleType int, workFr
 	}
 	defer st.Close()
 
-	_, err = st.Exec(companyId, titleType, subject, workFrom, workTo,
+	_, err = st.Exec(companyId, titleType, subject, workFrom, workTo, total,
 		quotationDate, billDate, taxRate,
 		assignee, product, id)
 	if err != nil {
@@ -408,12 +408,15 @@ func (d *tradingDAO) scanTrading(rows *sql.Rows) m.Trading {
 	var assignee, quotationNumber, billNumber string
 	var workFrom, workTo, total, quotationDate, billDate, created, modified int64
 
-	rows.Scan(&id, &companyId, &titleType, &subject,
+	err := rows.Scan(&id, &companyId, &titleType, &subject,
 		&workFrom, &workTo, &total,
 		&quotationDate, &quotationNumber,
 		&billDate, &billNumber,
 		&taxRate, &assignee, &product,
 		&created, &modified)
+	if err != nil {
+		d.logger.Errorf("Failed to scan trading :%s", err)
+	}
 
 	return m.Trading{
 		Id:              id,
