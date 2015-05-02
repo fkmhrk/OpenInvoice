@@ -313,17 +313,17 @@
         <section id="addCompany">
           <div class="wrapper">
             <div class="names">
-              <p><input type="text" placeholder="クライアント会社名"></p>
-              <p><input type="text" placeholder="部署名"></p>
-              <p><input type="text" placeholder="担当者"></p>
+              <p><input type="text" placeholder="クライアント会社名" value="{{name}}"></p>
+              <p><input type="text" placeholder="部署名" value="{{unit}}"></p>
+              <p><input type="text" placeholder="担当者" value="{{assignee}}"></p>
             </div>
             <div class="infos">
-              <p><input type="text" placeholder="郵便番号"><input type="text" placeholder="住所"></p>
-              <p><input type="text" placeholder="TEL"></p>
-              <p><input type="text" placeholder="FAX"></p>
+              <p><input type="text" placeholder="郵便番号" value="{{zip}}"><input type="text" placeholder="住所" value="{{address}}"></p>
+              <p><input type="text" placeholder="TEL" value="{{tel}}"></p>
+              <p><input type="text" placeholder="FAX" value="{{fax}}"></p>
             </div>
           </div>
-          <p class="addBtn"><i class="fa fa-plus"></i>追加</p>
+          <p class="addBtn" on-click="submit"><i class="fa fa-plus"></i>追加</p>
         </section>
         <section class="list">
           <table>

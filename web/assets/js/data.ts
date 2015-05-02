@@ -9,6 +9,7 @@ class Company {
     zip : string;
     address : string;
     phone : string;
+    fax : string;
     unit : string;
     assignee : string;
 }
