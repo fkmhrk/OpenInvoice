@@ -27,7 +27,7 @@ func (d *TradingDAO) Create(companyId, subject string, titleType int, workFrom, 
 	return d.CreateResult, nil
 }
 
-func (d *TradingDAO) Update(id, companyId, subject string, titleType int, workFrom, workTo, quotationDate, billDate int64, taxRate float32, assignee, product string) (*m.Trading, error) {
+func (d *TradingDAO) Update(id, companyId, subject string, titleType int, workFrom, workTo, total, quotationDate, billDate int64, taxRate float32, assignee, product string) (*m.Trading, error) {
 	return d.UpdateResult, nil
 }
 

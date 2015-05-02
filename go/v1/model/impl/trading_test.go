@@ -229,8 +229,9 @@ func TestTrading0300_Update(t *testing.T) {
 	}
 
 	// update
+	var total int64 = 3333
 	item2, err := dao.Update(item.Id, "company2222", "subject3333",
-		0, 2345, 6789, 2222, 3333, 10, userId, "product4444")
+		0, 2345, 6789, total, 2222, 3333, 10, userId, "product4444")
 	if err != nil {
 		t.Errorf("Failed to update trading : %s", err)
 		return
