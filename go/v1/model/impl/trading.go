@@ -80,11 +80,6 @@ func (d *tradingDAO) Create(date, companyId, subject string, titleType int, work
 		return nil, err
 	}
 	defer tr.Rollback()
-	// generate ID
-	id, err := d.generateNextId(tr, date)
-	if err != nil {
-		return nil, err
-	}
 
 	st, err := tr.Prepare("INSERT INTO trading(" +
 		"id,company_id,subject,title_type," +
@@ -104,11 +99,14 @@ func (d *tradingDAO) Create(date, companyId, subject string, titleType int, work
 	}
 	defer st.Close()
 
-	_, err = st.Exec(id, companyId, subject, titleType,
-		workFrom, workTo, total,
-		quotationDate,
-		billDate,
-		taxRate, assignee, product)
+	id, err := insertWithUUID(32, func(id string) error {
+		_, err = st.Exec(id, companyId, subject, titleType,
+			workFrom, workTo, total,
+			quotationDate,
+			billDate,
+			taxRate, assignee, product)
+		return err
+	})
 	if err != nil {
 		return nil, err
 	}
