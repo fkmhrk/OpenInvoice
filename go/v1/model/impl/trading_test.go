@@ -8,7 +8,7 @@ import (
 
 func createTradingDAO(db *sql.DB) *tradingDAO {
 	c := NewConnection(db)
-	return NewTradingDAO(c)
+	return NewTradingDAO(c, NewLogger())
 }
 
 func deleteTradingByUser(db *sql.DB, userId string) {

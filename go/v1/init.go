@@ -17,14 +17,11 @@ func InitRouter(r *mux.Router) error {
 		return err
 	}
 	c := mi.NewConnection(db)
-	userDAO := mi.NewUserDAO(c)
-	sessionDAO := mi.NewSessionDAO(c)
-	tradingDAO := mi.NewTradingDAO(c)
-	companyDAO := mi.NewCompanyDAO(c)
+	models := mi.NewModels(c)
 
-	userService := si.NewUserSerivce(userDAO, sessionDAO)
-	tradingService := si.NewTradingSerivce(sessionDAO, tradingDAO)
-	companyService := si.NewCompanySerivce(sessionDAO, companyDAO)
+	userService := si.NewUserSerivce(models.User, models.Session)
+	tradingService := si.NewTradingSerivce(models.Session, models.Trading)
+	companyService := si.NewCompanySerivce(models.Session, models.Company)
 	initRouter(r, userService, tradingService, companyService)
 	return nil
 }

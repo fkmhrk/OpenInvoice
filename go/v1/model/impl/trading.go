@@ -19,11 +19,13 @@ const (
 
 type tradingDAO struct {
 	connection *Connection
+	logger     m.Logger
 }
 
-func NewTradingDAO(connection *Connection) *tradingDAO {
+func NewTradingDAO(connection *Connection, logger m.Logger) *tradingDAO {
 	return &tradingDAO{
 		connection: connection,
+		logger:     logger,
 	}
 }
 
@@ -406,12 +408,15 @@ func (d *tradingDAO) scanTrading(rows *sql.Rows) m.Trading {
 	var assignee, quotationNumber, billNumber string
 	var workFrom, workTo, total, quotationDate, billDate, created, modified int64
 
-	rows.Scan(&id, &companyId, &titleType, &subject,
+	err := rows.Scan(&id, &companyId, &titleType, &subject,
 		&workFrom, &workTo, &total,
 		&quotationDate, &quotationNumber,
 		&billDate, &billNumber,
 		&taxRate, &assignee, &product,
 		&created, &modified)
+	if err != nil {
+		d.logger.Errorf("Failed to scan trading :%s", err)
+	}
 
 	return m.Trading{
 		Id:              id,
