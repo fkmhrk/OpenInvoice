@@ -86,7 +86,6 @@ func TestTrading0100_Create(t *testing.T) {
 
 	// params
 	token := "token1122"
-	date := "20150203"
 	companyId := "company1122"
 	titleType := 1
 	subject := "subject3344"
@@ -98,7 +97,7 @@ func TestTrading0100_Create(t *testing.T) {
 	billDate := int64(400)
 	taxRate := float32(8)
 
-	r := s.Create(token, date, companyId, subject, product, titleType, workFrom, workTo, total, quotationDate, billDate, taxRate)
+	r := s.Create(token, companyId, subject, product, titleType, workFrom, workTo, total, quotationDate, billDate, taxRate)
 	if r == nil {
 		t.Errorf("Result must not be nil")
 		return

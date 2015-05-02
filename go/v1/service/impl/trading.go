@@ -41,11 +41,8 @@ func (s *tradingService) GetListByUser(token string) s.Result {
 	return jsonResult(200, body)
 }
 
-func (s *tradingService) Create(token, date, companyId, subject, product string, titleType int, workFrom, workTo, total, quotationDate, billDate int64, taxRate float32) s.Result {
+func (s *tradingService) Create(token, companyId, subject, product string, titleType int, workFrom, workTo, total, quotationDate, billDate int64, taxRate float32) s.Result {
 	// input check
-	if len(date) == 0 {
-		return errorResult(400, MSG_ERR_DATE_EMPTY)
-	}
 	if len(companyId) == 0 {
 		return errorResult(400, MSG_ERR_COMPANY_ID_EMPTY)
 	}

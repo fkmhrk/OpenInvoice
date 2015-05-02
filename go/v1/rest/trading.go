@@ -18,7 +18,6 @@ func createTrading(trading s.TradingService) handler {
 	return makeJsonHandler(func(token, tType string,
 		json rj.RawJsonObject) s.Result {
 		// read input
-		date, _ := json.String("date")
 		companyId, _ := json.String("company_id")
 		titleType, _ := json.Int("title_type")
 		subject, _ := json.String("subject")
@@ -30,7 +29,7 @@ func createTrading(trading s.TradingService) handler {
 		taxRate, _ := json.Float("tax_rate")
 		product, _ := json.String("product")
 
-		return trading.Create(token, date, companyId,
+		return trading.Create(token, companyId,
 			subject, product, titleType, workFrom, workTo,
 			total, quotationDate, billDate, float32(taxRate))
 	})
