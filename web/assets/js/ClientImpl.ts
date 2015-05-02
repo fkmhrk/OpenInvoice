@@ -219,7 +219,11 @@ class AppClientImpl implements Client {
 		    callback.success(JSON.parse(data.responseText));
 		}
 	    }).fail(function(data) {
-		callback.error(data.status, JSON.parse(data.responseText));
+                if (data.status == 204) {
+                    callback.success({});
+                } else {
+		    callback.error(data.status, JSON.parse(data.responseText));
+                }
 	    });
     }
 }

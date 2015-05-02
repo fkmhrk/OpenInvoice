@@ -6,7 +6,6 @@
 
 class SheetPage implements Page {
     id : string;
-    trading : Trading;
     
     constructor(id : string) {
         this.id = id;
@@ -17,7 +16,22 @@ class SheetPage implements Page {
             window.history.back();
             return;
         }
-        this.trading = Utils.clone(item);
+        this.loadItems(app, Utils.clone(item));
+    }
+
+    private loadItems(app : App, trading : Trading) {
+        app.client.getTradingItems(app.accessToken, trading.id, {
+            success : (list : Array<TradingItem>) => {
+                this.show(app, trading, list);
+            },
+            error : (status : number, msg : string) => {
+                console.log('Failed to get items status=' + status);
+                window.history.back();
+            }
+        });
+    }
+
+    private show(app : App, trading : Trading, itemList : Array<TradingItem>) {
         var es = (node : any) => {
             $(node).easySelectBox({speed: 200});
             return {
@@ -36,14 +50,15 @@ class SheetPage implements Page {
                 easyselect: es,
             },
             data : {
-                'trading' : this.trading,
-                'workFrom' : Utils.toDateStr(this.trading.work_from),
-                'workTo' : Utils.toDateStr(this.trading.work_to),
-                'quotationDate' : Utils.toDateStr(this.trading.quotation_date),
-                'billDate' : Utils.toDateStr(this.trading.bill_date),
+                'trading' : trading,
+                'workFrom' : Utils.toDateStr(trading.work_from),
+                'workTo' : Utils.toDateStr(trading.work_to),
+                'quotationDate' : Utils.toDateStr(trading.quotation_date),
+                'billDate' : Utils.toDateStr(trading.bill_date),
                 'companies' : app.companies,
                 'users' : app.users,
-                'tradingItems' : tradingItemList
+                'tradingItems' : itemList,
+                'deletedItems' : [],
             }
         });
         var updateItemSum = (keypath : string) => {
@@ -92,9 +107,14 @@ class SheetPage implements Page {
         r.on({
             'addItem' : () => {
                 r.push('tradingItems', {
-                    'unit_price' : 0,
-                    'amount' : 0,
-                    'sum' : 0
+                    id : null,
+                    subject : '',
+                    unit_price : 0,
+                    amount : 0,
+                    degree : '',
+                    memo : '',
+                    tax_type : 1,
+                    sum : 0
                 });
             },
             'addCompany' : () => {
@@ -106,8 +126,11 @@ class SheetPage implements Page {
         });
         r.on('deleteItem', function(e, index) {
             itemObserver.cancel();
-            var a = r.splice('tradingItems', index, 1);
-            console.log(a);
+            var item = r.get('tradingItems')[index];
+            r.splice('tradingItems', index, 1);
+            if (item.id != null) {
+                r.push('deletedItems', item);
+            }
             itemObserver = observeItem();
         });
         r.on('save', () => {
@@ -133,6 +156,8 @@ class SheetPage implements Page {
         var titleType = $('#titleType').val();
         var workFrom = app.ractive.get('workFrom');
         var workTo = app.ractive.get('workTo');
+        var quotationDate = app.ractive.get('quotationDate');
+        var billDate = app.ractive.get('billDate');
         var tradingItems = app.ractive.get('tradingItems');
 
         // modify type
@@ -140,16 +165,61 @@ class SheetPage implements Page {
         trading.title_type = Number(titleType);
         trading.work_from = new Date(workFrom).getTime();
         trading.work_to = new Date(workTo).getTime();
+        trading.quotation_date = new Date(quotationDate).getTime();
+        trading.bill_date = new Date(billDate).getTime();
         trading.tax_rate = Number(trading.tax_rate);
         console.log(trading);
         app.client.saveTrading(app.accessToken, trading, {
             success : (id : string) => {
-                window.history.back();               
+                var deleted = app.ractive.get('deletedItems');
+                this.deleteItems(app, id, deleted);
             },
             error : (status : number, msg : string) => {
                 console.log('Failed to save trading status=' + status);
             }
         });
+    }
 
+    private deleteItems(app : App, id : string, list : Array<TradingItem>) {
+        if (list.length == 0) {
+            var list3 = [];
+            _.each(app.ractive.get('tradingItems'), (item : TradingItem, index : number) => {
+                item.sort_order = index;
+                item.unit_price = Number(item.unit_price);
+                item.amount = Number(item.amount);
+                item.tax_type = Number($('#tax_type' + index).val());
+                list3.push(item);
+            });
+            this.saveItems(app, id, list3);
+            return;
+        }
+        var item = list[0];
+        app.client.deleteTradingItem(app.accessToken, id, item.id, {
+            success : (itemId : string) => {
+                list.splice(0, 1);
+                this.deleteItems(app, id, list);
+            },
+            error : (status : number, msg : string) => {
+                console.log('Failed to delete items status=' + status);
+            }
+        });
+    }
+
+    private saveItems(app : App, id : string, list : Array<TradingItem>) {
+        if (list.length == 0) {
+            window.history.back();
+            return;
+        }
+        var item = list[0]
+        app.client.saveTradingItem(app.accessToken, id, item, {
+            success : (itemId : string) => {
+                item.id = itemId;
+                list.splice(0, 1);
+                this.saveItems(app, id, list);                
+            },
+            error : (status : number, msg : string) => {
+                console.log('Failed to save items status=' + status);
+            }
+        });
     }
 }

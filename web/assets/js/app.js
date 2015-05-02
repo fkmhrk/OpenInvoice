@@ -202,7 +202,12 @@ var AppClientImpl = (function () {
                 callback.success(JSON.parse(data.responseText));
             }
         }).fail(function (data) {
-            callback.error(data.status, JSON.parse(data.responseText));
+            if (data.status == 204) {
+                callback.success({});
+            }
+            else {
+                callback.error(data.status, JSON.parse(data.responseText));
+            }
         });
     };
     return AppClientImpl;
@@ -233,46 +238,46 @@ var TradingItem = (function () {
 var userList = [];
 userList.push({
     'id': 'user1',
-    'display_name': 'ユーザー1'
+    'display_name': '秋葉 秀樹'
 });
 userList.push({
     'id': 'user2',
-    'display_name': 'ユーザー2'
+    'display_name': '秋葉 ちひろ'
 });
 var companyList = [];
 var company = new Company();
 company.id = 'company1';
-company.name = '株式会社AAA';
+company.name = '株式会社NRI';
 company.unit = '生産革新部';
 company.zip = '111-2222';
-company.address = '東京都新宿区';
+company.address = '東京都新宿区新宿2-2-4';
 company.phone = '090-1111-2222';
-company.assignee = '担当者';
+company.assignee = '東山 正二';
 companyList.push(company);
 company = new Company();
 company.id = 'company2';
-company.name = '株式会社BBB';
+company.name = '株式会社カルチャー';
 company.unit = '';
 company.zip = '111-2222';
-company.address = '東京都渋谷区';
+company.address = '東京都渋谷区神宮前4-8-10';
 company.phone = '090-3333-4444';
 company.assignee = '';
 companyList.push(company);
 company = new Company();
 company.id = 'company3';
-company.name = '株式会社CCC';
+company.name = '株式会社忍者';
 company.unit = '';
 company.zip = '111-2222';
-company.address = '東京都中野区';
+company.address = '東京都三鷹市一丁目3-5-95';
 company.phone = '090-3333-4444';
 company.assignee = '';
 companyList.push(company);
 company = new Company();
 company.id = 'company4';
-company.name = 'DDD株式会社';
+company.name = 'ツクロウ';
 company.unit = '';
 company.zip = '111-2222';
-company.address = '広島県';
+company.address = '広島県福山市鞆の浦4154-5';
 company.phone = '090-3333-4444';
 company.assignee = '';
 companyList.push(company);
@@ -301,7 +306,7 @@ for (var i = 0; i < 10; ++i) {
         'id': 'idB' + i,
         'date': '1432542408000',
         'company_id': 'company2',
-        'company_name': '株式会社ZZZ',
+        'company_name': '株式会社NRI',
         'title_type': 1,
         'subject': '【コンサルツールモック】デザイン画面作成',
         'work_from': 1431505608,
@@ -711,13 +716,27 @@ var SheetPage = (function () {
         this.id = id;
     }
     SheetPage.prototype.onCreate = function (app) {
-        var _this = this;
         var item;
         if (app.tradingsMap === undefined || (item = app.tradingsMap[this.id]) === null) {
             window.history.back();
             return;
         }
-        this.trading = Utils.clone(item);
+        this.loadItems(app, Utils.clone(item));
+    };
+    SheetPage.prototype.loadItems = function (app, trading) {
+        var _this = this;
+        app.client.getTradingItems(app.accessToken, trading.id, {
+            success: function (list) {
+                _this.show(app, trading, list);
+            },
+            error: function (status, msg) {
+                console.log('Failed to get items status=' + status);
+                window.history.back();
+            }
+        });
+    };
+    SheetPage.prototype.show = function (app, trading, itemList) {
+        var _this = this;
         var es = function (node) {
             $(node).easySelectBox({ speed: 200 });
             return {
@@ -736,14 +755,15 @@ var SheetPage = (function () {
                 easyselect: es
             },
             data: {
-                'trading': this.trading,
-                'workFrom': Utils.toDateStr(this.trading.work_from),
-                'workTo': Utils.toDateStr(this.trading.work_to),
-                'quotationDate': Utils.toDateStr(this.trading.quotation_date),
-                'billDate': Utils.toDateStr(this.trading.bill_date),
+                'trading': trading,
+                'workFrom': Utils.toDateStr(trading.work_from),
+                'workTo': Utils.toDateStr(trading.work_to),
+                'quotationDate': Utils.toDateStr(trading.quotation_date),
+                'billDate': Utils.toDateStr(trading.bill_date),
                 'companies': app.companies,
                 'users': app.users,
-                'tradingItems': tradingItemList
+                'tradingItems': itemList,
+                'deletedItems': []
             }
         });
         var updateItemSum = function (keypath) {
@@ -792,9 +812,14 @@ var SheetPage = (function () {
         r.on({
             'addItem': function () {
                 r.push('tradingItems', {
-                    'unit_price': 0,
-                    'amount': 0,
-                    'sum': 0
+                    id: null,
+                    subject: '',
+                    unit_price: 0,
+                    amount: 0,
+                    degree: '',
+                    memo: '',
+                    tax_type: 1,
+                    sum: 0
                 });
             },
             'addCompany': function () {
@@ -806,8 +831,11 @@ var SheetPage = (function () {
         });
         r.on('deleteItem', function (e, index) {
             itemObserver.cancel();
-            var a = r.splice('tradingItems', index, 1);
-            console.log(a);
+            var item = r.get('tradingItems')[index];
+            r.splice('tradingItems', index, 1);
+            if (item.id != null) {
+                r.push('deletedItems', item);
+            }
             itemObserver = observeItem();
         });
         r.on('save', function () {
@@ -828,25 +856,74 @@ var SheetPage = (function () {
         app.showDialog(new AddUserDialog());
     };
     SheetPage.prototype.save = function (app) {
+        var _this = this;
         var trading = app.ractive.get('trading');
         var companyId = $('#company').val();
         var titleType = $('#titleType').val();
         var workFrom = app.ractive.get('workFrom');
         var workTo = app.ractive.get('workTo');
+        var quotationDate = app.ractive.get('quotationDate');
+        var billDate = app.ractive.get('billDate');
         var tradingItems = app.ractive.get('tradingItems');
         // modify type
         trading.company_id = companyId;
         trading.title_type = Number(titleType);
         trading.work_from = new Date(workFrom).getTime();
         trading.work_to = new Date(workTo).getTime();
+        trading.quotation_date = new Date(quotationDate).getTime();
+        trading.bill_date = new Date(billDate).getTime();
         trading.tax_rate = Number(trading.tax_rate);
         console.log(trading);
         app.client.saveTrading(app.accessToken, trading, {
             success: function (id) {
-                window.history.back();
+                var deleted = app.ractive.get('deletedItems');
+                _this.deleteItems(app, id, deleted);
             },
             error: function (status, msg) {
                 console.log('Failed to save trading status=' + status);
+            }
+        });
+    };
+    SheetPage.prototype.deleteItems = function (app, id, list) {
+        var _this = this;
+        if (list.length == 0) {
+            var list3 = [];
+            _.each(app.ractive.get('tradingItems'), function (item, index) {
+                item.sort_order = index;
+                item.unit_price = Number(item.unit_price);
+                item.amount = Number(item.amount);
+                item.tax_type = Number($('#tax_type' + index).val());
+                list3.push(item);
+            });
+            this.saveItems(app, id, list3);
+            return;
+        }
+        var item = list[0];
+        app.client.deleteTradingItem(app.accessToken, id, item.id, {
+            success: function (itemId) {
+                list.splice(0, 1);
+                _this.deleteItems(app, id, list);
+            },
+            error: function (status, msg) {
+                console.log('Failed to delete items status=' + status);
+            }
+        });
+    };
+    SheetPage.prototype.saveItems = function (app, id, list) {
+        var _this = this;
+        if (list.length == 0) {
+            window.history.back();
+            return;
+        }
+        var item = list[0];
+        app.client.saveTradingItem(app.accessToken, id, item, {
+            success: function (itemId) {
+                item.id = itemId;
+                list.splice(0, 1);
+                _this.saveItems(app, id, list);
+            },
+            error: function (status, msg) {
+                console.log('Failed to save items status=' + status);
             }
         });
     };

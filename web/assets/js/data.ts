@@ -33,6 +33,7 @@ class Trading {
 
 class TradingItem {
     id : string;
+    sort_order : number;
     subject : string;
     unit_price : number;
     amount : number;
@@ -45,50 +46,50 @@ class TradingItem {
 var userList : Array<User> = [];
 userList.push({
     'id' : 'user1',
-    'display_name' : 'ユーザー1'
+    'display_name' : '秋葉 秀樹'
 });
 userList.push({
     'id' : 'user2',
-    'display_name' : 'ユーザー2'
+    'display_name' : '秋葉 ちひろ'
 });
 
 var companyList : Array<Company> = [];
 var company = new Company();
 company.id = 'company1';
-company.name = '株式会社AAA';
+company.name = '株式会社NRI';
 company.unit = '生産革新部';
 company.zip = '111-2222';
-company.address = '東京都新宿区';
+company.address = '東京都新宿区新宿2-2-4';
 company.phone = '090-1111-2222';
-company.assignee = '担当者';
+company.assignee = '東山 正二';
 companyList.push(company);
 
 company = new Company();
 company.id = 'company2';
-company.name = '株式会社BBB';
+company.name = '株式会社カルチャー';
 company.unit = '';
 company.zip = '111-2222';
-company.address = '東京都渋谷区';
+company.address = '東京都渋谷区神宮前4-8-10';
 company.phone = '090-3333-4444';
 company.assignee = '';
 companyList.push(company);
 
 company = new Company();
 company.id = 'company3';
-company.name = '株式会社CCC';
+company.name = '株式会社忍者';
 company.unit = '';
 company.zip = '111-2222';
-company.address = '東京都中野区';
+company.address = '東京都三鷹市一丁目3-5-95';
 company.phone = '090-3333-4444';
 company.assignee = '';
 companyList.push(company);
 
 company = new Company();
 company.id = 'company4';
-company.name = 'DDD株式会社';
+company.name = 'ツクロウ';
 company.unit = '';
 company.zip = '111-2222';
-company.address = '広島県';
+company.address = '広島県福山市鞆の浦4154-5';
 company.phone = '090-3333-4444';
 company.assignee = '';
 companyList.push(company);
@@ -120,7 +121,7 @@ for (var i = 0 ; i < 10 ; ++i ){
         'id' : 'idB' + i,
         'date' : '1432542408000',
         'company_id' : 'company2',
-        'company_name' : '株式会社ZZZ',
+        'company_name' : '株式会社NRI',
         'title_type' : 1,
         'subject' : '【コンサルツールモック】デザイン画面作成',
         'work_from' : 1431505608,

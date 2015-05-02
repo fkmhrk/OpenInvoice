@@ -153,13 +153,13 @@
               {{#tradingItems:i}}
 	      <article>
 		<ul class="table">
-		  <li><input type="text" placeholder="項目名"></li>
-		  <li><input type="text" placeholder="単価" value="{{unit_price}}"></li>
-		  <li><input type="text" placeholder="数量" value="{{amount}}"></li>
-		  <li><input type="text" placeholder="単位"></li>
-		  <li><input type="text" value="{{sum}}" disabled></li>
+                  <li><input type="text" placeholder="項目名" value="{{tradingItems[i].subject}}"></li>
+                  <li><input type="text" placeholder="単価" value="{{tradingItems[i].unit_price}}"></li>
+                  <li><input type="text" placeholder="数量" value="{{tradingItems[i].amount}}"></li>
+                  <li><input type="text" placeholder="単位" value="{{tradingItems[i].degree}}"></li>
+                  <li><input type="text" value="{{tradingItems[i].sum}}" disabled></li>
 		</ul>
-		<p class="note"><textarea placeholder="備考"></textarea></p>
+		<p class="note"><textarea placeholder="備考" value="{{tradingItems[i].memo}}"></textarea></p>
 		<p class="tax">
 		  <select id="tax_type{{i}}" decorator="easyselect">
 		    <option value="1">税抜</option>
