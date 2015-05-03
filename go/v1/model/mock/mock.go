@@ -6,6 +6,7 @@ import (
 
 func NewMock() *m.Models {
 	return &m.Models{
-		Env: &EnvDAO{},
+		Session: &SessionDAO{},
+		Env:     &EnvDAO{},
 	}
 }

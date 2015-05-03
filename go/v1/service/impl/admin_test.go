@@ -9,6 +9,11 @@ import (
 
 func TestAdmin_0000_GetEnvironment(t *testing.T) {
 	models := mock.NewMock()
+	sessionDAO, _ := models.Session.(*mock.SessionDAO)
+	sessionDAO.GetByTokenResult = &m.Session{
+		Token:  "token1122",
+		UserId: "user1122",
+	}
 	envDAO, _ := models.Env.(*mock.EnvDAO)
 	envDAO.GetListResult = []*m.Env{
 		&m.Env{
