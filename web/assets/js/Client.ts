@@ -49,6 +49,16 @@ interface Client {
      */
     deleteTradingItem(token : string, tradingId : string,
                       itemId : string, callback : ItemCallback<string>);
+
+    /**
+     * Gets Environment
+     */
+    getEnvironment(token : string, callback : ItemCallback<Environment>);
+    
+    /**
+     * Saves Environment
+     */
+    saveEnvironment(token : string, env : Environment, callback : Callback);
 }
 
 interface Callback {

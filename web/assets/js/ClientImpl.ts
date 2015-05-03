@@ -118,6 +118,30 @@ class AppClientImpl implements Client {
             this.updateCompany(token, item, callback);
         }
     }
+
+    getEnvironment(token : string, callback : ItemCallback<Environment>) {
+        var url = this.url + '/api/v1/environments';
+        this.exec(url, 'GET', token, null, {
+            success : (json : any) => {
+                callback.success(json);
+            },
+            error : (status : any, body : any) => {
+                callback.error(status, body.msg);
+            }
+        });        
+    }
+
+    saveEnvironment(token : string, env : Environment, callback : Callback) {
+        var url = this.url + '/api/v1/environments';
+        this.exec(url, 'PUT', token, env, {
+            success : (json : any) => {
+                callback.success();
+            },
+            error : (status : any, body : any) => {
+                callback.error(status, body.msg);
+            }
+        });
+    }
     
     private createTrading(token : string, item : Trading, callback : ItemCallback<string>) {
         var url = this.url + '/api/v1/tradings';

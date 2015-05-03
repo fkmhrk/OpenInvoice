@@ -199,18 +199,18 @@
           <table>
             <tr>
               <th>消費税率</th>
-              <td><input type="text" value="8">%</td>
+              <td><input type="text" value="{{tax_rate}}">%</td>
               <th>お見積り期限</th>
-              <td>発行日から<input type="text" value="7">日間</td>
+              <td>発行日から<input type="text" value="{{quotation_limit}}">日間</td>
             </tr>
         	<tr>
               <th>決算月</th>
-              <td><input type="text" value="3">月</td>
+              <td><input type="text" value="{{closing_month}}">月</td>
               <th>お支払期限</th>
               <td>
-                <select>
-                  <option>翌月末</option>
-                  <option>翌々月末</option>
+                <select id="pay_limit" value="{{pay_limit}}" decorator="easyselect">
+                  <option value="1">翌月末</option>
+                  <option value="2">翌々月末</option>
                 </select>
               </td>
             </tr>
@@ -220,25 +220,25 @@
           <div class="companySetting">
             <h2>会社の基本情報</h2>
             <ul>
-              <li><input type="text" placeholder="会社名"></li>
-              <li><input type="text" placeholder="郵便番号"></li>
-              <li><input type="text" placeholder="住所"></li>
-              <li><input type="text" placeholder="TEL"></li>
-              <li><input type="text" placeholder="FAX"></li>
+              <li><input type="text" placeholder="会社名" value="{{company_name}}"></li>
+              <li><input type="text" placeholder="郵便番号" value="{{company_zip}}"></li>
+              <li><input type="text" placeholder="住所" value="{{company_address}}"></li>
+              <li><input type="text" placeholder="TEL" value="{{company_tel}}"></li>
+              <li><input type="text" placeholder="FAX" value="{{company_fax}}"></li>
             </ul>
           </div>
           <div class="bankSetting">
             <h2>口座情報</h2>
             <p>
-              <input type="text" placeholder="銀行名">
-              <select>
-                <option>普通</option>
-                <option>当座</option>
-                <option>定期</option>
+              <input type="text" placeholder="銀行名" value="{{company_bankname}}">
+              <select id="bank_type" value="company_bank_type" decorator="easyselect">
+                <option value="1">普通</option>
+                <option value="2">当座</option>
+                <option value="3">定期</option>
               </select>
-              <input type="text" placeholder="口座番号">
+              <input type="text" placeholder="口座番号" value="{{company_bank_num}}">
             </p>
-            <p class="name"><input type="text" placeholder="名義"></p>
+            <p class="name"><input type="text" placeholder="名義" value="{{company_bank_name}}"></p>
           </div>
         </section>
       </div>
