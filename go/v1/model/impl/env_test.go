@@ -99,6 +99,7 @@ func TestEnv_GetList(t *testing.T) {
 
 	hardDeleteEnv(db, "key1")
 	hardDeleteEnv(db, "key2")
+	hardDeleteEnv(db, "key3")
 
 	item, err := dao.Create("key1", "value1")
 	if err != nil {
@@ -138,4 +139,82 @@ func TestEnv_GetList(t *testing.T) {
 		t.Errorf("Unexpected length list1=%d list2=%d", len(list1), len(list2))
 	}
 
+}
+
+func TestEnv_Save(t *testing.T) {
+	db, err := connect()
+	if err != nil {
+		t.Errorf("Failed to connect")
+		return
+	}
+	defer db.Close()
+
+	dao := createEnvDAO(db)
+
+	hardDeleteEnv(db, "key1")
+	hardDeleteEnv(db, "key2")
+	hardDeleteEnv(db, "key3")
+
+	list := []*m.Env{
+		&m.Env{
+			Key:   "key1",
+			Value: "value1",
+		},
+		&m.Env{
+			Key:   "key2",
+			Value: "value2",
+		},
+	}
+
+	err = dao.Save(list)
+	if err != nil {
+		t.Errorf("Failed to Save : %s", err)
+		return
+	}
+
+	// get List
+	list2, err := dao.GetList()
+	if err != nil {
+		t.Errorf("Failed to Get List : %s", err)
+		return
+	}
+	if len(list2) != 2 {
+		t.Errorf("List must be 2 but %d", len(list2))
+		return
+	}
+
+	list = []*m.Env{
+		&m.Env{
+			Key:   "key1",
+			Value: "value3",
+		},
+		&m.Env{
+			Key:   "key3",
+			Value: "value4",
+		},
+	}
+
+	err = dao.Save(list)
+	if err != nil {
+		t.Errorf("Failed to Save : %s", err)
+		return
+	}
+
+	// check
+	item, err := dao.Get("key1")
+	if err != nil {
+		t.Errorf("Failed to Get : %s", err)
+		return
+	}
+	assertEnv(t, &item, "key1", "value3")
+
+	list3, err := dao.GetList()
+	if err != nil {
+		t.Errorf("Failed to Get List : %s", err)
+		return
+	}
+	if len(list3) != 3 {
+		t.Errorf("List must be 3 but %d", len(list3))
+		return
+	}
 }

@@ -89,6 +89,46 @@ func (d *envDAO) GetList() ([]*m.Env, error) {
 	return list, nil
 }
 
+func (d *envDAO) Save(list []*m.Env) error {
+	tr, err := d.connection.Begin()
+	if err != nil {
+		return err
+	}
+	defer tr.Rollback()
+
+	createSt, err := tr.Prepare("INSERT INTO env(id,value,created_time,modified_time,deleted) VALUES(?,?,unix_timestamp(now()),unix_timestamp(now()),0)")
+	if err != nil {
+		return err
+	}
+	defer createSt.Close()
+
+	updateSt, err := tr.Prepare("UPDATE env SET value=?,modified_time=unix_timestamp(now()) WHERE id=? AND deleted <> 1")
+	if err != nil {
+		return err
+	}
+	defer updateSt.Close()
+
+	for _, item := range list {
+		result, err := updateSt.Exec(item.Value, item.Key)
+		if err != nil {
+			return err
+		}
+		count, err := result.RowsAffected()
+		if err != nil {
+			return err
+		}
+		if count == 1 {
+			continue
+		}
+		result, err = createSt.Exec(item.Key, item.Value)
+		if err != nil {
+			return err
+		}
+	}
+	tr.Commit()
+	return nil
+}
+
 func (d *envDAO) Update(key, value string) (m.Env, error) {
 	db := d.connection.Connect()
 	st, err := db.Prepare("UPDATE env SET value=?,modified_time=unix_timestamp(now()) WHERE id=? AND deleted <> 1")
