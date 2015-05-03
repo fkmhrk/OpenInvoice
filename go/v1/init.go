@@ -18,15 +18,16 @@ func InitRouter(r *mux.Router) error {
 	}
 	c := mi.NewConnection(db)
 	models := mi.NewModels(c)
+	services := si.NewServices(models)
 
 	userService := si.NewUserSerivce(models.User, models.Session)
 	tradingService := si.NewTradingSerivce(models.Session, models.Trading)
 	companyService := si.NewCompanySerivce(models.Session, models.Company)
-	initRouter(r, userService, tradingService, companyService)
+	initRouter(r, services, userService, tradingService, companyService)
 	return nil
 }
 
-func initRouter(r *mux.Router, u s.UserService, t s.TradingService, c s.CompanyService) {
+func initRouter(r *mux.Router, services s.Services, u s.UserService, t s.TradingService, c s.CompanyService) {
 	r1 := r.PathPrefix("/api/v1").Subrouter()
-	rest.SetHandlers(r1, u, t, c)
+	rest.SetHandlers(r1, services, u, t, c)
 }

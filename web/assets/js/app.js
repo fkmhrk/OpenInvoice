@@ -110,6 +110,28 @@ var AppClientImpl = (function () {
             this.updateCompany(token, item, callback);
         }
     };
+    AppClientImpl.prototype.getEnvironment = function (token, callback) {
+        var url = this.url + '/api/v1/environments';
+        this.exec(url, 'GET', token, null, {
+            success: function (json) {
+                callback.success(json);
+            },
+            error: function (status, body) {
+                callback.error(status, body.msg);
+            }
+        });
+    };
+    AppClientImpl.prototype.saveEnvironment = function (token, env, callback) {
+        var url = this.url + '/api/v1/environments';
+        this.exec(url, 'PUT', token, env, {
+            success: function (json) {
+                callback.success();
+            },
+            error: function (status, body) {
+                callback.error(status, body.msg);
+            }
+        });
+    };
     AppClientImpl.prototype.createTrading = function (token, item, callback) {
         var url = this.url + '/api/v1/tradings';
         this.exec(url, 'POST', token, item, {
@@ -235,6 +257,11 @@ var TradingItem = (function () {
     }
     return TradingItem;
 })();
+var Environment = (function () {
+    function Environment() {
+    }
+    return Environment;
+})();
 ///<reference path="./Dialog.ts"/>
 ///<reference path="./Client.ts"/>
 var App = (function () {
@@ -289,7 +316,24 @@ var App = (function () {
         });
     };
     App.prototype.loadData = function (callback) {
-        this.loadUsers(callback);
+        this.loadEnvironment(callback);
+    };
+    App.prototype.loadEnvironment = function (callback) {
+        var _this = this;
+        if (this.environment != null) {
+            this.loadUsers(callback);
+            return;
+        }
+        this.client.getEnvironment(this.accessToken, {
+            success: function (item) {
+                _this.environment = item;
+                _this.loadUsers(callback);
+            },
+            error: function (status, msg) {
+                console.log('Failed to get environment status=' + status);
+                callback.error();
+            }
+        });
     };
     App.prototype.loadUsers = function (callback) {
         var _this = this;
@@ -492,19 +536,75 @@ var SettingsDialog = (function () {
     function SettingsDialog() {
     }
     SettingsDialog.prototype.attach = function (app, el) {
-        app.ractive = new Ractive({
+        var _this = this;
+        var es = function (node) {
+            $(node).easySelectBox({ speed: 200 });
+            return {
+                teardown: function () {
+                    // nop?
+                }
+            };
+        };
+        this.ractive = new Ractive({
             // どの箱に入れるかをIDで指定
             el: el,
             // 指定した箱に、どのHTMLを入れるかをIDで指定
-            template: '#settingTemplate'
+            template: '#settingTemplate',
+            decorators: {
+                easyselect: es
+            },
+            data: {
+                tax_rate: app.environment.tax_rate,
+                quotation_limit: app.environment.quotation_limit,
+                closing_month: app.environment.closing_month,
+                pay_limit: app.environment.pay_limit,
+                company_name: app.environment.company_name,
+                company_zip: app.environment.company_zip,
+                company_address: app.environment.company_address,
+                company_tel: app.environment.company_tel,
+                company_fax: app.environment.company_fax,
+                company_bankname: app.environment.company_bankname,
+                company_bank_type: app.environment.company_bank_type,
+                company_bank_num: app.environment.company_bank_num,
+                company_bank_name: app.environment.company_bank_name
+            }
         });
-        app.ractive.on({
+        this.ractive.on({
             'windowClicked': function () {
                 return false;
             },
             'close': function () {
                 app.closeDialog();
                 return false;
+            },
+            'save': function () {
+                _this.save(app);
+                return false;
+            }
+        });
+    };
+    SettingsDialog.prototype.save = function (app) {
+        var env = new Environment();
+        env.tax_rate = this.ractive.get('tax_rate');
+        env.quotation_limit = this.ractive.get('quotation_limit');
+        env.closing_month = this.ractive.get('closing_month');
+        env.pay_limit = $('#pay_limit').val();
+        env.company_name = this.ractive.get('company_name');
+        env.company_zip = this.ractive.get('company_zip');
+        env.company_address = this.ractive.get('company_address');
+        env.company_tel = this.ractive.get('company_tel');
+        env.company_fax = this.ractive.get('company_fax');
+        env.company_bankname = this.ractive.get('company_bankname');
+        env.company_bank_type = $('#bank_type').val();
+        env.company_bank_num = this.ractive.get('company_bank_num');
+        env.company_bank_name = this.ractive.get('company_bank_name');
+        app.client.saveEnvironment(app.accessToken, env, {
+            success: function () {
+                app.environment = env;
+                app.closeDialog();
+            },
+            error: function (status, msg) {
+                console.log('Failed to save environment statu=' + status);
             }
         });
     };

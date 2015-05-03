@@ -5,5 +5,6 @@ type Models struct {
 	Session SessionDAO
 	Company CompanyDAO
 	Trading TradingDAO
+	Env     EnvDAO
 	Logger  Logger
 }

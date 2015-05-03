@@ -9,6 +9,7 @@ class App {
     page : Page;
 
     accessToken : string;
+    environment : Environment;
     users : Array<User>;
     tradings : Array<Trading>;
     tradingsMap : any;    
@@ -62,8 +63,26 @@ class App {
         });            
     }
     loadData(callback : LoadCallback) {
-        this.loadUsers(callback);
+        this.loadEnvironment(callback);
     }
+    
+    private loadEnvironment(callback : LoadCallback) {
+        if (this.environment != null) {
+            this.loadUsers(callback);
+            return;
+        }
+        this.client.getEnvironment(this.accessToken, {
+            success : (item : Environment) => {
+                this.environment = item;
+                this.loadUsers(callback);
+            },
+            error : (status : number, msg : string) => {
+                console.log('Failed to get environment status=' + status);
+                callback.error();
+            }
+        });
+    }
+    
     private loadUsers(callback : LoadCallback) {
         if (this.users != null) {
             this.loadTradings(callback);
