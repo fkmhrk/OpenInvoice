@@ -8,8 +8,7 @@ import (
 
 type handler func(http.ResponseWriter, *http.Request)
 
-func SetHandlers(r *mux.Router, u s.UserService, t s.TradingService,
-	c s.CompanyService) {
+func SetHandlers(r *mux.Router, services s.Services, u s.UserService, t s.TradingService, c s.CompanyService) {
 	r.HandleFunc("/token", getToken(u)).
 		Methods("POST")
 	r.HandleFunc("/users", getUsers(u)).
@@ -34,4 +33,7 @@ func SetHandlers(r *mux.Router, u s.UserService, t s.TradingService,
 		Methods("POST")
 	r.HandleFunc("/companies/{companyId}", updateCompany(c)).
 		Methods("PUT")
+	// Environment
+	r.HandleFunc("/environments", getEnvironment(services)).
+		Methods("GET")
 }
