@@ -36,4 +36,6 @@ func SetHandlers(r *mux.Router, services s.Services, u s.UserService, t s.Tradin
 	// Environment
 	r.HandleFunc("/environments", getEnvironment(services)).
 		Methods("GET")
+	r.HandleFunc("/environments", saveEnvironment(services)).
+		Methods("PUT")
 }
