@@ -42,3 +42,27 @@ func (o *adminService) GetEnvironment(token string) s.Result {
 
 	return jsonResult(200, body)
 }
+
+func (o *adminService) SaveEnvironment(token string, list []*m.Env) s.Result {
+	if isEmpty(token) {
+		return errorResult(400, s.ERR_AUTHORIZATION_EMPTY)
+	}
+	// get Session
+	session, err := o.sessionDAO.GetByToken(token)
+	if err != nil {
+		return errorResult(500, s.ERR_SERVER_ERROR)
+	}
+	if session == nil {
+		return errorResult(401, s.ERR_NOT_AUTHORIZED)
+	}
+	// saves
+	err = o.envDAO.Save(list)
+	if err != nil {
+		return errorResult(500, s.ERR_SERVER_ERROR)
+	}
+
+	body := map[string]interface{}{
+		"msg": "ok",
+	}
+	return jsonResult(200, body)
+}

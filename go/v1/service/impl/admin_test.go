@@ -42,3 +42,32 @@ func TestAdmin_0000_GetEnvironment(t *testing.T) {
 	assertString(t, json, "company_name", "MyCompany1")
 	assertString(t, json, "company_tel", "080-1111-2222")
 }
+
+func TestAdmin_0200_SavetEnvironment(t *testing.T) {
+	models := mock.NewMock()
+	sessionDAO, _ := models.Session.(*mock.SessionDAO)
+	sessionDAO.GetByTokenResult = &m.Session{
+		Token:  "token1122",
+		UserId: "user1122",
+	}
+	envDAO, _ := models.Env.(*mock.EnvDAO)
+	envDAO.SaveResult = nil
+
+	list := []*m.Env{
+		&m.Env{
+			Key:   "company_name",
+			Value: "mokelab inc",
+		},
+	}
+
+	var service s.AdminService = NewAdminService(models)
+	r := service.SaveEnvironment("token", list)
+
+	// Assertion
+	if r.Status() != 200 {
+		t.Errorf("Status must be 200 but %d", r.Status())
+		return
+	}
+	json := json(r)
+	assertString(t, json, "msg", "ok")
+}
