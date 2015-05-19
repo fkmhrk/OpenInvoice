@@ -6,9 +6,11 @@
 
 class SheetPage implements Page {
     id : string;
+    copyMode : boolean;
     
-    constructor(id : string) {
+    constructor(id : string, copyMode : boolean) {
         this.id = id;
+        this.copyMode = copyMode;
     }
     onCreate(app : App) {
         var item : Trading;
@@ -22,6 +24,13 @@ class SheetPage implements Page {
     private loadItems(app : App, trading : Trading) {
         app.client.getTradingItems(app.accessToken, trading.id, {
             success : (list : Array<TradingItem>) => {
+                // if copyMode = true remove ids
+                if (this.copyMode) {
+                    trading.id = null;
+                    _.each(list, (item : TradingItem) => {
+                        item.id = null;
+                    });
+                }
                 this.show(app, trading, list);
             },
             error : (status : number, msg : string) => {
