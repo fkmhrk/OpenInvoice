@@ -20,8 +20,8 @@ var AppRouter = Backbone.Router.extend({
         "top" : "top",        
         // index.html#sheetの場合は、sheetという関数を実行する
         "sheets(/:id)" : "sheet",
+        "sheets(/:id)/copy" : "copySheet",
         "setting" : "setting"
-        //"signup" : "signUp",
     },
     signIn : function() {
         app.page = new SignInPage();
@@ -32,8 +32,12 @@ var AppRouter = Backbone.Router.extend({
         app.page.onCreate(app);
     },
     sheet : (id : string) => {
-        app.page = new SheetPage(id);
+        app.page = new SheetPage(id, false);
         app.page.onCreate(app);
+    },
+    copySheet : (id : string) => {
+        app.page = new SheetPage(id, true);
+        app.page.onCreate(app);        
     },
     setting : () => {
         // ダイアログ用の要素を作る

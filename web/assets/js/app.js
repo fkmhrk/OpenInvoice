@@ -694,11 +694,18 @@ var TopPage = (function () {
                 // #sheetに遷移する
                 app.router.navigate('sheets/' + item.id, { trigger: true });
             },
+            'copySheet': function (e, item) {
+                // #sheetに遷移する
+                app.router.navigate('sheets/' + item.id + '/copy', { trigger: true });
+                return false;
+            },
             'printQuotation': function (e, item) {
                 window.location.href = "/php/quotation.php?access_token=" + app.accessToken + "&trading_id=" + item.id;
+                return false;
             },
             'printBill': function (e, item) {
                 window.location.href = "/php/bill.php?access_token=" + app.accessToken + "&trading_id=" + item.id;
+                return false;
             },
             'showUserList': function () {
                 app.showDialog(new UserListDialog());
@@ -707,7 +714,6 @@ var TopPage = (function () {
                 app.showDialog(new CompanyListDialog());
             },
             'showSetting': function (e) {
-                // #settingに遷移する
                 app.showDialog(new SettingsDialog());
             }
         });
@@ -773,8 +779,9 @@ var AddUserDialog = (function () {
 ///<reference path="./AddCompanyDialog.ts"/>
 ///<reference path="./AddUserDialog.ts"/>
 var SheetPage = (function () {
-    function SheetPage(id) {
+    function SheetPage(id, copyMode) {
         this.id = id;
+        this.copyMode = copyMode;
     }
     SheetPage.prototype.onCreate = function (app) {
         var item;
@@ -788,6 +795,13 @@ var SheetPage = (function () {
         var _this = this;
         app.client.getTradingItems(app.accessToken, trading.id, {
             success: function (list) {
+                // if copyMode = true remove ids
+                if (_this.copyMode) {
+                    trading.id = null;
+                    _.each(list, function (item) {
+                        item.id = null;
+                    });
+                }
                 _this.show(app, trading, list);
             },
             error: function (status, msg) {
@@ -1009,6 +1023,7 @@ var AppRouter = Backbone.Router.extend({
         "top": "top",
         // index.html#sheetの場合は、sheetという関数を実行する
         "sheets(/:id)": "sheet",
+        "sheets(/:id)/copy": "copySheet",
         "setting": "setting"
     },
     signIn: function () {
@@ -1020,7 +1035,11 @@ var AppRouter = Backbone.Router.extend({
         app.page.onCreate(app);
     },
     sheet: function (id) {
-        app.page = new SheetPage(id);
+        app.page = new SheetPage(id, false);
+        app.page.onCreate(app);
+    },
+    copySheet: function (id) {
+        app.page = new SheetPage(id, true);
         app.page.onCreate(app);
     },
     setting: function () {
