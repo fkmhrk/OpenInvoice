@@ -157,8 +157,8 @@
 
       	<section id="inputArea">
       	  <div class="inner">
+            {{#tradingItems:i}}            
 	    <div class="inputBox">
-              {{#tradingItems:i}}
 	      <article>
 		<ul class="table">
                   <li><input type="text" placeholder="項目名" value="{{tradingItems[i].subject}}"></li>
@@ -178,9 +178,8 @@
 		<p class="delete" title="項目削除" on-click="deleteItem:{{i}}"><i class="fa fa-trash"></i></p>
                 
 	      </article>
-              {{/}}
-
-	    </div>
+            </div>
+            {{/}}
 	  </div>
 	  <p class="addInput" on-click="addItem"><i class="fa fa-plus-circle"></i>項目追加</p>
 
