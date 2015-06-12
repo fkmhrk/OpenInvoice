@@ -9,4 +9,6 @@ type AdminService interface {
 	GetEnvironment(token string) Result
 	// Saves Environment. If key exists, api updates it.
 	SaveEnvironment(token string, list []*m.Env) Result
+	// Gets My comanpy name
+	GetMyCompanyname() Result
 }

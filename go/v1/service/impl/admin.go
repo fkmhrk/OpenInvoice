@@ -66,3 +66,22 @@ func (o *adminService) SaveEnvironment(token string, list []*m.Env) s.Result {
 	}
 	return jsonResult(200, body)
 }
+
+func (o *adminService) GetMyCompanyname() s.Result {
+	// get list
+	env, err := o.envDAO.Get("company_name")
+	if err != nil {
+		return errorResult(500, s.ERR_SERVER_ERROR)
+	}
+	var name string
+	if env.IsEmpty() {
+		name = ""
+	} else {
+		name = env.Value
+	}
+
+	body := map[string]interface{}{
+		"name": name,
+	}
+	return jsonResult(200, body)
+}
