@@ -142,6 +142,18 @@ class AppClientImpl implements Client {
             }
         });
     }
+
+    getMyCompanyName(callback : ItemCallback<string>) {
+        var url = this.url + '/api/v1/environments';
+        this.exec(url, 'GET', null, null, {
+            success : (json : any) => {
+                callback.success(json['name']);
+            },
+            error : (status : any, body : any) => {
+                callback.error(status, body.msg);
+            }
+        });        
+    }
     
     private createTrading(token : string, item : Trading, callback : ItemCallback<string>) {
         var url = this.url + '/api/v1/tradings';
