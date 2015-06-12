@@ -144,7 +144,7 @@ class AppClientImpl implements Client {
     }
 
     getMyCompanyName(callback : ItemCallback<string>) {
-        var url = this.url + '/api/v1/environments';
+        var url = this.url + '/api/v1/myCompany/name';
         this.exec(url, 'GET', null, null, {
             success : (json : any) => {
                 callback.success(json['name']);
