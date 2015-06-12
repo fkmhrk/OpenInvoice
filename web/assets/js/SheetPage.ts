@@ -41,23 +41,13 @@ class SheetPage implements Page {
     }
 
     private show(app : App, trading : Trading, itemList : Array<TradingItem>) {
-        var es = (node : any) => {
-            $(node).easySelectBox({speed: 200});
-            return {
-                teardown : function() {
-                    // nop?
-                }
-            }
-        };
         // Racriveオブジェクトを作る
         var r = app.ractive = new Ractive({
             // どの箱に入れるかをIDで指定
             el : '#container',
             // 指定した箱に、どのHTMLを入れるかをIDで指定
             template : '#sheetTemplate',
-            decorators: {
-                easyselect: es,
-            },
+            decorators: { },
             data : {
                 'trading' : trading,
                 'workFrom' : Utils.toDateStr(trading.work_from),
@@ -131,7 +121,13 @@ class SheetPage implements Page {
             },
             'addUser' : () => {
                 this.showAddUserDialog(app);
-            }
+            },
+            'printQuotation' : () => {
+                this.printQuotation(app);
+            },
+            'printBill' : () => {
+                this.printBill(app);
+            },            
         });
         r.on('deleteItem', function(e, index) {
             itemObserver.cancel();
@@ -143,15 +139,15 @@ class SheetPage implements Page {
             itemObserver = observeItem();
         });
         r.on('save', () => {
-            this.save(app);
+            this.save(app, (id : string) => {
+                window.history.back();
+            });
         });
         r.observe('trading.tax_rate', function(newValue, oldValue, keypath) {
             updateSum();
         });        
         // この下にjQuery関連のコードおねがいしやす
         tooltipster();
-        //selectbox();
-        //sheet();
     }
     private showAddCompanyDialog(app : App) {
         app.showDialog(new AddCompanyDialog());
@@ -159,10 +155,18 @@ class SheetPage implements Page {
     private showAddUserDialog(app : App) {
         app.showDialog(new AddUserDialog());
     }
-    private save(app : App) {
+    private printQuotation(app : App) {
+        this.save(app, (id : string) => {
+            window.location.href = "/php/quotation.php?access_token=" + app.accessToken + "&trading_id=" + id;
+        });
+    }
+    private printBill(app : App) {
+        this.save(app, (id : string) => {
+            window.location.href = "/php/bill.php?access_token=" + app.accessToken + "&trading_id=" + id;
+        });        
+    }
+    private save(app : App, doneFunc : (id : string) => void) {
         var trading = app.ractive.get('trading');
-        var companyId = $('#company').val();
-        var titleType = $('#titleType').val();
         var workFrom = app.ractive.get('workFrom');
         var workTo = app.ractive.get('workTo');
         var quotationDate = app.ractive.get('quotationDate');
@@ -170,8 +174,7 @@ class SheetPage implements Page {
         var tradingItems = app.ractive.get('tradingItems');
 
         // modify type
-        trading.company_id = companyId;
-        trading.title_type = Number(titleType);
+        trading.title_type = Number(trading.title_type);
         trading.work_from = new Date(workFrom).getTime();
         trading.work_to = new Date(workTo).getTime();
         trading.quotation_date = new Date(quotationDate).getTime();
@@ -180,8 +183,9 @@ class SheetPage implements Page {
         console.log(trading);
         app.client.saveTrading(app.accessToken, trading, {
             success : (id : string) => {
+                app.tradingsMap[id] = trading;
                 var deleted = app.ractive.get('deletedItems');
-                this.deleteItems(app, id, deleted);
+                this.deleteItems(app, id, deleted, doneFunc);
             },
             error : (status : number, msg : string) => {
                 console.log('Failed to save trading status=' + status);
@@ -189,7 +193,8 @@ class SheetPage implements Page {
         });
     }
 
-    private deleteItems(app : App, id : string, list : Array<TradingItem>) {
+    private deleteItems(app : App, id : string, list : Array<TradingItem>,
+                        doneFunc : (id : string) => void) {
         if (list.length == 0) {
             var list3 = [];
             _.each(app.ractive.get('tradingItems'), (item : TradingItem, index : number) => {
@@ -199,14 +204,14 @@ class SheetPage implements Page {
                 item.tax_type = Number($('#tax_type' + index).val());
                 list3.push(item);
             });
-            this.saveItems(app, id, list3);
+            this.saveItems(app, id, list3, doneFunc);
             return;
         }
         var item = list[0];
         app.client.deleteTradingItem(app.accessToken, id, item.id, {
             success : (itemId : string) => {
                 list.splice(0, 1);
-                this.deleteItems(app, id, list);
+                this.deleteItems(app, id, list, doneFunc);
             },
             error : (status : number, msg : string) => {
                 console.log('Failed to delete items status=' + status);
@@ -214,9 +219,10 @@ class SheetPage implements Page {
         });
     }
 
-    private saveItems(app : App, id : string, list : Array<TradingItem>) {
+    private saveItems(app : App, id : string, list : Array<TradingItem>,
+                      doneFunc : (id : string) => void) {
         if (list.length == 0) {
-            window.history.back();
+            doneFunc(id);
             return;
         }
         var item = list[0]
@@ -224,7 +230,7 @@ class SheetPage implements Page {
             success : (itemId : string) => {
                 item.id = itemId;
                 list.splice(0, 1);
-                this.saveItems(app, id, list);                
+                this.saveItems(app, id, list, doneFunc);
             },
             error : (status : number, msg : string) => {
                 console.log('Failed to save items status=' + status);

@@ -1,4 +1,11 @@
 module Utils {
+    export function toList(obj : any) {
+        var list = [];
+        for (var k in obj) {
+            list.push(obj[k]);
+        }
+        return list;
+    }
     export function toNumber(source : string){
         var num = Number(String(source).replace(",", ""))
         return isNaN(num) ? 0 : num;

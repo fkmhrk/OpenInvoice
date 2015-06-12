@@ -3,6 +3,7 @@
 ///<reference path="./UserListDialog.ts"/>
 ///<reference path="./CompanyListDialog.ts"/>
 ///<reference path="./SettingsDialog.ts"/>
+///<reference path="./Functions.ts"/>
 
 class TopPage implements Page {
     onCreate(app : App) {
@@ -25,7 +26,8 @@ class TopPage implements Page {
             // データを設定。テンプレートで使います。
             data : {
                 'company' : app.companyMap,
-                'sheets' : app.tradings,
+                'sheets' : app.getTradings(),
+                'toDateStr' : Utils.toDateStr,
             }
         });
 

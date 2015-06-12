@@ -3,8 +3,8 @@
  * -------------------------- */
 @font-face {
   font-family: 'FontAwesome';
-  src: url('./fonts/fontawesome-webfont.eot?v=4.3.0');
-  src: url('./fonts/fontawesome-webfont.eot?#iefix&v=4.3.0') format('embedded-opentype'), url('./fonts/fontawesome-webfont.woff2?v=4.3.0') format('woff2'), url('./fonts/fontawesome-webfont.woff?v=4.3.0') format('woff'), url('./fonts/fontawesome-webfont.ttf?v=4.3.0') format('truetype'), url('./fonts/fontawesome-webfont.svg?v=4.3.0#fontawesomeregular') format('svg');
+  src: url('../fonts/fontawesome-webfont.eot?v=4.3.0');
+  src: url('../fonts/fontawesome-webfont.eot?#iefix&v=4.3.0') format('embedded-opentype'), url('../fonts/fontawesome-webfont.woff2?v=4.3.0') format('woff2'), url('../fonts/fontawesome-webfont.woff?v=4.3.0') format('woff'), url('../fonts/fontawesome-webfont.ttf?v=4.3.0') format('truetype'), url('../fonts/fontawesome-webfont.svg?v=4.3.0#fontawesomeregular') format('svg');
   font-weight: normal;
   font-style: normal; }
 
@@ -1720,6 +1720,54 @@ header .save {
         background: none;
         cursor: default; }
 
+#signin h1 {
+  text-align: center;
+  margin-top: 100px; }
+#signin .wrap {
+  width: 450px;
+  margin: 30px auto 0;
+  border-radius: 5px;
+  background-color: #e0e4e4;
+  border: 1px solid #ccc; }
+  #signin .wrap ul {
+    margin: 50px 0; }
+  #signin .wrap li {
+    position: relative;
+    width: 70%;
+    margin: 0 auto 15px; }
+    #signin .wrap li i {
+      position: absolute;
+      font-size: 22px;
+      color: #999;
+      left: 20px;
+      top: 20px; }
+    #signin .wrap li input {
+      padding: 20px 10px 20px 50px;
+      font-size: 18px;
+      width: 100%; }
+  #signin .wrap .btn {
+    text-align: center;
+    margin-bottom: 50px; }
+    #signin .wrap .btn button {
+      background-color: #4786e2;
+      color: #fff;
+      border: none;
+      font-size: 18px;
+      border-radius: 3px;
+      padding: 20px 35px;
+      transition: 0.3s;
+      cursor: pointer; }
+      #signin .wrap .btn button i {
+        margin-right: 20px;
+        font-size: 22px; }
+      #signin .wrap .btn button:hover {
+        background-color: #216ad5; }
+#signin .ver {
+  text-align: center;
+  color: #b3b3b3;
+  font-size: 12px;
+  margin-top: 10px; }
+
 #top {
   margin: 0 auto; }
   #top header {
@@ -1795,6 +1843,7 @@ header .save {
     width: 100%;
     background-color: #626666;
     color: #fff;
+    position: fixed;
     z-index: 10;
     top: 0; }
     #sheet header .inner {
@@ -1803,16 +1852,34 @@ header .save {
       box-sizing: border-box;
       position: relative;
       height: 68px; }
+      #sheet header .inner .sum {
+        position: absolute;
+        right: 200px;
+        top: -30px;
+        text-align: right;
+        font-weight: bold;
+        opacity: 0;
+        transition: 0.3s; }
+        #sheet header .inner .sum.in {
+          opacity: 1;
+          top: 22px; }
+        #sheet header .inner .sum span {
+          font-family: Arial;
+          font-size: 20px;
+          margin-left: 10px; }
   #sheet .wrapper {
     width: 960px;
     margin: 0 auto;
     box-sizing: border-box;
-    position: relative; }
+    position: relative;
+    padding-top: 100px; }
     #sheet .wrapper #basicInfo {
-      margin-top: 2rem;
       padding-bottom: 1rem; }
       #sheet .wrapper #basicInfo input[type=text], #sheet .wrapper #basicInfo textarea {
         width: 390px; }
+      #sheet .wrapper #basicInfo textarea {
+        font-size: 12px;
+        height: 80px; }
       #sheet .wrapper #basicInfo p, #sheet .wrapper #basicInfo li {
         margin-bottom: 0.5rem; }
       #sheet .wrapper #basicInfo .addList {
@@ -1831,11 +1898,79 @@ header .save {
           background-color: rgba(193, 39, 45, 0.1); }
       #sheet .wrapper #basicInfo li span {
         margin-right: 0.5rem; }
+    #sheet .wrapper #pdf {
+      width: 320px;
+      position: absolute;
+      right: 0;
+      top: 100px;
+      font-size: 12px; }
+      #sheet .wrapper #pdf dt {
+        display: inline-block;
+        width: 190px;
+        margin-bottom: 8px;
+        margin-right: 5px;
+        text-align: right;
+        position: relative; }
+        #sheet .wrapper #pdf dt input {
+          padding: 0.2rem;
+          font-size: 12px;
+          background: #f2f2f2; }
+          #sheet .wrapper #pdf dt input[type=date] {
+            width: 120px; }
+          #sheet .wrapper #pdf dt input[type=text] {
+            width: 70px;
+            color: #999; }
+        #sheet .wrapper #pdf dt::before {
+          content: "";
+          border: 6px solid transparent;
+          border-left: 6px solid #ccc;
+          position: absolute;
+          top: 7px;
+          right: -11px; }
+        #sheet .wrapper #pdf dt::after {
+          content: "";
+          border: 6px solid transparent;
+          border-left: 6px solid #f2f2f2;
+          position: absolute;
+          top: 7px;
+          right: -10px; }
+      #sheet .wrapper #pdf dd {
+        display: inline-block;
+        width: 115px;
+        margin-bottom: 8px;
+        border-radius: 3px;
+        color: #fff;
+        height: 30px;
+        line-height: 30px;
+        transition: 0.3s;
+        cursor: pointer; }
+        #sheet .wrapper #pdf dd i {
+          background-color: rgba(0, 0, 0, 0.1);
+          display: inline-block;
+          line-height: 30px;
+          padding: 0 8px;
+          margin-right: 8px; }
+        #sheet .wrapper #pdf dd.pdf_est {
+          background-color: #29abe2; }
+          #sheet .wrapper #pdf dd.pdf_est:hover {
+            background-color: #177da8; }
+        #sheet .wrapper #pdf dd.pdf_invoice {
+          background-color: #009245; }
+          #sheet .wrapper #pdf dd.pdf_invoice:hover {
+            background-color: #005f2d; }
+        #sheet .wrapper #pdf dd.pdf_order {
+          background-color: #aa5acd; }
+          #sheet .wrapper #pdf dd.pdf_order:hover {
+            background-color: #8433a8; }
+        #sheet .wrapper #pdf dd.pdf_attach {
+          background-color: #f15a24; }
+          #sheet .wrapper #pdf dd.pdf_attach:hover {
+            background-color: #bc3b0c; }
     #sheet .wrapper #sum {
       width: 292px;
       position: absolute;
       right: 0;
-      bottom: 1rem; }
+      bottom: 2rem; }
       #sheet .wrapper #sum dt {
         text-align: right;
         display: inline-block;

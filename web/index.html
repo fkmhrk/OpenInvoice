@@ -6,7 +6,6 @@
 	<title>請求書システム｜株式会社サンプル</title>
 	<link rel="stylesheet" href="./assets/style.css">
 	<link rel="stylesheet" href="./assets/tooltipster.css" />
-	<link rel="stylesheet" href="./lib/easyselectbox/easyselectbox.css">
 	
 </head>
 <body>
@@ -23,21 +22,20 @@
   </script>
 
   <script id="signInTemplate" type="text/ractive">
-    <section id="top">
-      <header>
-		<div class="inner">
-		  <h1>株式会社サンプル</h1>
-		</div>
-      </header>
-      <section style="margin-top:68px">
-      <label>username</label>
-      <input type="text" value="{{username}}"/>
-      <label>password</label>
-      <input type="password" value="{{password}}"/>
-      <button on-click="signIn">Sign in</button>
-      </section>      
+    <section id="signin">
+      <h1>株式会社サンプル</h1>
+      <section>
+				<div class="wrap">
+					<ul>
+						<li><i class="fa fa-user"></i><input type="text" placeholder="username" value="{{username}}"></li>
+						<li><i class="fa fa-unlock-alt"></i><input type="password" placeholder="password" value="{{password}}"></li>
+					</ul>
+					<p class="btn"><button on-click="signIn"><i class="fa fa-sign-in"></i>Sign in</button></p>
+				</div>
+				<p class="ver">Open Invoice ver.0.0</p>
+      </section>
   </script>
-  
+
   <script id="topTemplate" type="text/ractive">
     <section id="top">
       <header>
@@ -67,7 +65,7 @@
             <!-- 1つ1つのフィールドの内容を出すには、{{フィールド名}} -->
             {{#sheets}}
 	    <tr on-click="showSheet:{{.}}">
-	      <td>{{modified_time}}</td>
+	      <td>{{toDateStr(modified_time)}}</td>
 	      <td>{{company[company_id].name}}<span>{{subject}}</span></td>
 	      <td>{{total}}</td>
 	      <td>{{quotation_number}}</td>
@@ -96,6 +94,7 @@
 	  <ul class="actionBtn">
 	    <li><a href="#" title="閉じる"><i class="fa fa-remove"></i></a></li>
 	  </ul>
+		<p class="sum">合計金額 &yen;<span>540,000</span></p>
 	  <p class="save" on-click="save"><i class="fa fa-check"></i>保存</p>
 	</div>
       </header>
@@ -103,14 +102,13 @@
       	<div class="wrapper">
       	  <section id="basicInfo">
 	    <p>
-	      <select id="company" value="{{trading.company_id}}" decorator="easyselect">
+	      <select id="company" value="{{trading.company_id}}">
 		<option id="">会社名</option>
                 {{#companies}}
                 <option value="{{id}}">{{name}}</option>
                 {{/}}
 	      </select>
-              
-	      <select id="titleType" value="{{trading.title_type}}" decorator="easyselect">
+	      <select id="titleType" value="{{trading.title_type}}">
 		<option value="0">御中</option>
 		<option value="1">様</option>
 	      </select>
@@ -123,7 +121,7 @@
 	      <li><textarea placeholder="備考"></textarea></li>
 	      <li>
 		<span>担当者</span>
-		<select value="{{trading.assignee}}" decorator="easyselect">
+		<select value="{{trading.assignee}}">
                   {{#users}}
                   <option value="{{id}}">{{display_name}}</option>
                   {{/}}
@@ -132,12 +130,20 @@
 	      </li>
 	    </ul>
 	  </section>
+		<section id="pdf">
+			<dl>
+				<dt><input type="text" value="1506-1"><input type="date" value="{{quotationDate}}"></dt>
+				<dd class="pdf_est" on-click="printQuotation"><i class="fa fa-list-alt"></i>見積書 pdf</dd>
+				<dt><input type="text" value="15001-V"><input type="date" value="{{billDate}}"></dt>
+				<dd class="pdf_invoice" on-click="printBill"><i class="fa fa-list-alt"></i>請求書 pdf</dd>
+				<dt><input type="text" value="15001-D"><input type="date" value=""></dt>
+				<dd class="pdf_order"><i class="fa fa-list-alt"></i>納品書 pdf</dd>
+				<dt><input type="date" value=""></dt>
+				<dd class="pdf_attach"><i class="fa fa-list-alt"></i>添え状</dd>
+			</dl>
+		</section>          
 	  <section id="sum">
 	    <dl>
-	      <dt>見積書発行日</dt>
-	      <dd><input type="date" value="{{quotationDate}}"></dd>
-	      <dt>請求書発行日</dt>
-	      <dd><input type="date" value="{{billDate}}"></dd>
 	      <dt>小計　&yen;</dt>
 	      <dd><input type="text" disabled value="{{trading.sum}}"></dd>
 	      <dt>消費税 <input type="text" value="{{trading.tax_rate}}" class="inputS"> ％　&yen;</dt>
@@ -163,7 +169,7 @@
 		</ul>
 		<p class="note"><textarea placeholder="備考" value="{{tradingItems[i].memo}}"></textarea></p>
 		<p class="tax">
-		  <select id="tax_type{{i}}" decorator="easyselect">
+		  <select id="tax_type{{i}}">
 		    <option value="1">税抜</option>
 		    <option value="2">税込</option>
 		    <option value="0">非課税</option>
@@ -208,7 +214,7 @@
               <td><input type="text" value="{{closing_month}}">月</td>
               <th>お支払期限</th>
               <td>
-                <select id="pay_limit" value="{{pay_limit}}" decorator="easyselect">
+                <select id="pay_limit" value="{{pay_limit}}">
                   <option value="1">翌月末</option>
                   <option value="2">翌々月末</option>
                 </select>
@@ -231,7 +237,7 @@
             <h2>口座情報</h2>
             <p>
               <input type="text" placeholder="銀行名" value="{{company_bankname}}">
-              <select id="bank_type" value="company_bank_type" decorator="easyselect">
+              <select id="bank_type" value="company_bank_type">
                 <option value="1">普通</option>
                 <option value="2">当座</option>
                 <option value="3">定期</option>
@@ -382,9 +388,20 @@
   
 
 
-  <script src="http://code.jquery.com/jquery-1.9.0.min.js"></script>
+  <script src="https://code.jquery.com/jquery-1.9.0.min.js"></script>
   <script src="./assets/js/jquery.tooltipster.min.js"></script>
-  <script src="./lib/easyselectbox/easyselectbox.min.js"></script>
+	<script>
+	//$("#sheet .sum")
+	$(window).scroll(function() {
+	//console.log($(window).scrollTop())
+		if($(window).scrollTop() > 360 ){
+			$("#sheet .sum").addClass('in');
+		} else {
+			$("#sheet .sum").removeClass('in');
+		}
+	});
+
+	</script>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/ractive/0.7.1/ractive.js"></script>        
   <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.7.0/underscore-min.js" type="text/javascript"></script>
