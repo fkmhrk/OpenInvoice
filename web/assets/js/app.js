@@ -262,11 +262,53 @@ var Environment = (function () {
     }
     return Environment;
 })();
+var Utils;
+(function (Utils) {
+    function toList(obj) {
+        var list = [];
+        for (var k in obj) {
+            list.push(obj[k]);
+        }
+        return list;
+    }
+    Utils.toList = toList;
+    function toNumber(source) {
+        var num = Number(String(source).replace(",", ""));
+        return isNaN(num) ? 0 : num;
+    }
+    Utils.toNumber = toNumber;
+    function toDateStr(time) {
+        var date = new Date(time);
+        var m = date.getMonth() + 1;
+        var d = date.getDate();
+        if (m < 10) {
+            m = "0" + m;
+        }
+        if (d < 10) {
+            d = "0" + d;
+        }
+        return date.getFullYear() + "-" + m + "-" + d;
+    }
+    Utils.toDateStr = toDateStr;
+    function clone(source) {
+        var dest = {};
+        for (var k in source) {
+            dest[k] = source[k];
+        }
+        return dest;
+    }
+    Utils.clone = clone;
+})(Utils || (Utils = {}));
 ///<reference path="./Dialog.ts"/>
 ///<reference path="./Client.ts"/>
+///<reference path="./Functions.ts"/>
 var App = (function () {
     function App() {
     }
+    // getter
+    App.prototype.getTradings = function () {
+        return Utils.toList(this.tradingsMap);
+    };
     App.prototype.showDialog = function (dialog) {
         document.querySelector('#dialogs').style.display = 'block';
         app.dialogs.push('dialogs', dialog).then(function () {
@@ -354,15 +396,14 @@ var App = (function () {
     };
     App.prototype.loadTradings = function (callback) {
         var _this = this;
-        if (this.tradings != null) {
+        if (this.tradingsMap != null) {
             this.loadCompanies(callback);
             return;
         }
         this.client.getTradings(this.accessToken, {
             success: function (list) {
-                _this.tradings = list;
                 _this.tradingsMap = {};
-                _.each(_this.tradings, function (item) {
+                _.each(list, function (item) {
                     _this.tradingsMap[item.id] = item;
                 });
                 _this.loadCompanies(callback);
@@ -661,6 +702,7 @@ var SignInPage = (function () {
 ///<reference path="./UserListDialog.ts"/>
 ///<reference path="./CompanyListDialog.ts"/>
 ///<reference path="./SettingsDialog.ts"/>
+///<reference path="./Functions.ts"/>
 var TopPage = (function () {
     function TopPage() {
     }
@@ -685,7 +727,8 @@ var TopPage = (function () {
             // データを設定。テンプレートで使います。
             data: {
                 'company': app.companyMap,
-                'sheets': app.tradings
+                'sheets': app.getTradings(),
+                'toDateStr': Utils.toDateStr
             }
         });
         tooltipster();
@@ -720,35 +763,6 @@ var TopPage = (function () {
     };
     return TopPage;
 })();
-var Utils;
-(function (Utils) {
-    function toNumber(source) {
-        var num = Number(String(source).replace(",", ""));
-        return isNaN(num) ? 0 : num;
-    }
-    Utils.toNumber = toNumber;
-    function toDateStr(time) {
-        var date = new Date(time);
-        var m = date.getMonth() + 1;
-        var d = date.getDate();
-        if (m < 10) {
-            m = "0" + m;
-        }
-        if (d < 10) {
-            d = "0" + d;
-        }
-        return date.getFullYear() + "-" + m + "-" + d;
-    }
-    Utils.toDateStr = toDateStr;
-    function clone(source) {
-        var dest = {};
-        for (var k in source) {
-            dest[k] = source[k];
-        }
-        return dest;
-    }
-    Utils.clone = clone;
-})(Utils || (Utils = {}));
 ///<reference path="./Application.ts"/>
 ///<reference path="./Dialog.ts"/>
 var AddUserDialog = (function () {
@@ -812,23 +826,13 @@ var SheetPage = (function () {
     };
     SheetPage.prototype.show = function (app, trading, itemList) {
         var _this = this;
-        var es = function (node) {
-            $(node).easySelectBox({ speed: 200 });
-            return {
-                teardown: function () {
-                    // nop?
-                }
-            };
-        };
         // Racriveオブジェクトを作る
         var r = app.ractive = new Ractive({
             // どの箱に入れるかをIDで指定
             el: '#container',
             // 指定した箱に、どのHTMLを入れるかをIDで指定
             template: '#sheetTemplate',
-            decorators: {
-                easyselect: es
-            },
+            decorators: {},
             data: {
                 'trading': trading,
                 'workFrom': Utils.toDateStr(trading.work_from),
@@ -902,6 +906,12 @@ var SheetPage = (function () {
             },
             'addUser': function () {
                 _this.showAddUserDialog(app);
+            },
+            'printQuotation': function () {
+                _this.printQuotation(app);
+            },
+            'printBill': function () {
+                _this.printBill(app);
             }
         });
         r.on('deleteItem', function (e, index) {
@@ -914,15 +924,15 @@ var SheetPage = (function () {
             itemObserver = observeItem();
         });
         r.on('save', function () {
-            _this.save(app);
+            _this.save(app, function (id) {
+                window.history.back();
+            });
         });
         r.observe('trading.tax_rate', function (newValue, oldValue, keypath) {
             updateSum();
         });
         // この下にjQuery関連のコードおねがいしやす
         tooltipster();
-        //selectbox();
-        //sheet();
     };
     SheetPage.prototype.showAddCompanyDialog = function (app) {
         app.showDialog(new AddCompanyDialog());
@@ -930,19 +940,26 @@ var SheetPage = (function () {
     SheetPage.prototype.showAddUserDialog = function (app) {
         app.showDialog(new AddUserDialog());
     };
-    SheetPage.prototype.save = function (app) {
+    SheetPage.prototype.printQuotation = function (app) {
+        this.save(app, function (id) {
+            window.location.href = "/php/quotation.php?access_token=" + app.accessToken + "&trading_id=" + id;
+        });
+    };
+    SheetPage.prototype.printBill = function (app) {
+        this.save(app, function (id) {
+            window.location.href = "/php/bill.php?access_token=" + app.accessToken + "&trading_id=" + id;
+        });
+    };
+    SheetPage.prototype.save = function (app, doneFunc) {
         var _this = this;
         var trading = app.ractive.get('trading');
-        var companyId = $('#company').val();
-        var titleType = $('#titleType').val();
         var workFrom = app.ractive.get('workFrom');
         var workTo = app.ractive.get('workTo');
         var quotationDate = app.ractive.get('quotationDate');
         var billDate = app.ractive.get('billDate');
         var tradingItems = app.ractive.get('tradingItems');
         // modify type
-        trading.company_id = companyId;
-        trading.title_type = Number(titleType);
+        trading.title_type = Number(trading.title_type);
         trading.work_from = new Date(workFrom).getTime();
         trading.work_to = new Date(workTo).getTime();
         trading.quotation_date = new Date(quotationDate).getTime();
@@ -951,15 +968,16 @@ var SheetPage = (function () {
         console.log(trading);
         app.client.saveTrading(app.accessToken, trading, {
             success: function (id) {
+                app.tradingsMap[id] = trading;
                 var deleted = app.ractive.get('deletedItems');
-                _this.deleteItems(app, id, deleted);
+                _this.deleteItems(app, id, deleted, doneFunc);
             },
             error: function (status, msg) {
                 console.log('Failed to save trading status=' + status);
             }
         });
     };
-    SheetPage.prototype.deleteItems = function (app, id, list) {
+    SheetPage.prototype.deleteItems = function (app, id, list, doneFunc) {
         var _this = this;
         if (list.length == 0) {
             var list3 = [];
@@ -970,24 +988,24 @@ var SheetPage = (function () {
                 item.tax_type = Number($('#tax_type' + index).val());
                 list3.push(item);
             });
-            this.saveItems(app, id, list3);
+            this.saveItems(app, id, list3, doneFunc);
             return;
         }
         var item = list[0];
         app.client.deleteTradingItem(app.accessToken, id, item.id, {
             success: function (itemId) {
                 list.splice(0, 1);
-                _this.deleteItems(app, id, list);
+                _this.deleteItems(app, id, list, doneFunc);
             },
             error: function (status, msg) {
                 console.log('Failed to delete items status=' + status);
             }
         });
     };
-    SheetPage.prototype.saveItems = function (app, id, list) {
+    SheetPage.prototype.saveItems = function (app, id, list, doneFunc) {
         var _this = this;
         if (list.length == 0) {
-            window.history.back();
+            doneFunc(id);
             return;
         }
         var item = list[0];
@@ -995,7 +1013,7 @@ var SheetPage = (function () {
             success: function (itemId) {
                 item.id = itemId;
                 list.splice(0, 1);
-                _this.saveItems(app, id, list);
+                _this.saveItems(app, id, list, doneFunc);
             },
             error: function (status, msg) {
                 console.log('Failed to save items status=' + status);

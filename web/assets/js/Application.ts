@@ -1,5 +1,6 @@
 ///<reference path="./Dialog.ts"/>
 ///<reference path="./Client.ts"/>
+///<reference path="./Functions.ts"/>
 
 class App {
     router : any;
@@ -11,11 +12,16 @@ class App {
     accessToken : string;
     environment : Environment;
     users : Array<User>;
-    tradings : Array<Trading>;
     tradingsMap : any;    
     trading : any;
     companies : Array<Company>;
     companyMap : any;
+
+    // getter
+    getTradings() : Array<Trading> {
+        return Utils.toList(this.tradingsMap);
+    }
+    
     showDialog(dialog : Dialog) {
         (<HTMLElement>document.querySelector('#dialogs')).style.display = 'block';
         app.dialogs.push('dialogs', dialog).then(() => {
@@ -100,15 +106,14 @@ class App {
         });
     }
     private loadTradings(callback : LoadCallback) {
-        if (this.tradings != null) {
+        if (this.tradingsMap != null) {
             this.loadCompanies(callback);
             return;
         }
         this.client.getTradings(this.accessToken, {
             success : (list : Array<Trading>) => {
-                this.tradings = list;
                 this.tradingsMap = {};
-                _.each(this.tradings, (item : Trading) => {
+                _.each(list, (item : Trading) => {
                     this.tradingsMap[item.id] = item;
                 });
                 this.loadCompanies(callback);
