@@ -133,7 +133,7 @@ var AppClientImpl = (function () {
         });
     };
     AppClientImpl.prototype.getMyCompanyName = function (callback) {
-        var url = this.url + '/api/v1/environments';
+        var url = this.url + '/api/v1/myCompany/name';
         this.exec(url, 'GET', null, null, {
             success: function (json) {
                 callback.success(json['name']);
