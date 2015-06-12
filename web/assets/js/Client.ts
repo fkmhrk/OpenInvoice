@@ -59,6 +59,11 @@ interface Client {
      * Saves Environment
      */
     saveEnvironment(token : string, env : Environment, callback : Callback);
+
+    /**
+     * Gets my company name
+     */
+    getMyCompanyName(callback : ItemCallback<string>);
 }
 
 interface Callback {

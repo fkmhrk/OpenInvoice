@@ -71,3 +71,23 @@ func TestAdmin_0200_SavetEnvironment(t *testing.T) {
 	json := json(r)
 	assertString(t, json, "msg", "ok")
 }
+
+func TestAdmin_0400_GetMyCompanyname(t *testing.T) {
+	models := mock.NewMock()
+	envDAO, _ := models.Env.(*mock.EnvDAO)
+	envDAO.GetResult = m.Env{
+		Key:   "company_name",
+		Value: "mokelab inc",
+	}
+
+	var service s.AdminService = NewAdminService(models)
+	r := service.GetMyCompanyname()
+
+	// Assertion
+	if r.Status() != 200 {
+		t.Errorf("Status must be 200 but %d", r.Status())
+		return
+	}
+	json := json(r)
+	assertString(t, json, "name", "mokelab inc")
+}

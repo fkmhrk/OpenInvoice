@@ -132,6 +132,17 @@ var AppClientImpl = (function () {
             }
         });
     };
+    AppClientImpl.prototype.getMyCompanyName = function (callback) {
+        var url = this.url + '/api/v1/environments';
+        this.exec(url, 'GET', null, null, {
+            success: function (json) {
+                callback.success(json['name']);
+            },
+            error: function (status, body) {
+                callback.error(status, body.msg);
+            }
+        });
+    };
     AppClientImpl.prototype.createTrading = function (token, item, callback) {
         var url = this.url + '/api/v1/tradings';
         this.exec(url, 'POST', token, item, {
@@ -340,6 +351,7 @@ var App = (function () {
     App.prototype.start = function () {
         this.client = createClient();
         this.initDialog();
+        this.loadMyCompanyName();
     };
     App.prototype.initDialog = function () {
         var _this = this;
@@ -354,6 +366,20 @@ var App = (function () {
         this.dialogs.on({
             'closeClick': function () {
                 _this.closeDialog();
+            }
+        });
+    };
+    App.prototype.loadMyCompanyName = function () {
+        var _this = this;
+        if (this.myCompanyName != null && this.myCompanyName.length > 0) {
+            return;
+        }
+        this.client.getMyCompanyName({
+            success: function (name) {
+                _this.myCompanyName = name;
+            },
+            error: function (status, msg) {
+                console.log('Failed to get my company name status=' + status);
             }
         });
     };
@@ -669,6 +695,7 @@ var SignInPage = (function () {
             template: '#signInTemplate',
             // データを設定。テンプレートで使います。
             data: {
+                myCompanyName: app.myCompanyName,
                 inProgress: false
             }
         });
@@ -726,6 +753,7 @@ var TopPage = (function () {
             template: '#topTemplate',
             // データを設定。テンプレートで使います。
             data: {
+                myCompanyName: app.myCompanyName,
                 'company': app.companyMap,
                 'sheets': app.getTradings(),
                 'toDateStr': Utils.toDateStr
@@ -834,6 +862,7 @@ var SheetPage = (function () {
             template: '#sheetTemplate',
             decorators: {},
             data: {
+                myCompanyName: app.myCompanyName,
                 'trading': trading,
                 'workFrom': Utils.toDateStr(trading.work_from),
                 'workTo': Utils.toDateStr(trading.work_to),

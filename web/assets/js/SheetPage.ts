@@ -49,6 +49,7 @@ class SheetPage implements Page {
             template : '#sheetTemplate',
             decorators: { },
             data : {
+                myCompanyName : app.myCompanyName,
                 'trading' : trading,
                 'workFrom' : Utils.toDateStr(trading.work_from),
                 'workTo' : Utils.toDateStr(trading.work_to),

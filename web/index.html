@@ -23,7 +23,7 @@
 
   <script id="signInTemplate" type="text/ractive">
     <section id="signin">
-      <h1>株式会社サンプル</h1>
+      <h1>{{myCompanyName}}</h1>
       <section>
 				<div class="wrap">
 					<ul>
@@ -40,7 +40,7 @@
     <section id="top">
       <header>
 		<div class="inner">
-		  <h1>株式会社サンプル</h1>
+		  <h1>{{myCompanyName}}</h1>
 		  <ul class="actionBtn">
 		    <li on-click="showUserList"><a title="担当者の編集"><i class="fa fa-user"></i></a></li>
 		    <li on-click="showCompanyList"><a title="クライアントの編集"><i class="fa fa-building"></i></a></li>
@@ -90,7 +90,7 @@
     <section id="sheet">
       <header>
 	<div class="inner">
-	  <h1>株式会社サンプル</h1>
+	  <h1>{{myCompanyName}}</h1>
 	  <ul class="actionBtn">
 	    <li><a href="#" title="閉じる"><i class="fa fa-remove"></i></a></li>
 	  </ul>

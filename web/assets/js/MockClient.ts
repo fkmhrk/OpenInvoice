@@ -168,7 +168,14 @@ class MockClient implements Client {
      */
     saveEnvironment(token : string, env : Environment, callback : Callback) {
         callback.success();
-    };   
+    };
+
+    /**
+     * Gets my company name
+     */
+    getMyCompanyName(callback : ItemCallback<string>) {
+        callback.success('テスト用株式会社');
+    }
 }
 
 function createClient() {

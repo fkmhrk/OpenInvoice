@@ -32,3 +32,9 @@ func toEnvList(json rj.RawJsonObject) []*m.Env {
 	}
 	return list
 }
+
+func getMyCompanyName(services s.Services) handler {
+	return makeBaseHandler(func(req *http.Request) s.Result {
+		return services.Admin.GetMyCompanyname()
+	})
+}
