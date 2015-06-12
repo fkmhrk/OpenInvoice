@@ -14,6 +14,7 @@ class SignInPage implements Page {
             template : '#signInTemplate',
             // データを設定。テンプレートで使います。
             data : {
+                myCompanyName : app.myCompanyName,
                 inProgress : false,
             }
         });

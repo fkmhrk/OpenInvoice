@@ -1,241 +1,170 @@
 /// <reference path="./Client.ts"/>
-var $;
-var _;
-var baseURL = '';
-var AppClientImpl = (function () {
-    function AppClientImpl(url) {
-        this.url = url;
+var globalSeq = {
+    'company': 1,
+    'trading': 1,
+    'tradingItem': 1
+};
+var userList = [{
+        id: "user1",
+        display_name: "担当者1"
+    }];
+var companyList = {
+    "company1": {
+        id: "company1",
+        name: "会社1",
+        zip: "111-2222",
+        address: "東京都のどっか",
+        phone: "090-1111-2222",
+        fax: "090-1111-3333",
+        unit: "開発部",
+        assignee: "担当さん"
     }
-    AppClientImpl.prototype.login = function (username, password, callback) {
-        var params = {
-            username: username,
-            password: password
-        };
-        this.exec(this.url + '/api/v1/token', 'POST', null, params, {
-            success: function (json) {
-                callback.success(json.access_token);
-            },
-            error: function (status, body) {
-                callback.error(status, body.msg);
-            }
-        });
-    };
-    AppClientImpl.prototype.getTradings = function (token, callback) {
-        this.exec(this.url + '/api/v1/tradings', 'GET', token, null, {
-            success: function (json) {
-                callback.success(_.map(json.tradings, function (item) {
-                    item.date = item.id;
-                    return item;
-                }));
-            },
-            error: function (status, body) {
-                callback.error(status, body.msg);
-            }
-        });
-    };
-    AppClientImpl.prototype.getTradingItems = function (token, tradingId, callback) {
-        var url = this.url + '/api/v1/tradings/' + tradingId + '/items';
-        this.exec(url, 'GET', token, null, {
-            success: function (json) {
-                callback.success(_.map(json.items, function (item) {
-                    item.sum = item.unit_price * item.amount;
-                    return item;
-                }));
-            },
-            error: function (status, body) {
-                callback.error(status, body.msg);
-            }
-        });
-    };
-    AppClientImpl.prototype.getUsers = function (token, callback) {
-        var url = this.url + '/api/v1/users';
-        this.exec(url, 'GET', token, null, {
-            success: function (json) {
-                callback.success(json.users);
-            },
-            error: function (status, body) {
-                callback.error(status, body.msg);
-            }
-        });
-    };
-    AppClientImpl.prototype.getCompanies = function (token, callback) {
-        var url = this.url + '/api/v1/companies';
-        this.exec(url, 'GET', token, null, {
-            success: function (json) {
-                callback.success(json.companies);
-            },
-            error: function (status, body) {
-                callback.error(status, body.msg);
-            }
-        });
-    };
-    AppClientImpl.prototype.saveTrading = function (token, item, callback) {
-        if (item.id === null) {
-            this.createTrading(token, item, callback);
+};
+var sheetList = {
+    "trading1": {
+        id: "trading1",
+        date: "2015-6-12",
+        company_id: "company1",
+        company_name: "会社1",
+        title_type: 1,
+        work_from: 10,
+        work_to: 20,
+        quotation_date: 10,
+        bill_date: 20,
+        tax_rate: 8,
+        subject: "プロジェクト1",
+        assignee: "user1",
+        product: "製品1",
+        total: 10,
+        modified_time: 10
+    }
+};
+var tradingItemList = {
+    "trading1": {
+        "item1-1": {
+            id: "item1-1",
+            sort_order: 1,
+            subject: "品目1-1",
+            unit_price: 10000,
+            amount: 2,
+            degree: "人月",
+            tax_type: 1,
+            memo: "メモ1-1",
+            sum: 20000
         }
-        else {
-            this.updateTrading(token, item, callback);
+    }
+};
+var MockClient = (function () {
+    function MockClient() {
+    }
+    /**
+     * Logs in with username and password.
+     */
+    MockClient.prototype.login = function (username, password, callback) {
+        callback.success('token1122');
+    };
+    /**
+      * Gets all users
+      */
+    MockClient.prototype.getUsers = function (token, callback) {
+        callback.success(userList);
+    };
+    /**
+     * Gets all companies
+     */
+    MockClient.prototype.getCompanies = function (token, callback) {
+        var list = [];
+        for (var k in companyList) {
+            list.push(companyList[k]);
         }
+        callback.success(list);
     };
-    AppClientImpl.prototype.saveTradingItem = function (token, tradingId, item, callback) {
-        if (item.id === null) {
-            this.createTradingItem(token, tradingId, item, callback);
+    /**
+     * Saves company
+     * @return item is Company ID
+     */
+    MockClient.prototype.saveCompany = function (token, item, callback) {
+        if (item.id == null) {
+            item.id = "compnay" + (++globalSeq['company']);
         }
-        else {
-            this.updateTradingItem(token, tradingId, item, callback);
+        companyList[item.id] = item;
+        callback.success(item.id);
+    };
+    /**
+     * Gets Tradings
+     */
+    MockClient.prototype.getTradings = function (token, callback) {
+        var list = [];
+        for (var k in sheetList) {
+            list.push(sheetList[k]);
         }
+        callback.success(list);
     };
-    AppClientImpl.prototype.deleteTradingItem = function (token, tradingId, itemId, callback) {
-        var url = this.url + '/api/v1/tradings/' + tradingId +
-            '/items/' + itemId;
-        this.exec(url, 'DELETE', token, null, {
-            success: function (json) {
-                callback.success(itemId);
-            },
-            error: function (status, body) {
-                if (status == 404) {
-                    callback.success(itemId);
-                }
-                else {
-                    callback.error(status, body.msg);
-                }
-            }
-        });
-    };
-    AppClientImpl.prototype.saveCompany = function (token, item, callback) {
-        if (item.id === null || item.id.length == 0) {
-            this.createCompany(token, item, callback);
+    /**
+     * Gets trading items of specified Trading
+     */
+    MockClient.prototype.getTradingItems = function (token, tradingId, callback) {
+        var items = tradingItemList[tradingId];
+        var list = [];
+        for (var k in items) {
+            list.push(items[k]);
         }
-        else {
-            this.updateCompany(token, item, callback);
+        callback.success(list);
+    };
+    /**
+     * Saves Trading
+     * @return item is trading ID
+     */
+    MockClient.prototype.saveTrading = function (token, item, callback) {
+        if (item.id == null) {
+            item.id = "trading" + (++globalSeq['trading']);
         }
+        item.modified_time = new Date().getTime();
+        sheetList[item.id] = item;
+        callback.success(item.id);
     };
-    AppClientImpl.prototype.getEnvironment = function (token, callback) {
-        var url = this.url + '/api/v1/environments';
-        this.exec(url, 'GET', token, null, {
-            success: function (json) {
-                callback.success(json);
-            },
-            error: function (status, body) {
-                callback.error(status, body.msg);
-            }
-        });
-    };
-    AppClientImpl.prototype.saveEnvironment = function (token, env, callback) {
-        var url = this.url + '/api/v1/environments';
-        this.exec(url, 'PUT', token, env, {
-            success: function (json) {
-                callback.success();
-            },
-            error: function (status, body) {
-                callback.error(status, body.msg);
-            }
-        });
-    };
-    AppClientImpl.prototype.createTrading = function (token, item, callback) {
-        var url = this.url + '/api/v1/tradings';
-        this.exec(url, 'POST', token, item, {
-            success: function (json) {
-                callback.success(json.id);
-            },
-            error: function (status, body) {
-                callback.error(status, body.msg);
-            }
-        });
-    };
-    AppClientImpl.prototype.updateTrading = function (token, item, callback) {
-        var url = this.url + '/api/v1/tradings/' + item.id;
-        this.exec(url, 'PUT', token, item, {
-            success: function (json) {
-                callback.success(item.id);
-            },
-            error: function (status, body) {
-                callback.error(status, body.msg);
-            }
-        });
-    };
-    AppClientImpl.prototype.createTradingItem = function (token, tradingId, item, callback) {
-        var url = this.url + '/api/v1/tradings/' + tradingId + '/items';
-        this.exec(url, 'POST', token, item, {
-            success: function (json) {
-                callback.success(json.id);
-            },
-            error: function (status, body) {
-                callback.error(status, body.msg);
-            }
-        });
-    };
-    AppClientImpl.prototype.updateTradingItem = function (token, tradingId, item, callback) {
-        var url = this.url + '/api/v1/tradings/' + tradingId +
-            '/items/' + item.id;
-        this.exec(url, 'PUT', token, item, {
-            success: function (json) {
-                callback.success(item.id);
-            },
-            error: function (status, body) {
-                callback.error(status, body.msg);
-            }
-        });
-    };
-    AppClientImpl.prototype.createCompany = function (token, item, callback) {
-        var url = this.url + '/api/v1/companies';
-        this.exec(url, 'POST', token, item, {
-            success: function (json) {
-                callback.success(json.id);
-            },
-            error: function (status, body) {
-                callback.error(status, body.msg);
-            }
-        });
-    };
-    AppClientImpl.prototype.updateCompany = function (token, item, callback) {
-        var url = this.url + '/api/v1/companies/' + item.id;
-        this.exec(url, 'PUT', token, item, {
-            success: function (json) {
-                callback.success(json.id);
-            },
-            error: function (status, body) {
-                callback.error(status, body.msg);
-            }
-        });
-    };
-    AppClientImpl.prototype.exec = function (url, method, token, params, callback) {
-        var data = {
-            url: url,
-            type: method,
-            dataType: 'json',
-            scriptCharset: 'utf-8',
-            processData: false
-        };
-        if (token != null) {
-            data.headers = {
-                authorization: 'bearer ' + token
-            };
+    /**
+     * Saves Trading item of specified Trading
+     * @return item is item ID
+     */
+    MockClient.prototype.saveTradingItem = function (token, tradingId, item, callback) {
+        var items = tradingItemList[tradingId];
+        if (items === undefined) {
+            items = {};
         }
-        if (params != null) {
-            data.data = JSON.stringify(params);
+        if (item.id == null) {
+            item.id = "item" + (++globalSeq['tradingItem']);
         }
-        $.ajax(data)
-            .done(function (data_, status, data) {
-            if (data.status == 204) {
-                callback.success({});
-            }
-            else {
-                callback.success(JSON.parse(data.responseText));
-            }
-        }).fail(function (data) {
-            if (data.status == 204) {
-                callback.success({});
-            }
-            else {
-                callback.error(data.status, JSON.parse(data.responseText));
-            }
-        });
+        items[item.id] = item;
+        callback.success(item.id);
     };
-    return AppClientImpl;
+    /**
+     * Deltes Trading item of specified Trading
+     */
+    MockClient.prototype.deleteTradingItem = function (token, tradingId, itemId, callback) { };
+    /**
+     * Gets Environment
+     */
+    MockClient.prototype.getEnvironment = function (token, callback) {
+        callback.success(new Environment());
+    };
+    /**
+     * Saves Environment
+     */
+    MockClient.prototype.saveEnvironment = function (token, env, callback) {
+        callback.success();
+    };
+    ;
+    /**
+     * Gets my company name
+     */
+    MockClient.prototype.getMyCompanyName = function (callback) {
+        callback.success('テスト用株式会社');
+    };
+    return MockClient;
 })();
 function createClient() {
-    return new AppClientImpl(baseURL);
+    return new MockClient();
 }
 var User = (function () {
     function User() {
@@ -340,6 +269,7 @@ var App = (function () {
     App.prototype.start = function () {
         this.client = createClient();
         this.initDialog();
+        this.loadMyCompanyName();
     };
     App.prototype.initDialog = function () {
         var _this = this;
@@ -354,6 +284,20 @@ var App = (function () {
         this.dialogs.on({
             'closeClick': function () {
                 _this.closeDialog();
+            }
+        });
+    };
+    App.prototype.loadMyCompanyName = function () {
+        var _this = this;
+        if (this.myCompanyName != null && this.myCompanyName.length > 0) {
+            return;
+        }
+        this.client.getMyCompanyName({
+            success: function (name) {
+                _this.myCompanyName = name;
+            },
+            error: function (status, msg) {
+                console.log('Failed to get my company name status=' + status);
             }
         });
     };
@@ -669,6 +613,7 @@ var SignInPage = (function () {
             template: '#signInTemplate',
             // データを設定。テンプレートで使います。
             data: {
+                myCompanyName: app.myCompanyName,
                 inProgress: false
             }
         });
@@ -726,6 +671,7 @@ var TopPage = (function () {
             template: '#topTemplate',
             // データを設定。テンプレートで使います。
             data: {
+                myCompanyName: app.myCompanyName,
                 'company': app.companyMap,
                 'sheets': app.getTradings(),
                 'toDateStr': Utils.toDateStr
@@ -834,6 +780,7 @@ var SheetPage = (function () {
             template: '#sheetTemplate',
             decorators: {},
             data: {
+                myCompanyName: app.myCompanyName,
                 'trading': trading,
                 'workFrom': Utils.toDateStr(trading.work_from),
                 'workTo': Utils.toDateStr(trading.work_to),

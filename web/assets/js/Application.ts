@@ -10,6 +10,7 @@ class App {
     page : Page;
 
     accessToken : string;
+    myCompanyName : string;
     environment : Environment;
     users : Array<User>;
     tradingsMap : any;    
@@ -52,6 +53,7 @@ class App {
     start() {
         this.client = createClient();
         this.initDialog();
+        this.loadMyCompanyName();
     }
     private initDialog() {
         // dialogの準備
@@ -68,6 +70,20 @@ class App {
             }
         });            
     }
+    private loadMyCompanyName() {
+        if (this.myCompanyName != null && this.myCompanyName.length > 0) {
+            return;
+        }
+        this.client.getMyCompanyName({
+            success : (name : string) => {
+                this.myCompanyName = name;
+            },
+            error : (status : number, msg : string) => {
+                console.log('Failed to get my company name status=' + status);
+            }
+        });
+    }
+    
     loadData(callback : LoadCallback) {
         this.loadEnvironment(callback);
     }
