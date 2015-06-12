@@ -17,6 +17,11 @@ class TopPage implements Page {
         });
     }
     private show(app : App) {
+        var sheets = app.getTradings();
+        var total = 0;
+        _.each(sheets, (item : Trading) => {
+            total += item.total;
+        });
         // Racriveオブジェクトを作る
         app.ractive = new Ractive({
             // どの箱に入れるかをIDで指定
@@ -27,8 +32,9 @@ class TopPage implements Page {
             data : {
                 myCompanyName : app.myCompanyName,
                 'company' : app.companyMap,
-                'sheets' : app.getTradings(),
+                'sheets' : sheets,
                 'toDateStr' : Utils.toDateStr,
+                total : total,
             }
         });
 
