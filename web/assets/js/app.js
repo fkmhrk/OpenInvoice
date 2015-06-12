@@ -745,6 +745,11 @@ var TopPage = (function () {
         });
     };
     TopPage.prototype.show = function (app) {
+        var sheets = app.getTradings();
+        var total = 0;
+        _.each(sheets, function (item) {
+            total += item.total;
+        });
         // Racriveオブジェクトを作る
         app.ractive = new Ractive({
             // どの箱に入れるかをIDで指定
@@ -755,8 +760,9 @@ var TopPage = (function () {
             data: {
                 myCompanyName: app.myCompanyName,
                 'company': app.companyMap,
-                'sheets': app.getTradings(),
-                'toDateStr': Utils.toDateStr
+                'sheets': sheets,
+                'toDateStr': Utils.toDateStr,
+                total: total
             }
         });
         tooltipster();
