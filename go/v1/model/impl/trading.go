@@ -131,7 +131,6 @@ func (d *tradingDAO) Create(companyId, subject string, titleType int, workFrom, 
 }
 
 func (d *tradingDAO) Update(trading m.Trading) (*m.Trading, error) {
-	//id, companyId, subject string, titleType int, workFrom, workTo, total, quotationDate, billDate int64, taxRate float32, assignee, product string
 	tr, err := d.connection.Begin()
 	if err != nil {
 		return nil, err
@@ -140,7 +139,9 @@ func (d *tradingDAO) Update(trading m.Trading) (*m.Trading, error) {
 
 	st, err := tr.Prepare("UPDATE trading SET " +
 		"company_id=?,title_type=?,subject=?," +
-		"work_from=?,work_to=?,total=?,quotation_date=?,bill_date=?," +
+		"work_from=?,work_to=?,total=?," +
+		"quotation_date=?,quotation_number=?," +
+		"bill_date=?,bill_number=?," +
 		"tax_rate=?,assignee=?,product=?," +
 		"modified_time=unix_timestamp(now()) " +
 		"WHERE id=? AND deleted <> 1")
@@ -151,8 +152,8 @@ func (d *tradingDAO) Update(trading m.Trading) (*m.Trading, error) {
 
 	_, err = st.Exec(trading.CompanyId, trading.TitleType, trading.Subject,
 		trading.WorkFrom, trading.WorkTo, trading.Total,
-		trading.QuotationDate,
-		trading.BillDate,
+		trading.QuotationDate, trading.QuotationNumber,
+		trading.BillDate, trading.BillNumber,
 		trading.TaxRate, trading.AssigneeId, trading.Product, trading.Id)
 	if err != nil {
 		return nil, err
