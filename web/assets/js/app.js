@@ -994,6 +994,7 @@ var SheetPage = (function () {
         var trading = app.ractive.get('trading');
         var quotationDate = app.ractive.get('quotationDate');
         var doneFunc = function (id) {
+            app.ractive.update();
             window.location.href = "/php/quotation.php?access_token=" + app.accessToken + "&trading_id=" + id;
         };
         if (trading.quotation_number == null || trading.quotation_number.length == 0) {
@@ -1016,6 +1017,7 @@ var SheetPage = (function () {
         var trading = app.ractive.get('trading');
         var billDate = app.ractive.get('billDate');
         var doneFunc = function (id) {
+            app.ractive.update();
             window.location.href = "/php/bill.php?access_token=" + app.accessToken + "&trading_id=" + id;
         };
         if (trading.bill_number == null || trading.bill_number.length == 0) {
