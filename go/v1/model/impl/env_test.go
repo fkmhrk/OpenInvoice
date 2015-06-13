@@ -178,8 +178,8 @@ func TestEnv_Save(t *testing.T) {
 		t.Errorf("Failed to Get List : %s", err)
 		return
 	}
-	if len(list2) != 2 {
-		t.Errorf("List must be 2 but %d", len(list2))
+	if len(list2) != 15 {
+		t.Errorf("List must be 15 but %d", len(list2))
 		return
 	}
 
@@ -213,8 +213,8 @@ func TestEnv_Save(t *testing.T) {
 		t.Errorf("Failed to Get List : %s", err)
 		return
 	}
-	if len(list3) != 3 {
-		t.Errorf("List must be 3 but %d", len(list3))
+	if len(list3) != 16 {
+		t.Errorf("List must be 16 but %d", len(list3))
 		return
 	}
 }

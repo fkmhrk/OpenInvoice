@@ -1,6 +1,7 @@
 package impl
 
 import (
+	m "../"
 	"database/sql"
 	_ "github.com/go-sql-driver/mysql"
 	"testing"
@@ -29,12 +30,12 @@ func insertTrading(db *sql.DB, id, user, subject, product string) {
 		"work_from,work_to,total," +
 		"quotation_date,quotation_number," +
 		"bill_date,bill_number," +
-		"tax_rate,assignee,product,deleted)" +
+		"tax_rate,assignee,product,created_time,modified_time,deleted)" +
 		"VALUES(?,'company1',0,?," +
 		"0,0,1280," +
 		"100,''," +
 		"200,''," +
-		"8.0,?,?,0)")
+		"8.0,?,?,unix_timestamp(now()),unix_timestamp(now()),0)")
 	defer s.Close()
 	s.Exec(id, subject, user, product)
 }
@@ -230,8 +231,20 @@ func TestTrading0300_Update(t *testing.T) {
 
 	// update
 	var total int64 = 3333
-	item2, err := dao.Update(item.Id, "company2222", "subject3333",
-		0, 2345, 6789, total, 2222, 3333, 10, userId, "product4444")
+	item2, err := dao.Update(m.Trading{
+		Id:            item.Id,
+		CompanyId:     "company2222",
+		Subject:       "subject3333",
+		TitleType:     0,
+		WorkFrom:      2345,
+		WorkTo:        6789,
+		Total:         total,
+		QuotationDate: 2222,
+		BillDate:      3333,
+		TaxRate:       10,
+		AssigneeId:    userId,
+		Product:       "product4444",
+	})
 	if err != nil {
 		t.Errorf("Failed to update trading : %s", err)
 		return
