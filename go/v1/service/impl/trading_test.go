@@ -240,8 +240,7 @@ func TestTrading0200_GetItemsByTradingId(t *testing.T) {
 func TestTrading0300_CreateItem(t *testing.T) {
 	models := mock.NewMock()
 	sessionDAO, _ := models.Session.(*mock.SessionDAO)
-	sessionDAO.
-		GetByTokenResult = &m.Session{
+	sessionDAO.GetByTokenResult = &m.Session{
 		Token: "testToken",
 	}
 	tradingDAO, _ := models.Trading.(*mock.TradingDAO)
@@ -306,8 +305,7 @@ func TestTrading0400_UpdateItem(t *testing.T) {
 func TestTrading0500_DeleteItem(t *testing.T) {
 	models := mock.NewMock()
 	sessionDAO, _ := models.Session.(*mock.SessionDAO)
-	sessionDAO.
-		GetByTokenResult = &m.Session{
+	sessionDAO.GetByTokenResult = &m.Session{
 		Token: "testToken",
 	}
 	tradingDAO, _ := models.Trading.(*mock.TradingDAO)
@@ -326,5 +324,53 @@ func TestTrading0500_DeleteItem(t *testing.T) {
 	if r.Status() != 204 {
 		t.Errorf("Wrong status : %d", r.Status())
 		return
+	}
+}
+
+func TestTrading0600_GetNextNumber(t *testing.T) {
+	models := mock.NewMock()
+	sessionDAO, _ := models.Session.(*mock.SessionDAO)
+	sessionDAO.GetByTokenResult = &m.Session{
+		Token: "testToken",
+	}
+	envDAO, _ := models.Env.(*mock.EnvDAO)
+	envDAO.GetResult = m.Env{
+		Value: "3",
+	}
+	tradingDAO, _ := models.Trading.(*mock.TradingDAO)
+	seqDAO, _ := models.Seq.(*mock.SeqDAO)
+	seqDAO.NextResult = m.Seq{
+		Value: 4,
+	}
+	s := NewTradingSerivce(sessionDAO, tradingDAO, models)
+
+	table := []struct {
+		Arg      string
+		Expected m.SeqType
+		Label    string
+	}{
+		{"quotation", m.SeqType_Quotation, "m.SeqType_Quotation"},
+		{"delivery", m.SeqType_Delivery, "m.SeqType_Delivery"},
+		{"bill", m.SeqType_Bill, "m.SeqType_Bill"},
+	}
+
+	for _, item := range table {
+		token := "token1122"
+		date := int64(1434162098716) // 2015-6-13
+		r := s.GetNextNumber(token, item.Arg, date)
+		if r == nil {
+			t.Errorf("Result must not be nil")
+			return
+		}
+		if r.Status() != 200 {
+			t.Errorf("Wrong status : %d", r.Status())
+			return
+		}
+		body := json(r)
+		assertInt(t, body, "number", 4)
+		// args check
+		if seqDAO.NextSeqType != item.Expected {
+			t.Errorf("SeqType must be %s but %d", item.Label, seqDAO.NextSeqType)
+		}
 	}
 }

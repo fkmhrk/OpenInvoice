@@ -9,5 +9,6 @@ func NewMock() *m.Models {
 		Session: &SessionDAO{},
 		Trading: &TradingDAO{},
 		Env:     &EnvDAO{},
+		Seq:     &SeqDAO{},
 	}
 }
