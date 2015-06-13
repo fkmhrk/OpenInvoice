@@ -113,11 +113,14 @@ func (s *tradingService) Update(token string, trading s.Trading) s.Result {
 		return errorResult(404, MSG_TRADING_NOT_FOUND)
 	}
 	// update
-	item2, err := s.tradingDAO.Update(trading.Id, trading.CompanyId, trading.Subject, trading.TitleType,
-		trading.WorkFrom, trading.WorkTo, trading.Total,
-		trading.QuotationDate,
-		trading.BillDate,
-		trading.TaxRate, session.UserId, trading.Product)
+	/*
+		item2, err := s.tradingDAO.Update(trading.Id, trading.CompanyId, trading.Subject, trading.TitleType,
+			trading.WorkFrom, trading.WorkTo, trading.Total,
+			trading.QuotationDate,
+			trading.BillDate,
+			trading.TaxRate, session.UserId, trading.Product)
+	*/
+	item2, err := s.tradingDAO.Update(trading.Trading)
 	if err != nil {
 		return errorResult(500, MSG_SERVER_ERROR)
 	}
