@@ -1,9 +1,13 @@
 package service
 
+import (
+	m "../model"
+)
+
 type TradingService interface {
 	GetListByUser(token string) Result
 	Create(token, companyId, subject, product string, titleType int, workFrom, workTo, total, quotationDate, billDate int64, taxRate float32) Result
-	Update(token, id, companyId, subject, product string, titleType int, workFrom, workTo, total, quotationDate, billDate int64, taxRate float32) Result
+	Update(token string, trading Trading) Result
 
 	// Gets trading items
 	GetItemListByTradingId(token, tradingId string) Result
@@ -16,4 +20,8 @@ type TradingService interface {
 
 	// Gets next number
 	GetNextNumber(token, seqType string, date int64) Result
+}
+
+type Trading struct {
+	m.Trading
 }

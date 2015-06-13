@@ -21,7 +21,7 @@ func (d *SeqDAO) Get(seqType m.SeqType, year int) (m.Seq, error) {
 	return d.GetResult, nil
 }
 
-func (d *SeqDAO) Update(seqType, year, value int) (m.Seq, error) {
+func (d *SeqDAO) Update(seqType m.SeqType, year, value int) (m.Seq, error) {
 	return d.UpdateResult, nil
 }
 
