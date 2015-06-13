@@ -12,6 +12,7 @@ func NewModels(connection *Connection) *m.Models {
 		Company: NewCompanyDAO(connection),
 		Trading: NewTradingDAO(connection, logger),
 		Env:     NewEnvDAO(connection),
+		Seq:     NewSeqDAO(connection),
 		Logger:  logger,
 	}
 }

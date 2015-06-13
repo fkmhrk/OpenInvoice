@@ -3,7 +3,7 @@ package model
 type SeqDAO interface {
 	Create(seqType SeqType, year, value int) (Seq, error)
 	Get(seqType SeqType, year int) (Seq, error)
-	Update(seqType, SeqType, value int) (Seq, error)
+	Update(seqType SeqType, year, value int) (Seq, error)
 	Next(seqType SeqType, year int) (Seq, error)
 	Delete(seqType SeqType, year int) (Seq, error)
 }

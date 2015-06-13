@@ -21,7 +21,7 @@ func InitRouter(r *mux.Router) error {
 	services := si.NewServices(models)
 
 	userService := si.NewUserSerivce(models.User, models.Session)
-	tradingService := si.NewTradingSerivce(models.Session, models.Trading)
+	tradingService := si.NewTradingSerivce(models.Session, models.Trading, models)
 	companyService := si.NewCompanySerivce(models.Session, models.Company)
 	initRouter(r, services, userService, tradingService, companyService)
 	return nil

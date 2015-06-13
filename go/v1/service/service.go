@@ -1,5 +1,6 @@
 package service
 
 type Services struct {
-	Admin AdminService
+	Admin   AdminService
+	Trading TradingService
 }

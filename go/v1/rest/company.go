@@ -49,3 +49,19 @@ func updateCompany(company s.CompanyService) handler {
 			address, phone, unit)
 	})
 }
+
+func getNextNumber(services s.Services) handler {
+	return makeHandler(func(token, tType string, req *http.Request) s.Result {
+		// read path param
+		vars := mux.Vars(req)
+		seqType := vars["seqType"]
+
+		// to json
+		json, _ := rj.ObjectFromString(readBody(req))
+
+		// read input
+		date, _ := json.Long("date")
+
+		return services.Trading.GetNextNumber(token, seqType, date)
+	})
+}
