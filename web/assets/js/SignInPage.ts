@@ -32,7 +32,7 @@ class SignInPage implements Page {
         app.ractive.update();
         app.client.login(username, password, {
             success : (token : string) => {
-                app.accessToken = token;
+                localStorage.setItem('refreshToken', token);
                 app.router.navigate('top', {trigger:true});
             },
             error : (status : number, msg : string) => {

@@ -52,6 +52,8 @@ class App {
     }
     start() {
         this.client = createClient();
+        var refreshToken = localStorage.getItem('refreshToken');
+        this.client.setRefreshToken(refreshToken);
         this.initDialog();
         this.loadMyCompanyName();
     }
@@ -93,7 +95,7 @@ class App {
             this.loadUsers(callback);
             return;
         }
-        this.client.getEnvironment(this.accessToken, {
+        this.client.getEnvironment({
             success : (item : Environment) => {
                 this.environment = item;
                 this.loadUsers(callback);
@@ -110,7 +112,7 @@ class App {
             this.loadTradings(callback);
             return;
         }
-        this.client.getUsers(this.accessToken, {
+        this.client.getUsers({
             success : (list : Array<User>) => {
                 this.users = list;
                 this.loadTradings(callback);
@@ -126,7 +128,7 @@ class App {
             this.loadCompanies(callback);
             return;
         }
-        this.client.getTradings(this.accessToken, {
+        this.client.getTradings({
             success : (list : Array<Trading>) => {
                 this.tradingsMap = {};
                 _.each(list, (item : Trading) => {
@@ -145,7 +147,7 @@ class App {
             callback.done();
             return;
         }
-        this.client.getCompanies(this.accessToken, {
+        this.client.getCompanies({
             success : (list : Array<Company>) => {
                 this.companies = list;
                 this.companyMap = {};

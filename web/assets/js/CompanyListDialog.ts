@@ -60,7 +60,7 @@ class CompanyListDialog implements Dialog {
         company.unit = unit;
         company.assignee = assignee;
 
-        app.client.saveCompany(app.accessToken, company, {
+        app.client.saveCompany(company, {
             success : (id : string) => {
                 company.id = id;
                 app.companyMap[id] = company;
