@@ -58,6 +58,7 @@ func updateTrading(trading s.TradingService) handler {
 		billDate, _ := json.Long("bill_date")
 		billNumber, _ := json.String("bill_number")
 		taxRate, _ := json.Float("tax_rate")
+		assignee, _ := json.String("assignee")
 		product, _ := json.String("product")
 
 		return trading.Update(token, s.Trading{
@@ -65,16 +66,17 @@ func updateTrading(trading s.TradingService) handler {
 				Id:              tradingId,
 				CompanyId:       companyId,
 				Subject:         subject,
-				Product:         product,
 				TitleType:       titleType,
 				WorkFrom:        workFrom,
 				WorkTo:          workTo,
-				Total:           total,
 				QuotationDate:   quotationDate,
 				QuotationNumber: quotationNumber,
 				BillDate:        billDate,
 				BillNumber:      billNumber,
 				TaxRate:         float32(taxRate),
+				AssigneeId:      assignee,
+				Product:         product,
+				Total:           total,
 			},
 		})
 	})
