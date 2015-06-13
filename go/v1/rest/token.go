@@ -17,3 +17,14 @@ func getToken(user s.UserService) handler {
 		return user.GetToken(username, password)
 	})
 }
+
+func refreshToken(services s.Services) handler {
+	return makeBaseHandler(func(req *http.Request) s.Result {
+		// read input
+		json, _ := rj.ObjectFromString(readBody(req))
+		// get values
+		token, _ := json.String("token")
+		// execute
+		return services.User.RefreshToken(token)
+	})
+}

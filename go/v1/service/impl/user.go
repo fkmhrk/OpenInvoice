@@ -58,6 +58,31 @@ func (o *userService) GetToken(name, pass string) s.Result {
 	return jsonResult(200, body)
 }
 
+func (o *userService) RefreshToken(token string) s.Result {
+	// input check
+	if isEmpty(token) {
+		return errorResult(400, s.ERR_TOKEN_EMPTY)
+	}
+	// get refresh token
+	sessionRefresh, err := o.sessionRefreshDAO.Get(token)
+	if err != nil {
+		return errorResult(500, MSG_SERVER_ERROR)
+	}
+	// create access token
+	session, err := o.sessionDAO.Create(sessionRefresh.UserId, sessionRefresh.Role, TIME_30MIN)
+	if err != nil {
+		return errorResult(500, MSG_SERVER_ERROR)
+	}
+
+	body := map[string]interface{}{
+		"id":           sessionRefresh.UserId,
+		"access_token": session.Token,
+		"token_type":   "bearer",
+	}
+
+	return jsonResult(200, body)
+}
+
 func (s *userService) GetUsers(token string) s.Result {
 	// input check
 	session, err := s.sessionDAO.GetByToken(token)

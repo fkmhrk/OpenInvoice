@@ -42,6 +42,37 @@ func TestUser0000_GetToken(t *testing.T) {
 	assertString(t, json, "refresh_token", "tokenRefresh")
 }
 
+func TestUser0100_RefreshToken(t *testing.T) {
+	models := mock.NewMock()
+	sessionRefreshDAO, _ := models.SessionRefresh.(*mock.SessionRefreshDAO)
+	sessionRefreshDAO.GetResult = m.SessionRefresh{
+		Token:  "tokenRefresh",
+		Role:   "Admin",
+		UserId: "user1122",
+	}
+	sessionDAO, _ := models.Session.(*mock.SessionDAO)
+	sessionDAO.CreateResult = &m.Session{
+		Token: "testToken",
+	}
+
+	service := NewUserSerivce(models.User, sessionDAO, models)
+
+	token := "token1122"
+	r := service.RefreshToken(token)
+	if r == nil {
+		t.Errorf("Result must not be nil")
+		return
+	}
+	if r.Status() != 200 {
+		t.Errorf("Wrong status : %d", r.Status())
+		return
+	}
+	json := json(r)
+	assertString(t, json, "id", "user1122")
+	assertString(t, json, "token_type", "bearer")
+	assertString(t, json, "access_token", "testToken")
+}
+
 func TestUser0100_GetList(t *testing.T) {
 	models := mock.NewMock()
 	var list []*m.User
