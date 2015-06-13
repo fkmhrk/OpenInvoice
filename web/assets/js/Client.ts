@@ -64,6 +64,11 @@ interface Client {
      * Gets my company name
      */
     getMyCompanyName(callback : ItemCallback<string>);
+
+    /**
+     * Gets next number
+     */
+    getNextNumber(token : string, type : string, date : number, callback : ItemCallback<number>);
 }
 
 interface Callback {

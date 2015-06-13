@@ -4,6 +4,8 @@ var globalSeq = {
     'company' : 1,
     'trading' : 1,
     'tradingItem' : 1,
+    'quotationNumber' : 1,
+    'billNumber' : 1,
 };
 
 var userList : Array<User> = [{
@@ -25,7 +27,7 @@ var companyList = {
 };
 
 var sheetList = {
-    "trading1" : {
+    "trading1" : <Trading>{
         id : "trading1",
         date : "2015-6-12",
         company_id : "company1",
@@ -34,7 +36,11 @@ var sheetList = {
         work_from : 10,
         work_to : 20,
         quotation_date : 10,
+        quotation_number : '',
         bill_date : 20,
+        bill_number : '',
+        delivery_date : 20,
+        delivery_number : '',        
         tax_rate : 8,
         subject : "プロジェクト1",
         assignee : "user1",
@@ -175,6 +181,13 @@ class MockClient implements Client {
      */
     getMyCompanyName(callback : ItemCallback<string>) {
         callback.success('テスト用株式会社');
+    }
+
+    /**
+     * Gets next number
+     */
+    getNextNumber(token : string, type : string, date : number, callback : ItemCallback<number>) {
+        callback.success(20150000 + (++globalSeq[type + 'Number']));
     }
 }
 
