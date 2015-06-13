@@ -11,6 +11,8 @@ type handler func(http.ResponseWriter, *http.Request)
 func SetHandlers(r *mux.Router, services s.Services, u s.UserService, t s.TradingService, c s.CompanyService) {
 	r.HandleFunc("/token", getToken(u)).
 		Methods("POST")
+	r.HandleFunc("/token/refresh", refreshToken(services)).
+		Methods("POST")
 	r.HandleFunc("/users", getUsers(u)).
 		Methods("GET")
 	r.HandleFunc("/tradings", getTradings(t)).
