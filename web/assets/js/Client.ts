@@ -1,6 +1,11 @@
 
 interface Client {
     /**
+     * Sets refresh token
+     */
+    setRefreshToken(refreshToken : string);
+    
+    /**
      * Logs in with username and password.
      */
     login(username : string, password : string, callback : ItemCallback<string>);
@@ -8,57 +13,55 @@ interface Client {
    /**
      * Gets all users
      */
-    getUsers(token : string, callback : ItemListCallback<User>);
+    getUsers(callback : ItemListCallback<User>);
 
     /**
      * Gets all companies
      */
-    getCompanies(token : string, callback : ItemListCallback<Company>);
+    getCompanies(callback : ItemListCallback<Company>);
 
     /**
      * Saves company
      * @return item is Company ID
      */
-    saveCompany(token : string, item : Company, callback : ItemCallback<string>);    
+    saveCompany(item : Company, callback : ItemCallback<string>);    
     
     /**
      * Gets Tradings
      */
-    getTradings(token : string, callback : ItemListCallback<Trading>);
+    getTradings(callback : ItemListCallback<Trading>);
 
     /**
      * Gets trading items of specified Trading
      */
-    getTradingItems(token : string, tradingId : string, callback : ItemListCallback<TradingItem>);
+    getTradingItems(tradingId : string, callback : ItemListCallback<TradingItem>);
 
     /**
      * Saves Trading
      * @return item is trading ID
      */
-    saveTrading(token : string, item : Trading, callback : ItemCallback<string>);
+    saveTrading(item : Trading, callback : ItemCallback<string>);
     
     /**
      * Saves Trading item of specified Trading
      * @return item is item ID
      */
-    saveTradingItem(token : string, tradingId : string,
-                    item : TradingItem, callback : ItemCallback<string>);
+    saveTradingItem(tradingId : string, item : TradingItem, callback : ItemCallback<string>);
 
     /**
      * Deltes Trading item of specified Trading
      */
-    deleteTradingItem(token : string, tradingId : string,
-                      itemId : string, callback : ItemCallback<string>);
+    deleteTradingItem(tradingId : string, itemId : string, callback : ItemCallback<string>);
 
     /**
      * Gets Environment
      */
-    getEnvironment(token : string, callback : ItemCallback<Environment>);
+    getEnvironment(callback : ItemCallback<Environment>);
     
     /**
      * Saves Environment
      */
-    saveEnvironment(token : string, env : Environment, callback : Callback);
+    saveEnvironment(env : Environment, callback : Callback);
 
     /**
      * Gets my company name
@@ -68,7 +71,7 @@ interface Client {
     /**
      * Gets next number
      */
-    getNextNumber(token : string, type : string, date : number, callback : ItemCallback<number>);
+    getNextNumber(type : string, date : number, callback : ItemCallback<number>);
 }
 
 interface Callback {

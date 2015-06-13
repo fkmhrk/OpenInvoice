@@ -67,6 +67,9 @@ var tradingItemList = {
 };
 
 class MockClient implements Client {
+    setRefreshToken(refreshToken : string) {
+    }
+    
     /**
      * Logs in with username and password.
      */
@@ -77,14 +80,14 @@ class MockClient implements Client {
    /**
      * Gets all users
      */
-    getUsers(token : string, callback : ItemListCallback<User>) {
+    getUsers(callback : ItemListCallback<User>) {
         callback.success(userList);
     }
 
     /**
      * Gets all companies
      */
-    getCompanies(token : string, callback : ItemListCallback<Company>) {
+    getCompanies(callback : ItemListCallback<Company>) {
         var list = [];
         for (var k in companyList) {
             list.push(companyList[k]);
@@ -96,7 +99,7 @@ class MockClient implements Client {
      * Saves company
      * @return item is Company ID
      */
-    saveCompany(token : string, item : Company, callback : ItemCallback<string>) {
+    saveCompany(item : Company, callback : ItemCallback<string>) {
         if (item.id == null) {
             item.id = "compnay" + (++globalSeq['company']);
         }
@@ -107,7 +110,7 @@ class MockClient implements Client {
     /**
      * Gets Tradings
      */
-    getTradings(token : string, callback : ItemListCallback<Trading>) {
+    getTradings(callback : ItemListCallback<Trading>) {
         var list = [];
         for (var k in sheetList) {
             list.push(sheetList[k]);
@@ -118,7 +121,7 @@ class MockClient implements Client {
     /**
      * Gets trading items of specified Trading
      */
-    getTradingItems(token : string, tradingId : string, callback : ItemListCallback<TradingItem>) {
+    getTradingItems(tradingId : string, callback : ItemListCallback<TradingItem>) {
         var items = tradingItemList[tradingId];
         var list = [];
         for (var k in items) {
@@ -131,7 +134,7 @@ class MockClient implements Client {
      * Saves Trading
      * @return item is trading ID
      */
-    saveTrading(token : string, item : Trading, callback : ItemCallback<string>) {
+    saveTrading(item : Trading, callback : ItemCallback<string>) {
         if (item.id == null) {
             item.id = "trading" + (++globalSeq['trading']);
         }
@@ -144,8 +147,7 @@ class MockClient implements Client {
      * Saves Trading item of specified Trading
      * @return item is item ID
      */
-    saveTradingItem(token : string, tradingId : string,
-                    item : TradingItem, callback : ItemCallback<string>) {
+    saveTradingItem(tradingId : string, item : TradingItem, callback : ItemCallback<string>) {
         var items = tradingItemList[tradingId];
         if (items === undefined) { items = {}; }
 
@@ -159,20 +161,19 @@ class MockClient implements Client {
     /**
      * Deltes Trading item of specified Trading
      */
-    deleteTradingItem(token : string, tradingId : string,
-                      itemId : string, callback : ItemCallback<string>) { }
+    deleteTradingItem(tradingId : string, itemId : string, callback : ItemCallback<string>) { }
 
     /**
      * Gets Environment
      */
-    getEnvironment(token : string, callback : ItemCallback<Environment>) {
+    getEnvironment(callback : ItemCallback<Environment>) {
         callback.success(new Environment());
     }
 
     /**
      * Saves Environment
      */
-    saveEnvironment(token : string, env : Environment, callback : Callback) {
+    saveEnvironment(env : Environment, callback : Callback) {
         callback.success();
     };
 
@@ -186,7 +187,7 @@ class MockClient implements Client {
     /**
      * Gets next number
      */
-    getNextNumber(token : string, type : string, date : number, callback : ItemCallback<number>) {
+    getNextNumber(type : string, date : number, callback : ItemCallback<number>) {
         callback.success(20150000 + (++globalSeq[type + 'Number']));
     }
 }

@@ -22,7 +22,7 @@ class SheetPage implements Page {
     }
 
     private loadItems(app : App, trading : Trading) {
-        app.client.getTradingItems(app.accessToken, trading.id, {
+        app.client.getTradingItems(trading.id, {
             success : (list : Array<TradingItem>) => {
                 // if copyMode = true remove ids
                 if (this.copyMode) {
@@ -165,7 +165,7 @@ class SheetPage implements Page {
             window.location.href = "/php/quotation.php?access_token=" + app.accessToken + "&trading_id=" + id;
         };
         if (trading.quotation_number == null || trading.quotation_number.length == 0) {
-            app.client.getNextNumber(app.accessToken, 'quotation', new Date(quotationDate).getTime(), {
+            app.client.getNextNumber('quotation', new Date(quotationDate).getTime(), {
                 success : (val : number) => {
                     trading.quotation_number = '' + val + '-I';
                     this.save(app, doneFunc);
@@ -187,7 +187,7 @@ class SheetPage implements Page {
             window.location.href = "/php/bill.php?access_token=" + app.accessToken + "&trading_id=" + id;
         };
         if (trading.bill_number == null || trading.bill_number.length == 0) {
-            app.client.getNextNumber(app.accessToken, 'bill', new Date(billDate).getTime(), {
+            app.client.getNextNumber('bill', new Date(billDate).getTime(), {
                 success : (val : number) => {
                     trading.bill_number = '' + val + '-V';
                     this.save(app, doneFunc);
@@ -216,7 +216,7 @@ class SheetPage implements Page {
         trading.bill_date = new Date(billDate).getTime();
         trading.tax_rate = Number(trading.tax_rate);
         console.log(trading);
-        app.client.saveTrading(app.accessToken, trading, {
+        app.client.saveTrading(trading, {
             success : (id : string) => {
                 app.tradingsMap[id] = trading;
                 var deleted = app.ractive.get('deletedItems');
@@ -243,7 +243,7 @@ class SheetPage implements Page {
             return;
         }
         var item = list[0];
-        app.client.deleteTradingItem(app.accessToken, id, item.id, {
+        app.client.deleteTradingItem(id, item.id, {
             success : (itemId : string) => {
                 list.splice(0, 1);
                 this.deleteItems(app, id, list, doneFunc);
@@ -261,7 +261,7 @@ class SheetPage implements Page {
             return;
         }
         var item = list[0]
-        app.client.saveTradingItem(app.accessToken, id, item, {
+        app.client.saveTradingItem(id, item, {
             success : (itemId : string) => {
                 item.id = itemId;
                 list.splice(0, 1);

@@ -4,9 +4,19 @@ var _;
 var baseURL = '';
 class AppClientImpl implements Client {
     url : string;
+    accessToken : string;
+    refreshToken : string;
+    isRetry : boolean;
     
     constructor(url : string) {
         this.url = url;
+        this.isRetry = false;
+    }
+
+    setRefreshToken(refreshToken : string) {
+        if (refreshToken == null) { return; }
+        this.accessToken = '';
+        this.refreshToken = refreshToken;
     }
     
     login(username : string, password : string, callback : ItemCallback<string>) {
@@ -16,15 +26,17 @@ class AppClientImpl implements Client {
         };
         this.exec(this.url + '/api/v1/token', 'POST', null, params, {
             success : (json : any) => {
-                callback.success(json.access_token);
+                this.accessToken = json.access_token;
+                this.refreshToken = json.refresh_token;
+                callback.success(json.refresh_token);
             },
             error : (status : any, body : any) => {
                 callback.error(status, body.msg);
             }
         });
     }
-    getTradings(token : string, callback : ItemListCallback<Trading>) {
-        this.exec(this.url + '/api/v1/tradings', 'GET', token, null, {
+    getTradings(callback : ItemListCallback<Trading>) {
+        this.exec(this.url + '/api/v1/tradings', 'GET', this.accessToken, null, {
             success : (json : any) => {
                 callback.success(_.map(json.tradings, (item) => {
                     item.date = item.id;
@@ -37,10 +49,9 @@ class AppClientImpl implements Client {
         });            
     }
     
-    getTradingItems(token : string, tradingId : string,
-                    callback : ItemListCallback<TradingItem>) {
+    getTradingItems(tradingId : string, callback : ItemListCallback<TradingItem>) {
         var url = this.url + '/api/v1/tradings/' + tradingId + '/items';
-        this.exec(url, 'GET', token, null, {
+        this.exec(url, 'GET', this.accessToken, null, {
             success : (json : any) => {
                 callback.success(_.map(json.items, (item) => {
                     item.sum = item.unit_price * item.amount;
@@ -53,9 +64,9 @@ class AppClientImpl implements Client {
         });
     }
     
-    getUsers(token : string, callback : ItemListCallback<User>) {
+    getUsers(callback : ItemListCallback<User>) {
         var url = this.url + '/api/v1/users';
-        this.exec(url, 'GET', token, null, {
+        this.exec(url, 'GET', this.accessToken, null, {
             success : (json : any) => {
                 callback.success(json.users);
             },
@@ -65,9 +76,9 @@ class AppClientImpl implements Client {
         });            
     }
     
-    getCompanies(token : string, callback : ItemListCallback<Company>) {
+    getCompanies(callback : ItemListCallback<Company>) {
         var url = this.url + '/api/v1/companies';
-        this.exec(url, 'GET', token, null, {
+        this.exec(url, 'GET', this.accessToken, null, {
             success : (json : any) => {
                 callback.success(json.companies);
             },
@@ -77,27 +88,25 @@ class AppClientImpl implements Client {
         });                        
     }
     
-    saveTrading(token : string, item : Trading, callback : ItemCallback<string>) {
+    saveTrading(item : Trading, callback : ItemCallback<string>) {
         if (item.id === null) {
-            this.createTrading(token, item, callback);
+            this.createTrading(item, callback);
         } else {
-            this.updateTrading(token, item, callback);
+            this.updateTrading(item, callback);
         }
     }
     
-    saveTradingItem(token : string, tradingId : string,
-                    item : TradingItem, callback : ItemCallback<string>) {
+    saveTradingItem(tradingId : string, item : TradingItem, callback : ItemCallback<string>) {
         if (item.id === null) {
-            this.createTradingItem(token, tradingId, item, callback);
+            this.createTradingItem(tradingId, item, callback);
         } else {
-            this.updateTradingItem(token, tradingId, item, callback);
+            this.updateTradingItem(tradingId, item, callback);
         }            
     }
-    deleteTradingItem(token : string, tradingId : string,
-                      itemId : string, callback : ItemCallback<string>) {
+    deleteTradingItem(tradingId : string, itemId : string, callback : ItemCallback<string>) {
         var url = this.url + '/api/v1/tradings/' + tradingId +
             '/items/' + itemId;
-        this.exec(url, 'DELETE', token, null, {
+        this.exec(url, 'DELETE', this.accessToken, null, {
             success : (json : any) => {
                 callback.success(itemId);
             },
@@ -111,17 +120,17 @@ class AppClientImpl implements Client {
         });            
     }
     
-    saveCompany(token : string, item : Company, callback : ItemCallback<string>) {
+    saveCompany(item : Company, callback : ItemCallback<string>) {
         if (item.id === null || item.id.length == 0 ) {
-            this.createCompany(token, item, callback);
+            this.createCompany(item, callback);
         } else {
-            this.updateCompany(token, item, callback);
+            this.updateCompany(item, callback);
         }
     }
 
-    getEnvironment(token : string, callback : ItemCallback<Environment>) {
+    getEnvironment(callback : ItemCallback<Environment>) {
         var url = this.url + '/api/v1/environments';
-        this.exec(url, 'GET', token, null, {
+        this.exec(url, 'GET', this.accessToken, null, {
             success : (json : any) => {
                 callback.success(json);
             },
@@ -131,9 +140,9 @@ class AppClientImpl implements Client {
         });        
     }
 
-    saveEnvironment(token : string, env : Environment, callback : Callback) {
+    saveEnvironment(env : Environment, callback : Callback) {
         var url = this.url + '/api/v1/environments';
-        this.exec(url, 'PUT', token, env, {
+        this.exec(url, 'PUT', this.accessToken, env, {
             success : (json : any) => {
                 callback.success();
             },
@@ -155,12 +164,12 @@ class AppClientImpl implements Client {
         });        
     }
 
-    getNextNumber(token : string, type : string, date : number, callback : ItemCallback<number>) {
+    getNextNumber(type : string, date : number, callback : ItemCallback<number>) {
         var url = this.url + '/api/v1/sequences/' + type;
         var params = {
             date : date,
         }
-        this.exec(url, 'POST', token, params, {
+        this.exec(url, 'POST', this.accessToken, params, {
             success : (json : any) => {
                 callback.success(json['number']);
             },
@@ -170,9 +179,9 @@ class AppClientImpl implements Client {
         });                
     }
     
-    private createTrading(token : string, item : Trading, callback : ItemCallback<string>) {
+    private createTrading(item : Trading, callback : ItemCallback<string>) {
         var url = this.url + '/api/v1/tradings';
-        this.exec(url, 'POST', token, item, {
+        this.exec(url, 'POST', this.accessToken, item, {
             success : (json : any) => {
                 callback.success(json.id);
             },
@@ -182,9 +191,9 @@ class AppClientImpl implements Client {
         });
     }
     
-    private updateTrading(token : string, item : Trading, callback : ItemCallback<string>) {
+    private updateTrading(item : Trading, callback : ItemCallback<string>) {
         var url = this.url + '/api/v1/tradings/' + item.id;
-        this.exec(url, 'PUT', token, item, {
+        this.exec(url, 'PUT', this.accessToken, item, {
             success : (json : any) => {
                 callback.success(item.id);
             },
@@ -194,10 +203,9 @@ class AppClientImpl implements Client {
         });
     }
     
-    private createTradingItem(token : string, tradingId : string,
-                              item : TradingItem, callback : ItemCallback<string>) {
+    private createTradingItem(tradingId : string, item : TradingItem, callback : ItemCallback<string>) {
         var url = this.url + '/api/v1/tradings/' + tradingId + '/items';
-        this.exec(url, 'POST', token, item, {
+        this.exec(url, 'POST', this.accessToken, item, {
             success : (json : any) => {
                 callback.success(json.id);
             },
@@ -207,11 +215,10 @@ class AppClientImpl implements Client {
         });
     }
     
-    private updateTradingItem(token : string, tradingId : string,
-                              item : TradingItem, callback : ItemCallback<string>) {
+    private updateTradingItem(tradingId : string, item : TradingItem, callback : ItemCallback<string>) {
         var url = this.url + '/api/v1/tradings/' + tradingId +
             '/items/' + item.id;
-        this.exec(url, 'PUT', token, item, {
+        this.exec(url, 'PUT', this.accessToken, item, {
             success : (json : any) => {
                 callback.success(item.id);
             },
@@ -221,9 +228,9 @@ class AppClientImpl implements Client {
         });
     }
     
-    private createCompany(token : string, item : Company, callback : ItemCallback<string>) {
+    private createCompany(item : Company, callback : ItemCallback<string>) {
         var url = this.url + '/api/v1/companies';
-        this.exec(url, 'POST', token, item, {
+        this.exec(url, 'POST', this.accessToken, item, {
             success : (json : any) => {
                 callback.success(json.id);
             },
@@ -233,9 +240,9 @@ class AppClientImpl implements Client {
         });
     }
     
-    private updateCompany(token : string, item : Company, callback : ItemCallback<string>) {
+    private updateCompany(item : Company, callback : ItemCallback<string>) {
         var url = this.url + '/api/v1/companies/' + item.id;
-        this.exec(url, 'PUT', token, item, {
+        this.exec(url, 'PUT', this.accessToken, item, {
             success : (json : any) => {
                 callback.success(json.id);
             },
@@ -243,10 +250,26 @@ class AppClientImpl implements Client {
                 callback.error(status, body.msg);
             }
         });
-    }        
+    }
+
+    private tokenRefresh(url : string, method : string, token : string, params : any, callback : HttpCallback) {
+        var refreshURL = this.url + '/api/v1/token/refresh';
+        var refreshParams = {
+            token : this.refreshToken
+        };
+        this.exec(refreshURL, 'POST', null, refreshParams, {
+            success : (json : any) => {
+                this.accessToken = json.access_token;
+                this.isRetry = true;
+                this.exec(url, method, this.accessToken, params, callback);
+            },
+            error : (status : any, body : any) => {
+                callback.error(status, body.msg);
+            }
+        });        
+    }
     
-    private exec(url : string, method : string, token : string,
-                 params : any, callback : HttpCallback) {
+    private exec(url : string, method : string, token : string, params : any, callback : HttpCallback) {
         var data : any = {
             url : url,
             type : method,
@@ -262,20 +285,30 @@ class AppClientImpl implements Client {
         if (params != null) {
             data.data = JSON.stringify(params);
         }
-        $.ajax(data)
-            .done(function(data_, status, data) {
-		if (data.status == 204) {
-		    callback.success({});
-		} else {
-		    callback.success(JSON.parse(data.responseText));
-		}
-	    }).fail(function(data) {
-                if (data.status == 204) {
-                    callback.success({});
+        $.ajax(data).done(function(data_, status, data) {
+            this.isRetry = false;
+	    if (data.status == 204) {
+		callback.success({});
+	    } else {
+		callback.success(JSON.parse(data.responseText));
+	    }
+	}).fail(function(data) {
+            if (data.status == 204) {
+                this.isRetry = false;
+                callback.success({});
+            } else if (data.status == 401) {
+                if (this.isRetry) {
+                    this.isRetry = false;
+                    callback.error(data.status, JSON.parse(data.responseText));
                 } else {
-		    callback.error(data.status, JSON.parse(data.responseText));
+                    this.isRetry = true;
+                    this.tokenRefresh(callback);
                 }
-	    });
+            } else {
+                this.isRetry = false;
+		callback.error(data.status, JSON.parse(data.responseText));
+            }
+	});
     }
 }
 

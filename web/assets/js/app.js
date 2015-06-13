@@ -5,23 +5,34 @@ var baseURL = '';
 var AppClientImpl = (function () {
     function AppClientImpl(url) {
         this.url = url;
+        this.isRetry = false;
     }
+    AppClientImpl.prototype.setRefreshToken = function (refreshToken) {
+        if (refreshToken == null) {
+            return;
+        }
+        this.accessToken = '';
+        this.refreshToken = refreshToken;
+    };
     AppClientImpl.prototype.login = function (username, password, callback) {
+        var _this = this;
         var params = {
             username: username,
             password: password
         };
         this.exec(this.url + '/api/v1/token', 'POST', null, params, {
             success: function (json) {
-                callback.success(json.access_token);
+                _this.accessToken = json.access_token;
+                _this.refreshToken = json.refresh_token;
+                callback.success(json.refresh_token);
             },
             error: function (status, body) {
                 callback.error(status, body.msg);
             }
         });
     };
-    AppClientImpl.prototype.getTradings = function (token, callback) {
-        this.exec(this.url + '/api/v1/tradings', 'GET', token, null, {
+    AppClientImpl.prototype.getTradings = function (callback) {
+        this.exec(this.url + '/api/v1/tradings', 'GET', this.accessToken, null, {
             success: function (json) {
                 callback.success(_.map(json.tradings, function (item) {
                     item.date = item.id;
@@ -33,9 +44,9 @@ var AppClientImpl = (function () {
             }
         });
     };
-    AppClientImpl.prototype.getTradingItems = function (token, tradingId, callback) {
+    AppClientImpl.prototype.getTradingItems = function (tradingId, callback) {
         var url = this.url + '/api/v1/tradings/' + tradingId + '/items';
-        this.exec(url, 'GET', token, null, {
+        this.exec(url, 'GET', this.accessToken, null, {
             success: function (json) {
                 callback.success(_.map(json.items, function (item) {
                     item.sum = item.unit_price * item.amount;
@@ -47,9 +58,9 @@ var AppClientImpl = (function () {
             }
         });
     };
-    AppClientImpl.prototype.getUsers = function (token, callback) {
+    AppClientImpl.prototype.getUsers = function (callback) {
         var url = this.url + '/api/v1/users';
-        this.exec(url, 'GET', token, null, {
+        this.exec(url, 'GET', this.accessToken, null, {
             success: function (json) {
                 callback.success(json.users);
             },
@@ -58,9 +69,9 @@ var AppClientImpl = (function () {
             }
         });
     };
-    AppClientImpl.prototype.getCompanies = function (token, callback) {
+    AppClientImpl.prototype.getCompanies = function (callback) {
         var url = this.url + '/api/v1/companies';
-        this.exec(url, 'GET', token, null, {
+        this.exec(url, 'GET', this.accessToken, null, {
             success: function (json) {
                 callback.success(json.companies);
             },
@@ -69,26 +80,26 @@ var AppClientImpl = (function () {
             }
         });
     };
-    AppClientImpl.prototype.saveTrading = function (token, item, callback) {
+    AppClientImpl.prototype.saveTrading = function (item, callback) {
         if (item.id === null) {
-            this.createTrading(token, item, callback);
+            this.createTrading(item, callback);
         }
         else {
-            this.updateTrading(token, item, callback);
+            this.updateTrading(item, callback);
         }
     };
-    AppClientImpl.prototype.saveTradingItem = function (token, tradingId, item, callback) {
+    AppClientImpl.prototype.saveTradingItem = function (tradingId, item, callback) {
         if (item.id === null) {
-            this.createTradingItem(token, tradingId, item, callback);
+            this.createTradingItem(tradingId, item, callback);
         }
         else {
-            this.updateTradingItem(token, tradingId, item, callback);
+            this.updateTradingItem(tradingId, item, callback);
         }
     };
-    AppClientImpl.prototype.deleteTradingItem = function (token, tradingId, itemId, callback) {
+    AppClientImpl.prototype.deleteTradingItem = function (tradingId, itemId, callback) {
         var url = this.url + '/api/v1/tradings/' + tradingId +
             '/items/' + itemId;
-        this.exec(url, 'DELETE', token, null, {
+        this.exec(url, 'DELETE', this.accessToken, null, {
             success: function (json) {
                 callback.success(itemId);
             },
@@ -102,17 +113,17 @@ var AppClientImpl = (function () {
             }
         });
     };
-    AppClientImpl.prototype.saveCompany = function (token, item, callback) {
+    AppClientImpl.prototype.saveCompany = function (item, callback) {
         if (item.id === null || item.id.length == 0) {
-            this.createCompany(token, item, callback);
+            this.createCompany(item, callback);
         }
         else {
-            this.updateCompany(token, item, callback);
+            this.updateCompany(item, callback);
         }
     };
-    AppClientImpl.prototype.getEnvironment = function (token, callback) {
+    AppClientImpl.prototype.getEnvironment = function (callback) {
         var url = this.url + '/api/v1/environments';
-        this.exec(url, 'GET', token, null, {
+        this.exec(url, 'GET', this.accessToken, null, {
             success: function (json) {
                 callback.success(json);
             },
@@ -121,9 +132,9 @@ var AppClientImpl = (function () {
             }
         });
     };
-    AppClientImpl.prototype.saveEnvironment = function (token, env, callback) {
+    AppClientImpl.prototype.saveEnvironment = function (env, callback) {
         var url = this.url + '/api/v1/environments';
-        this.exec(url, 'PUT', token, env, {
+        this.exec(url, 'PUT', this.accessToken, env, {
             success: function (json) {
                 callback.success();
             },
@@ -143,12 +154,12 @@ var AppClientImpl = (function () {
             }
         });
     };
-    AppClientImpl.prototype.getNextNumber = function (token, type, date, callback) {
+    AppClientImpl.prototype.getNextNumber = function (type, date, callback) {
         var url = this.url + '/api/v1/sequences/' + type;
         var params = {
             date: date
         };
-        this.exec(url, 'POST', token, params, {
+        this.exec(url, 'POST', this.accessToken, params, {
             success: function (json) {
                 callback.success(json['number']);
             },
@@ -157,9 +168,9 @@ var AppClientImpl = (function () {
             }
         });
     };
-    AppClientImpl.prototype.createTrading = function (token, item, callback) {
+    AppClientImpl.prototype.createTrading = function (item, callback) {
         var url = this.url + '/api/v1/tradings';
-        this.exec(url, 'POST', token, item, {
+        this.exec(url, 'POST', this.accessToken, item, {
             success: function (json) {
                 callback.success(json.id);
             },
@@ -168,9 +179,9 @@ var AppClientImpl = (function () {
             }
         });
     };
-    AppClientImpl.prototype.updateTrading = function (token, item, callback) {
+    AppClientImpl.prototype.updateTrading = function (item, callback) {
         var url = this.url + '/api/v1/tradings/' + item.id;
-        this.exec(url, 'PUT', token, item, {
+        this.exec(url, 'PUT', this.accessToken, item, {
             success: function (json) {
                 callback.success(item.id);
             },
@@ -179,9 +190,9 @@ var AppClientImpl = (function () {
             }
         });
     };
-    AppClientImpl.prototype.createTradingItem = function (token, tradingId, item, callback) {
+    AppClientImpl.prototype.createTradingItem = function (tradingId, item, callback) {
         var url = this.url + '/api/v1/tradings/' + tradingId + '/items';
-        this.exec(url, 'POST', token, item, {
+        this.exec(url, 'POST', this.accessToken, item, {
             success: function (json) {
                 callback.success(json.id);
             },
@@ -190,10 +201,10 @@ var AppClientImpl = (function () {
             }
         });
     };
-    AppClientImpl.prototype.updateTradingItem = function (token, tradingId, item, callback) {
+    AppClientImpl.prototype.updateTradingItem = function (tradingId, item, callback) {
         var url = this.url + '/api/v1/tradings/' + tradingId +
             '/items/' + item.id;
-        this.exec(url, 'PUT', token, item, {
+        this.exec(url, 'PUT', this.accessToken, item, {
             success: function (json) {
                 callback.success(item.id);
             },
@@ -202,9 +213,9 @@ var AppClientImpl = (function () {
             }
         });
     };
-    AppClientImpl.prototype.createCompany = function (token, item, callback) {
+    AppClientImpl.prototype.createCompany = function (item, callback) {
         var url = this.url + '/api/v1/companies';
-        this.exec(url, 'POST', token, item, {
+        this.exec(url, 'POST', this.accessToken, item, {
             success: function (json) {
                 callback.success(json.id);
             },
@@ -213,11 +224,28 @@ var AppClientImpl = (function () {
             }
         });
     };
-    AppClientImpl.prototype.updateCompany = function (token, item, callback) {
+    AppClientImpl.prototype.updateCompany = function (item, callback) {
         var url = this.url + '/api/v1/companies/' + item.id;
-        this.exec(url, 'PUT', token, item, {
+        this.exec(url, 'PUT', this.accessToken, item, {
             success: function (json) {
                 callback.success(json.id);
+            },
+            error: function (status, body) {
+                callback.error(status, body.msg);
+            }
+        });
+    };
+    AppClientImpl.prototype.tokenRefresh = function (url, method, token, params, callback) {
+        var _this = this;
+        var refreshURL = this.url + '/api/v1/token/refresh';
+        var refreshParams = {
+            token: this.refreshToken
+        };
+        this.exec(refreshURL, 'POST', null, refreshParams, {
+            success: function (json) {
+                _this.accessToken = json.access_token;
+                _this.isRetry = true;
+                _this.exec(url, method, _this.accessToken, params, callback);
             },
             error: function (status, body) {
                 callback.error(status, body.msg);
@@ -240,8 +268,8 @@ var AppClientImpl = (function () {
         if (params != null) {
             data.data = JSON.stringify(params);
         }
-        $.ajax(data)
-            .done(function (data_, status, data) {
+        $.ajax(data).done(function (data_, status, data) {
+            this.isRetry = false;
             if (data.status == 204) {
                 callback.success({});
             }
@@ -250,9 +278,21 @@ var AppClientImpl = (function () {
             }
         }).fail(function (data) {
             if (data.status == 204) {
+                this.isRetry = false;
                 callback.success({});
             }
+            else if (data.status == 401) {
+                if (this.isRetry) {
+                    this.isRetry = false;
+                    callback.error(data.status, JSON.parse(data.responseText));
+                }
+                else {
+                    this.isRetry = true;
+                    this.tokenRefresh(callback);
+                }
+            }
             else {
+                this.isRetry = false;
                 callback.error(data.status, JSON.parse(data.responseText));
             }
         });
@@ -364,6 +404,8 @@ var App = (function () {
     };
     App.prototype.start = function () {
         this.client = createClient();
+        var refreshToken = localStorage.getItem('refreshToken');
+        this.client.setRefreshToken(refreshToken);
         this.initDialog();
         this.loadMyCompanyName();
     };
@@ -406,7 +448,7 @@ var App = (function () {
             this.loadUsers(callback);
             return;
         }
-        this.client.getEnvironment(this.accessToken, {
+        this.client.getEnvironment({
             success: function (item) {
                 _this.environment = item;
                 _this.loadUsers(callback);
@@ -423,7 +465,7 @@ var App = (function () {
             this.loadTradings(callback);
             return;
         }
-        this.client.getUsers(this.accessToken, {
+        this.client.getUsers({
             success: function (list) {
                 _this.users = list;
                 _this.loadTradings(callback);
@@ -440,7 +482,7 @@ var App = (function () {
             this.loadCompanies(callback);
             return;
         }
-        this.client.getTradings(this.accessToken, {
+        this.client.getTradings({
             success: function (list) {
                 _this.tradingsMap = {};
                 _.each(list, function (item) {
@@ -460,7 +502,7 @@ var App = (function () {
             callback.done();
             return;
         }
-        this.client.getCompanies(this.accessToken, {
+        this.client.getCompanies({
             success: function (list) {
                 _this.companies = list;
                 _this.companyMap = {};
@@ -587,7 +629,7 @@ var CompanyListDialog = (function () {
         company.fax = fax;
         company.unit = unit;
         company.assignee = assignee;
-        app.client.saveCompany(app.accessToken, company, {
+        app.client.saveCompany(company, {
             success: function (id) {
                 company.id = id;
                 app.companyMap[id] = company;
@@ -679,7 +721,7 @@ var SettingsDialog = (function () {
         env.company_bank_type = $('#bank_type').val();
         env.company_bank_num = this.ractive.get('company_bank_num');
         env.company_bank_name = this.ractive.get('company_bank_name');
-        app.client.saveEnvironment(app.accessToken, env, {
+        app.client.saveEnvironment(env, {
             success: function () {
                 app.environment = env;
                 app.closeDialog();
@@ -726,7 +768,7 @@ var SignInPage = (function () {
         app.ractive.update();
         app.client.login(username, password, {
             success: function (token) {
-                app.accessToken = token;
+                localStorage.setItem('refreshToken', token);
                 app.router.navigate('top', { trigger: true });
             },
             error: function (status, msg) {
@@ -855,7 +897,7 @@ var SheetPage = (function () {
     };
     SheetPage.prototype.loadItems = function (app, trading) {
         var _this = this;
-        app.client.getTradingItems(app.accessToken, trading.id, {
+        app.client.getTradingItems(trading.id, {
             success: function (list) {
                 // if copyMode = true remove ids
                 if (_this.copyMode) {
@@ -998,7 +1040,7 @@ var SheetPage = (function () {
             window.location.href = "/php/quotation.php?access_token=" + app.accessToken + "&trading_id=" + id;
         };
         if (trading.quotation_number == null || trading.quotation_number.length == 0) {
-            app.client.getNextNumber(app.accessToken, 'quotation', new Date(quotationDate).getTime(), {
+            app.client.getNextNumber('quotation', new Date(quotationDate).getTime(), {
                 success: function (val) {
                     trading.quotation_number = '' + val + '-I';
                     _this.save(app, doneFunc);
@@ -1021,7 +1063,7 @@ var SheetPage = (function () {
             window.location.href = "/php/bill.php?access_token=" + app.accessToken + "&trading_id=" + id;
         };
         if (trading.bill_number == null || trading.bill_number.length == 0) {
-            app.client.getNextNumber(app.accessToken, 'bill', new Date(billDate).getTime(), {
+            app.client.getNextNumber('bill', new Date(billDate).getTime(), {
                 success: function (val) {
                     trading.bill_number = '' + val + '-V';
                     _this.save(app, doneFunc);
@@ -1051,7 +1093,7 @@ var SheetPage = (function () {
         trading.bill_date = new Date(billDate).getTime();
         trading.tax_rate = Number(trading.tax_rate);
         console.log(trading);
-        app.client.saveTrading(app.accessToken, trading, {
+        app.client.saveTrading(trading, {
             success: function (id) {
                 app.tradingsMap[id] = trading;
                 var deleted = app.ractive.get('deletedItems');
@@ -1077,7 +1119,7 @@ var SheetPage = (function () {
             return;
         }
         var item = list[0];
-        app.client.deleteTradingItem(app.accessToken, id, item.id, {
+        app.client.deleteTradingItem(id, item.id, {
             success: function (itemId) {
                 list.splice(0, 1);
                 _this.deleteItems(app, id, list, doneFunc);
@@ -1094,7 +1136,7 @@ var SheetPage = (function () {
             return;
         }
         var item = list[0];
-        app.client.saveTradingItem(app.accessToken, id, item, {
+        app.client.saveTradingItem(id, item, {
             success: function (itemId) {
                 item.id = itemId;
                 list.splice(0, 1);

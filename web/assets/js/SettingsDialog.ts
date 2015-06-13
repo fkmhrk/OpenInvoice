@@ -67,7 +67,7 @@ class SettingsDialog implements Dialog {
         env.company_bank_num = this.ractive.get('company_bank_num');
         env.company_bank_name = this.ractive.get('company_bank_name');
 
-        app.client.saveEnvironment(app.accessToken, env, {
+        app.client.saveEnvironment(env, {
             success : () => {
                 app.environment = env;
                 app.closeDialog();
