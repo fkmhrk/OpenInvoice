@@ -17,6 +17,10 @@ func TestUser0000_GetToken(t *testing.T) {
 	sessionDAO.CreateResult = &m.Session{
 		Token: "testToken",
 	}
+	sessionRefreshDAO, _ := models.SessionRefresh.(*mock.SessionRefreshDAO)
+	sessionRefreshDAO.CreateResult = m.SessionRefresh{
+		Token: "tokenRefresh",
+	}
 
 	s := NewUserSerivce(userDAO, sessionDAO, models)
 
@@ -32,15 +36,10 @@ func TestUser0000_GetToken(t *testing.T) {
 		return
 	}
 	json := json(r)
-	if id, _ := json.String("id"); id != "testUser" {
-		t.Errorf("Wrong id : %s", id)
-	}
-	if v, _ := json.String("access_token"); v != "testToken" {
-		t.Errorf("Wrong token : %s", v)
-	}
-	if v, _ := json.String("token_type"); v != "bearer" {
-		t.Errorf("Wrong token type : %s", v)
-	}
+	assertString(t, json, "id", "testUser")
+	assertString(t, json, "token_type", "bearer")
+	assertString(t, json, "access_token", "testToken")
+	assertString(t, json, "refresh_token", "tokenRefresh")
 }
 
 func TestUser0100_GetList(t *testing.T) {
