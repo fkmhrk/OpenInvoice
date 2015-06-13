@@ -4,6 +4,7 @@ type SeqDAO interface {
 	Create(seqType, year, value int) (Seq, error)
 	Get(seqType int, year int) (Seq, error)
 	Update(seqType, year, value int) (Seq, error)
+	Next(seqType, year int) (Seq, error)
 	Delete(seqType int, year int) (Seq, error)
 }
 

@@ -91,3 +91,38 @@ func TestSeq_All(t *testing.T) {
 		return
 	}
 }
+
+func TestSeq_Next(t *testing.T) {
+	db, err := connect()
+	if err != nil {
+		t.Errorf("Failed to connect")
+		return
+	}
+	defer db.Close()
+
+	dao := createSeqDAO(db)
+
+	var seqType int = 10
+	var year int = 100
+	hardDeleteSeq(db, seqType, year)
+	item, err := dao.Next(seqType, year)
+	if err != nil {
+		t.Errorf("Failed to Create : %s", err)
+		return
+	}
+	assertSeq(t, &item, 10, 100, 1)
+
+	item2, err := dao.Next(seqType, year)
+	if err != nil {
+		t.Errorf("Failed to Get : %s", err)
+		return
+	}
+	assertSeq(t, &item2, 10, 100, 2)
+
+	item3, err := dao.Get(seqType, year)
+	if err != nil {
+		t.Errorf("Failed to Get : %s", err)
+		return
+	}
+	assertSeq(t, &item3, 10, 100, 2)
+}
