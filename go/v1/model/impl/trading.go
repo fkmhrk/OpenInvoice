@@ -130,7 +130,7 @@ func (d *tradingDAO) Create(companyId, subject string, titleType int, workFrom, 
 	}, nil
 }
 
-func (d *tradingDAO) Update(id, companyId, subject string, titleType int, workFrom, workTo, total, quotationDate, billDate int64, taxRate float32, assignee, product string) (*m.Trading, error) {
+func (d *tradingDAO) Update(trading m.Trading) (*m.Trading, error) {
 	tr, err := d.connection.Begin()
 	if err != nil {
 		return nil, err
@@ -139,7 +139,9 @@ func (d *tradingDAO) Update(id, companyId, subject string, titleType int, workFr
 
 	st, err := tr.Prepare("UPDATE trading SET " +
 		"company_id=?,title_type=?,subject=?," +
-		"work_from=?,work_to=?,total=?,quotation_date=?,bill_date=?," +
+		"work_from=?,work_to=?,total=?," +
+		"quotation_date=?,quotation_number=?," +
+		"bill_date=?,bill_number=?," +
 		"tax_rate=?,assignee=?,product=?," +
 		"modified_time=unix_timestamp(now()) " +
 		"WHERE id=? AND deleted <> 1")
@@ -148,27 +150,18 @@ func (d *tradingDAO) Update(id, companyId, subject string, titleType int, workFr
 	}
 	defer st.Close()
 
-	_, err = st.Exec(companyId, titleType, subject, workFrom, workTo, total,
-		quotationDate, billDate, taxRate,
-		assignee, product, id)
+	_, err = st.Exec(trading.CompanyId, trading.TitleType, trading.Subject,
+		trading.WorkFrom, trading.WorkTo, trading.Total,
+		trading.QuotationDate, trading.QuotationNumber,
+		trading.BillDate, trading.BillNumber,
+		trading.TaxRate, trading.AssigneeId, trading.Product, trading.Id)
 	if err != nil {
 		return nil, err
 	}
 
 	tr.Commit()
 
-	return &m.Trading{
-		Id:            id,
-		CompanyId:     companyId,
-		Subject:       subject,
-		WorkFrom:      workFrom,
-		WorkTo:        workTo,
-		QuotationDate: quotationDate,
-		BillDate:      billDate,
-		TaxRate:       taxRate,
-		AssigneeId:    assignee,
-		Product:       product,
-	}, nil
+	return &trading, nil
 }
 
 func (d *tradingDAO) GetItemsById(tradingId string) ([]*m.TradingItem, error) {

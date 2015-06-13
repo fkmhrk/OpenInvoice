@@ -1,6 +1,7 @@
 package impl
 
 import (
+	s "../"
 	m "../../model"
 	mock "../../model/mock"
 	"fmt"
@@ -37,10 +38,10 @@ func TestTrading0000_GetListByUser(t *testing.T) {
 	tradingDAO, _ := models.Trading.(*mock.TradingDAO)
 	tradingDAO.GetListByUserResult = list
 
-	s := NewTradingSerivce(sessionDAO, tradingDAO, models)
+	service := NewTradingSerivce(sessionDAO, tradingDAO, models)
 
 	token := "token1122"
-	r := s.GetListByUser(token)
+	r := service.GetListByUser(token)
 	if r == nil {
 		t.Errorf("Result must not be nil")
 		return
@@ -140,7 +141,7 @@ func TestTrading0200_Update(t *testing.T) {
 		Product:    "product",
 	}
 
-	s := NewTradingSerivce(sessionDAO, tradingDAO, models)
+	service := NewTradingSerivce(sessionDAO, tradingDAO, models)
 
 	// params
 	token := "token1122"
@@ -156,7 +157,21 @@ func TestTrading0200_Update(t *testing.T) {
 	billDate := int64(400)
 	taxRate := float32(8)
 
-	r := s.Update(token, id, companyId, subject, product, titleType, workFrom, workTo, total, quotationDate, billDate, taxRate)
+	r := service.Update(token, s.Trading{
+		m.Trading{
+			Id:            id,
+			CompanyId:     companyId,
+			Subject:       subject,
+			Product:       product,
+			TitleType:     titleType,
+			WorkFrom:      workFrom,
+			WorkTo:        workTo,
+			Total:         total,
+			QuotationDate: quotationDate,
+			BillDate:      billDate,
+			TaxRate:       taxRate,
+		},
+	})
 	if r == nil {
 		t.Errorf("Result must not be nil")
 		return
