@@ -288,5 +288,6 @@ func (s *tradingService) toJson(t *m.Trading) map[string]interface{} {
 		"tax_rate":         t.TaxRate,
 		"assignee":         t.AssigneeId,
 		"product":          t.Product,
+		"modified_time":    t.ModifiedTime,
 	}
 }
