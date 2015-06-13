@@ -3,17 +3,23 @@ package impl
 import (
 	s "../"
 	m "../../model"
+	"strconv"
+	"time"
 )
 
 type tradingService struct {
 	sessionDAO m.SessionDAO
 	tradingDAO m.TradingDAO
+	envDAO     m.EnvDAO
+	seqDAO     m.SeqDAO
 }
 
-func NewTradingSerivce(s m.SessionDAO, t m.TradingDAO) *tradingService {
+func NewTradingSerivce(s m.SessionDAO, t m.TradingDAO, models *m.Models) *tradingService {
 	return &tradingService{
 		sessionDAO: s,
 		tradingDAO: t,
+		envDAO:     models.Env,
+		seqDAO:     models.Seq,
 	}
 }
 
@@ -213,6 +219,57 @@ func (s *tradingService) DeleteItem(token, id, tradingId string) s.Result {
 		status: 204,
 		body:   "",
 	}
+}
+
+func (o *tradingService) GetNextNumber(token, seqType string, date int64) s.Result {
+	// input check
+	if isEmpty(token) {
+		return errorResult(400, s.ERR_TOKEN_EMPTY)
+	}
+	var seqTypeInt m.SeqType
+	switch seqType {
+	case "quotation":
+		seqTypeInt = m.SeqType_Quotation
+		break
+	case "delivery":
+		seqTypeInt = m.SeqType_Delivery
+		break
+	case "bill":
+		seqTypeInt = m.SeqType_Bill
+		break
+	default:
+		return errorResult(400, s.ERR_INVALID_SEQUENCE_TYPE)
+	}
+	// get session
+	session, err := o.sessionDAO.GetByToken(token)
+	if err != nil {
+		return errorResult(500, MSG_SERVER_ERROR)
+	}
+	if session == nil {
+		return errorResult(400, MSG_WRONG_TOKEN)
+	}
+	// determine year
+	t := time.Unix(date/1000, 0)
+	year := t.Year()
+	month := t.Month()
+	env, err := o.envDAO.Get("closing_month")
+	if err != nil {
+		return errorResult(500, MSG_SERVER_ERROR)
+	}
+	intVal, _ := strconv.Atoi(env.Value)
+	if int(month) <= intVal {
+		year--
+	}
+	// get next sequence
+	seq, err := o.seqDAO.Next(seqTypeInt, year)
+	if err != nil {
+		return errorResult(500, MSG_SERVER_ERROR)
+	}
+
+	body := map[string]interface{}{
+		"number": seq.Value,
+	}
+	return jsonResult(200, body)
 }
 
 func (s *tradingService) toJson(t *m.Trading) map[string]interface{} {
