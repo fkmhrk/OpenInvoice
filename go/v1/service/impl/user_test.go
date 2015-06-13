@@ -1,25 +1,24 @@
 package impl
 
 import (
-	"../../model"
-	m "../../model/mock"
+	m "../../model"
+	mock "../../model/mock"
 	"fmt"
 	"testing"
 )
 
 func TestUser0000_GetToken(t *testing.T) {
-	userDAO := &m.UserDAO{
-		GetByNamePasswordResult: &model.User{
-			Id: "testUser",
-		},
+	models := mock.NewMock()
+	userDAO, _ := models.User.(*mock.UserDAO)
+	userDAO.GetByNamePasswordResult = &m.User{
+		Id: "testUser",
 	}
-	sessionDAO := &m.SessionDAO{
-		CreateResult: &model.Session{
-			Token: "testToken",
-		},
+	sessionDAO, _ := models.Session.(*mock.SessionDAO)
+	sessionDAO.CreateResult = &m.Session{
+		Token: "testToken",
 	}
 
-	s := NewUserSerivce(userDAO, sessionDAO)
+	s := NewUserSerivce(userDAO, sessionDAO, models)
 
 	name := "user1122"
 	pass := "pass2233"
@@ -45,24 +44,23 @@ func TestUser0000_GetToken(t *testing.T) {
 }
 
 func TestUser0100_GetList(t *testing.T) {
-	var list []*model.User
+	models := mock.NewMock()
+	var list []*m.User
 	for i := 0; i < 2; i++ {
-		list = append(list, &model.User{
+		list = append(list, &m.User{
 			Id:          fmt.Sprintf("user%d", i),
 			LoginName:   fmt.Sprintf("login%d", i),
 			DisplayName: fmt.Sprintf("name%d", i),
 		})
 	}
-	userDAO := &m.UserDAO{
-		GetListResult: list,
-	}
-	sessionDAO := &m.SessionDAO{
-		GetByTokenResult: &model.Session{
-			Token: "testToken",
-		},
+	userDAO, _ := models.User.(*mock.UserDAO)
+	userDAO.GetListResult = list
+	sessionDAO, _ := models.Session.(*mock.SessionDAO)
+	sessionDAO.GetByTokenResult = &m.Session{
+		Token: "testToken",
 	}
 
-	s := NewUserSerivce(userDAO, sessionDAO)
+	s := NewUserSerivce(userDAO, sessionDAO, models)
 
 	token := "token1122"
 	r := s.GetUsers(token)
@@ -96,19 +94,18 @@ func TestUser0100_GetList(t *testing.T) {
 }
 
 func TestUser0200_Create(t *testing.T) {
-	sessionDAO := &m.SessionDAO{
-		GetByTokenResult: &model.Session{
-			Token: "testToken",
-			Role:  model.Role("Admin"),
-		},
+	models := mock.NewMock()
+	sessionDAO, _ := models.Session.(*mock.SessionDAO)
+	sessionDAO.GetByTokenResult = &m.Session{
+		Token: "testToken",
+		Role:  m.Role("Admin"),
 	}
-	userDAO := &m.UserDAO{
-		CreateResult: &model.User{
-			Id: "id1234",
-		},
+	userDAO, _ := models.User.(*mock.UserDAO)
+	userDAO.CreateResult = &m.User{
+		Id: "id1234",
 	}
 
-	s := NewUserSerivce(userDAO, sessionDAO)
+	s := NewUserSerivce(userDAO, sessionDAO, models)
 
 	token := "token1122"
 	r := s.Create(token, "loginName", "disp", "Read,Write", "pass1122")
@@ -127,19 +124,18 @@ func TestUser0200_Create(t *testing.T) {
 }
 
 func TestUser0201_Create_Not_Admin(t *testing.T) {
-	sessionDAO := &m.SessionDAO{
-		GetByTokenResult: &model.Session{
-			Token: "testToken",
-			Role:  model.Role("Read,Write"),
-		},
+	models := mock.NewMock()
+	sessionDAO, _ := models.Session.(*mock.SessionDAO)
+	sessionDAO.GetByTokenResult = &m.Session{
+		Token: "testToken",
+		Role:  m.Role("Read,Write"),
 	}
-	userDAO := &m.UserDAO{
-		CreateResult: &model.User{
-			Id: "id1234",
-		},
+	userDAO, _ := models.User.(*mock.UserDAO)
+	userDAO.CreateResult = &m.User{
+		Id: "id1234",
 	}
 
-	s := NewUserSerivce(userDAO, sessionDAO)
+	s := NewUserSerivce(userDAO, sessionDAO, models)
 
 	token := "token1122"
 	r := s.Create(token, "loginName", "disp", "Read,Write", "pass1122")

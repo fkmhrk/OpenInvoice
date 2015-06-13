@@ -6,18 +6,20 @@ import (
 )
 
 type userService struct {
-	userDAO    m.UserDAO
-	sessionDAO m.SessionDAO
+	userDAO           m.UserDAO
+	sessionDAO        m.SessionDAO
+	sessionRefreshDAO m.SessionRefreshDAO
 }
 
 const (
 	TIME_30MIN = 30 * 60
 )
 
-func NewUserSerivce(u m.UserDAO, s m.SessionDAO) *userService {
+func NewUserSerivce(u m.UserDAO, s m.SessionDAO, models *m.Models) *userService {
 	return &userService{
-		userDAO:    u,
-		sessionDAO: s,
+		userDAO:           u,
+		sessionDAO:        s,
+		sessionRefreshDAO: models.SessionRefresh,
 	}
 }
 
