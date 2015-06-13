@@ -143,6 +143,20 @@ var AppClientImpl = (function () {
             }
         });
     };
+    AppClientImpl.prototype.getNextNumber = function (token, type, date, callback) {
+        var url = this.url + '/api/v1/sequences/' + type;
+        var params = {
+            date: date
+        };
+        this.exec(url, 'POST', token, params, {
+            success: function (json) {
+                callback.success(json['number']);
+            },
+            error: function (status, body) {
+                callback.error(status, body.msg);
+            }
+        });
+    };
     AppClientImpl.prototype.createTrading = function (token, item, callback) {
         var url = this.url + '/api/v1/tradings';
         this.exec(url, 'POST', token, item, {
@@ -976,14 +990,48 @@ var SheetPage = (function () {
         app.showDialog(new AddUserDialog());
     };
     SheetPage.prototype.printQuotation = function (app) {
-        this.save(app, function (id) {
+        var _this = this;
+        var trading = app.ractive.get('trading');
+        var quotationDate = app.ractive.get('quotationDate');
+        var doneFunc = function (id) {
             window.location.href = "/php/quotation.php?access_token=" + app.accessToken + "&trading_id=" + id;
-        });
+        };
+        if (trading.quotation_number == null || trading.quotation_number.length == 0) {
+            app.client.getNextNumber(app.accessToken, 'quotation', new Date(quotationDate).getTime(), {
+                success: function (val) {
+                    trading.quotation_number = '' + val + '-I';
+                    _this.save(app, doneFunc);
+                },
+                error: function (status, msg) {
+                    console.log('Failed to get next quotation number status=' + status);
+                }
+            });
+        }
+        else {
+            this.save(app, doneFunc);
+        }
     };
     SheetPage.prototype.printBill = function (app) {
-        this.save(app, function (id) {
+        var _this = this;
+        var trading = app.ractive.get('trading');
+        var billDate = app.ractive.get('billDate');
+        var doneFunc = function (id) {
             window.location.href = "/php/bill.php?access_token=" + app.accessToken + "&trading_id=" + id;
-        });
+        };
+        if (trading.bill_number == null || trading.bill_number.length == 0) {
+            app.client.getNextNumber(app.accessToken, 'bill', new Date(billDate).getTime(), {
+                success: function (val) {
+                    trading.bill_number = '' + val + '-V';
+                    _this.save(app, doneFunc);
+                },
+                error: function (status, msg) {
+                    console.log('Failed to get next bill number status=' + status);
+                }
+            });
+        }
+        else {
+            this.save(app, doneFunc);
+        }
     };
     SheetPage.prototype.save = function (app, doneFunc) {
         var _this = this;

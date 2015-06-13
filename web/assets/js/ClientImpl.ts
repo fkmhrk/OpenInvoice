@@ -154,6 +154,21 @@ class AppClientImpl implements Client {
             }
         });        
     }
+
+    getNextNumber(token : string, type : string, date : number, callback : ItemCallback<number>) {
+        var url = this.url + '/api/v1/sequences/' + type;
+        var params = {
+            date : date,
+        }
+        this.exec(url, 'POST', token, params, {
+            success : (json : any) => {
+                callback.success(json['number']);
+            },
+            error : (status : any, body : any) => {
+                callback.error(status, body.msg);
+            }
+        });                
+    }
     
     private createTrading(token : string, item : Trading, callback : ItemCallback<string>) {
         var url = this.url + '/api/v1/tradings';

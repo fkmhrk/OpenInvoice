@@ -130,11 +130,11 @@
 	  </section>
 		<section id="pdf">
 			<dl>
-				<dt><input type="text" value="1506-1"><input type="date" value="{{quotationDate}}"></dt>
+				<dt><input type="text" value="{{trading.quotation_number}}"><input type="date" value="{{quotationDate}}"></dt>
 				<dd class="pdf_est" on-click="printQuotation"><i class="fa fa-list-alt"></i>見積書 pdf</dd>
-				<dt><input type="text" value="15001-V"><input type="date" value="{{billDate}}"></dt>
+				<dt><input type="text" value="{{trading.bill_number}}"><input type="date" value="{{billDate}}"></dt>
 				<dd class="pdf_invoice" on-click="printBill"><i class="fa fa-list-alt"></i>請求書 pdf</dd>
-				<dt><input type="text" value="15001-D"><input type="date" value=""></dt>
+				<dt><input type="text" value="{{trading.delivery_number}}"><input type="date" value="{{deliveryDate}}"></dt>
 				<dd class="pdf_order"><i class="fa fa-list-alt"></i>納品書 pdf</dd>
 				<dt><input type="date" value=""></dt>
 				<dd class="pdf_attach"><i class="fa fa-list-alt"></i>添え状</dd>

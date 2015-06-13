@@ -24,7 +24,11 @@ class Trading {
     work_from : number;
     work_to : number;
     quotation_date : number;
+    quotation_number : string;
     bill_date : number;
+    bill_number : string;
+    delivery_date : number;
+    delivery_number : string;
     tax_rate : number;
     assignee : string;
     product : string;

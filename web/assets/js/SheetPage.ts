@@ -157,14 +157,46 @@ class SheetPage implements Page {
         app.showDialog(new AddUserDialog());
     }
     private printQuotation(app : App) {
-        this.save(app, (id : string) => {
+        var trading = app.ractive.get('trading');
+        var quotationDate = app.ractive.get('quotationDate');
+
+        var doneFunc = (id : string) => {
             window.location.href = "/php/quotation.php?access_token=" + app.accessToken + "&trading_id=" + id;
-        });
+        };
+        if (trading.quotation_number == null || trading.quotation_number.length == 0) {
+            app.client.getNextNumber(app.accessToken, 'quotation', new Date(quotationDate).getTime(), {
+                success : (val : number) => {
+                    trading.quotation_number = '' + val + '-I';
+                    this.save(app, doneFunc);
+                },
+                error : (status : number, msg : string) => {
+                    console.log('Failed to get next quotation number status=' + status);
+                }
+            });
+        } else {
+            this.save(app, doneFunc);
+        }
     }
     private printBill(app : App) {
-        this.save(app, (id : string) => {
+        var trading = app.ractive.get('trading');
+        var billDate = app.ractive.get('billDate');
+        
+        var doneFunc = (id : string) => {
             window.location.href = "/php/bill.php?access_token=" + app.accessToken + "&trading_id=" + id;
-        });        
+        };
+        if (trading.bill_number == null || trading.bill_number.length == 0) {
+            app.client.getNextNumber(app.accessToken, 'bill', new Date(billDate).getTime(), {
+                success : (val : number) => {
+                    trading.bill_number = '' + val + '-V';
+                    this.save(app, doneFunc);
+                },
+                error : (status : number, msg : string) => {
+                    console.log('Failed to get next bill number status=' + status);
+                }
+            });
+        } else {
+            this.save(app, doneFunc);
+        }        
     }
     private save(app : App, doneFunc : (id : string) => void) {
         var trading = app.ractive.get('trading');
