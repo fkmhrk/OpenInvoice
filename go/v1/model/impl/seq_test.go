@@ -10,7 +10,7 @@ func createSeqDAO(db *sql.DB) *seqDAO {
 	return NewSeqDAO(NewConnection(db))
 }
 
-func assertSeq(t *testing.T, item *m.Seq, seqType, year, value int) {
+func assertSeq(t *testing.T, item *m.Seq, seqType m.SeqType, year, value int) {
 	caller := getCaller()
 	if item.SeqType != seqType {
 		t.Errorf("[%s] seqType must be %d but %d", caller, seqType, item.SeqType)
@@ -23,7 +23,7 @@ func assertSeq(t *testing.T, item *m.Seq, seqType, year, value int) {
 	}
 }
 
-func hardDeleteSeq(db *sql.DB, seqType int, year int) {
+func hardDeleteSeq(db *sql.DB, seqType m.SeqType, year int) {
 	s, _ := db.Prepare("DELETE FROM seq WHERE seq_type=? AND year=?")
 	defer s.Close()
 	s.Exec(seqType, year)
@@ -39,7 +39,7 @@ func TestSeq_All(t *testing.T) {
 
 	dao := createSeqDAO(db)
 
-	var seqType int = 10
+	var seqType m.SeqType = 10
 	var year int = 100
 	var value int = 100
 	hardDeleteSeq(db, seqType, year)
@@ -102,7 +102,7 @@ func TestSeq_Next(t *testing.T) {
 
 	dao := createSeqDAO(db)
 
-	var seqType int = 10
+	var seqType m.SeqType = 11
 	var year int = 100
 	hardDeleteSeq(db, seqType, year)
 	item, err := dao.Next(seqType, year)
@@ -110,19 +110,19 @@ func TestSeq_Next(t *testing.T) {
 		t.Errorf("Failed to Create : %s", err)
 		return
 	}
-	assertSeq(t, &item, 10, 100, 1)
+	assertSeq(t, &item, 11, 100, 1)
 
 	item2, err := dao.Next(seqType, year)
 	if err != nil {
 		t.Errorf("Failed to Get : %s", err)
 		return
 	}
-	assertSeq(t, &item2, 10, 100, 2)
+	assertSeq(t, &item2, 11, 100, 2)
 
 	item3, err := dao.Get(seqType, year)
 	if err != nil {
 		t.Errorf("Failed to Get : %s", err)
 		return
 	}
-	assertSeq(t, &item3, 10, 100, 2)
+	assertSeq(t, &item3, 11, 100, 2)
 }

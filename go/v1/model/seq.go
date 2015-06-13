@@ -1,15 +1,15 @@
 package model
 
 type SeqDAO interface {
-	Create(seqType, year, value int) (Seq, error)
-	Get(seqType int, year int) (Seq, error)
-	Update(seqType, year, value int) (Seq, error)
-	Next(seqType, year int) (Seq, error)
-	Delete(seqType int, year int) (Seq, error)
+	Create(seqType SeqType, year, value int) (Seq, error)
+	Get(seqType SeqType, year int) (Seq, error)
+	Update(seqType, SeqType, value int) (Seq, error)
+	Next(seqType SeqType, year int) (Seq, error)
+	Delete(seqType SeqType, year int) (Seq, error)
 }
 
 type Seq struct {
-	SeqType int
+	SeqType SeqType
 	Year    int
 	Value   int
 }
@@ -17,3 +17,12 @@ type Seq struct {
 func (o Seq) IsEmpty() bool {
 	return o.SeqType == 0 && o.Year == 0
 }
+
+type SeqType int
+
+const (
+	SeqType_Null SeqType = iota
+	SeqType_Quotation
+	SeqType_Delivery
+	SeqType_Bill
+)
