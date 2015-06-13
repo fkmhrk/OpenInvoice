@@ -161,6 +161,7 @@ class SheetPage implements Page {
         var quotationDate = app.ractive.get('quotationDate');
 
         var doneFunc = (id : string) => {
+            app.ractive.update();
             window.location.href = "/php/quotation.php?access_token=" + app.accessToken + "&trading_id=" + id;
         };
         if (trading.quotation_number == null || trading.quotation_number.length == 0) {
@@ -182,6 +183,7 @@ class SheetPage implements Page {
         var billDate = app.ractive.get('billDate');
         
         var doneFunc = (id : string) => {
+            app.ractive.update();
             window.location.href = "/php/bill.php?access_token=" + app.accessToken + "&trading_id=" + id;
         };
         if (trading.bill_number == null || trading.bill_number.length == 0) {
