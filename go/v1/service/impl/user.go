@@ -90,7 +90,7 @@ func (s *userService) GetUsers(token string) s.Result {
 		return errorResult(500, MSG_SERVER_ERROR)
 	}
 	if session == nil {
-		return errorResult(400, MSG_WRONG_TOKEN)
+		return errorResult(401, MSG_WRONG_TOKEN)
 	}
 	// get User
 	users, err := s.userDAO.GetList()
@@ -117,7 +117,7 @@ func (s *userService) Create(token, loginName, displayName, role, password strin
 		return errorResult(500, MSG_SERVER_ERROR)
 	}
 	if session == nil {
-		return errorResult(400, MSG_WRONG_TOKEN)
+		return errorResult(401, MSG_WRONG_TOKEN)
 	}
 	if !session.Role.IsAdmin() {
 		return errorResult(401, MSG_NOT_AUTHORIZED)

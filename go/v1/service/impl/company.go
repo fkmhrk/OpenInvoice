@@ -24,7 +24,7 @@ func (s *companyService) GetList(token string) s.Result {
 		return errorResult(500, MSG_SERVER_ERROR)
 	}
 	if session == nil {
-		return errorResult(400, MSG_WRONG_TOKEN)
+		return errorResult(401, MSG_WRONG_TOKEN)
 	}
 	// get item
 	companies, err := s.companyDAO.GetList()
@@ -48,7 +48,7 @@ func (s *companyService) Create(token, name, zip, address, phone, unit string) s
 		return errorResult(500, MSG_SERVER_ERROR)
 	}
 	if session == nil {
-		return errorResult(400, MSG_WRONG_TOKEN)
+		return errorResult(401, MSG_WRONG_TOKEN)
 	}
 	// create
 	company, err := s.companyDAO.Create(name, zip, address, phone, unit)
@@ -68,7 +68,7 @@ func (s *companyService) Update(token, id, name, zip, address, phone, unit strin
 		return errorResult(500, MSG_SERVER_ERROR)
 	}
 	if session == nil {
-		return errorResult(400, MSG_WRONG_TOKEN)
+		return errorResult(401, MSG_WRONG_TOKEN)
 	}
 	// create
 	company, err := s.companyDAO.Update(id, name, zip, address, phone, unit)

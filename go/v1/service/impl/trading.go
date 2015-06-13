@@ -30,7 +30,7 @@ func (s *tradingService) GetListByUser(token string) s.Result {
 		return errorResult(500, MSG_SERVER_ERROR)
 	}
 	if session == nil {
-		return errorResult(400, MSG_WRONG_TOKEN)
+		return errorResult(401, MSG_WRONG_TOKEN)
 	}
 	// get
 	tradings, err := s.tradingDAO.GetListByUser(session.UserId)
@@ -65,7 +65,7 @@ func (s *tradingService) Create(token, companyId, subject, product string, title
 		return errorResult(500, MSG_SERVER_ERROR)
 	}
 	if session == nil {
-		return errorResult(400, MSG_WRONG_TOKEN)
+		return errorResult(401, MSG_WRONG_TOKEN)
 	}
 	// create
 	item, err := s.tradingDAO.Create(companyId, subject, titleType, workFrom, workTo, total, quotationDate, billDate, taxRate, session.UserId, product)
@@ -100,7 +100,7 @@ func (s *tradingService) Update(token string, trading s.Trading) s.Result {
 		return errorResult(500, MSG_SERVER_ERROR)
 	}
 	if session == nil {
-		return errorResult(400, MSG_WRONG_TOKEN)
+		return errorResult(401, MSG_WRONG_TOKEN)
 	}
 
 	// get item
@@ -130,7 +130,7 @@ func (s *tradingService) GetItemListByTradingId(token, tradingId string) s.Resul
 		return errorResult(500, MSG_SERVER_ERROR)
 	}
 	if session == nil {
-		return errorResult(400, MSG_WRONG_TOKEN)
+		return errorResult(401, MSG_WRONG_TOKEN)
 	}
 	// get trading
 	// get
@@ -164,7 +164,7 @@ func (s *tradingService) CreateItem(token, tradingId, subject, degree, memo stri
 		return errorResult(500, MSG_SERVER_ERROR)
 	}
 	if session == nil {
-		return errorResult(400, MSG_WRONG_TOKEN)
+		return errorResult(401, MSG_WRONG_TOKEN)
 	}
 	// get trading
 	// create
@@ -186,7 +186,7 @@ func (s *tradingService) UpdateItem(token, id, tradingId, subject, degree, memo 
 		return errorResult(500, MSG_SERVER_ERROR)
 	}
 	if session == nil {
-		return errorResult(400, MSG_WRONG_TOKEN)
+		return errorResult(401, MSG_WRONG_TOKEN)
 	}
 	// get trading
 	// create
@@ -208,7 +208,7 @@ func (s *tradingService) DeleteItem(token, id, tradingId string) s.Result {
 		return errorResult(500, MSG_SERVER_ERROR)
 	}
 	if session == nil {
-		return errorResult(400, MSG_WRONG_TOKEN)
+		return errorResult(401, MSG_WRONG_TOKEN)
 	}
 	// soft delete
 	err = s.tradingDAO.SoftDeleteItem(id, tradingId)
@@ -224,7 +224,7 @@ func (s *tradingService) DeleteItem(token, id, tradingId string) s.Result {
 func (o *tradingService) GetNextNumber(token, seqType string, date int64) s.Result {
 	// input check
 	if isEmpty(token) {
-		return errorResult(400, s.ERR_TOKEN_EMPTY)
+		return errorResult(401, s.ERR_TOKEN_EMPTY)
 	}
 	var seqTypeInt m.SeqType
 	switch seqType {
@@ -246,7 +246,7 @@ func (o *tradingService) GetNextNumber(token, seqType string, date int64) s.Resu
 		return errorResult(500, MSG_SERVER_ERROR)
 	}
 	if session == nil {
-		return errorResult(400, MSG_WRONG_TOKEN)
+		return errorResult(401, MSG_WRONG_TOKEN)
 	}
 	// determine year
 	t := time.Unix(date/1000, 0)
