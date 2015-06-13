@@ -19,7 +19,7 @@ func NewAdminService(models *m.Models) *adminService {
 
 func (o *adminService) GetEnvironment(token string) s.Result {
 	if isEmpty(token) {
-		return errorResult(400, s.ERR_AUTHORIZATION_EMPTY)
+		return errorResult(401, s.ERR_AUTHORIZATION_EMPTY)
 	}
 	// get Session
 	session, err := o.sessionDAO.GetByToken(token)
@@ -45,7 +45,7 @@ func (o *adminService) GetEnvironment(token string) s.Result {
 
 func (o *adminService) SaveEnvironment(token string, list []*m.Env) s.Result {
 	if isEmpty(token) {
-		return errorResult(400, s.ERR_AUTHORIZATION_EMPTY)
+		return errorResult(401, s.ERR_AUTHORIZATION_EMPTY)
 	}
 	// get Session
 	session, err := o.sessionDAO.GetByToken(token)
