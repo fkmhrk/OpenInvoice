@@ -15,7 +15,7 @@ func NewSessionRefreshDAO(connection *Connection) *session_refreshDAO {
 	}
 }
 
-func (d *session_refreshDAO) Create(token, userId, role string) (m.SessionRefresh, error) {
+func (d *session_refreshDAO) Create(userId, role string) (m.SessionRefresh, error) {
 	tr, err := d.connection.Begin()
 	if err != nil {
 		return m.SessionRefresh{}, err
@@ -28,7 +28,10 @@ func (d *session_refreshDAO) Create(token, userId, role string) (m.SessionRefres
 	}
 	defer st.Close()
 
-	_, err = st.Exec(token, userId, role)
+	token, err := insertWithUUID(48, func(id string) error {
+		_, err = st.Exec(id, userId, role)
+		return err
+	})
 	if err != nil {
 		return m.SessionRefresh{}, err
 	}

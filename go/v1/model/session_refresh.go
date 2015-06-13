@@ -1,7 +1,7 @@
 package model
 
 type SessionRefreshDAO interface {
-	Create(token, userId, role string) (SessionRefresh, error)
+	Create(userId, role string) (SessionRefresh, error)
 	Get(token string) (SessionRefresh, error)
 	Update(token, userId, role string) (SessionRefresh, error)
 	Delete(token string) (SessionRefresh, error)

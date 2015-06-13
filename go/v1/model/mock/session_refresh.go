@@ -11,7 +11,7 @@ type SessionRefreshDAO struct {
 	DeleteResult m.SessionRefresh
 }
 
-func (d *SessionRefreshDAO) Create(token, userId, role string) (m.SessionRefresh, error) {
+func (d *SessionRefreshDAO) Create(userId, role string) (m.SessionRefresh, error) {
 	return d.CreateResult, nil
 }
 
