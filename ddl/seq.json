@@ -1,0 +1,20 @@
+{
+    "tables":[
+        {
+            "name" : "seq",
+            "fields" : [
+                { "name" : "seq_type", "type" : "int" },
+                { "name" : "year",     "type" : "int" },                
+                { "name" : "value",    "type" : "int" }
+            ],
+            "primary_keys" : [ "seq_type", "year" ]
+        }
+    ],
+    "db" : {
+        "type" : "mysql"
+    },
+    "test" : {
+        "db_type" : "mysql",
+        "db_dsn" : "openinvoice_test:openinvoice@/openinvoice"
+    }
+}

@@ -99,3 +99,13 @@ create table if not exists env(
   deleted tinyint,
   primary key(id)
 ) engine=InnoDB;
+
+create table if not exists seq(
+  seq_type tinyint,
+  year int,
+  value int,
+  created_time bigint,
+  modified_time bigint,
+  deleted tinyint,  
+  primary key(seq_type, year)
+) engine=InnoDB;
