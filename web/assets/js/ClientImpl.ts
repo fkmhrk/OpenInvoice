@@ -252,7 +252,7 @@ class AppClientImpl implements Client {
         });
     }
 
-    private tokenRefresh(url : string, method : string, token : string, params : any, callback : HttpCallback) {
+    private tokenRefresh(url : string, method : string, params : any, callback : HttpCallback) {
         var refreshURL = this.url + '/api/v1/token/refresh';
         var refreshParams = {
             token : this.refreshToken
@@ -285,14 +285,14 @@ class AppClientImpl implements Client {
         if (params != null) {
             data.data = JSON.stringify(params);
         }
-        $.ajax(data).done(function(data_, status, data) {
+        $.ajax(data).done((data_ : any, status : any, data : any) => {
             this.isRetry = false;
 	    if (data.status == 204) {
 		callback.success({});
 	    } else {
 		callback.success(JSON.parse(data.responseText));
 	    }
-	}).fail(function(data) {
+	}).fail((data : any) => {
             if (data.status == 204) {
                 this.isRetry = false;
                 callback.success({});
@@ -302,7 +302,7 @@ class AppClientImpl implements Client {
                     callback.error(data.status, JSON.parse(data.responseText));
                 } else {
                     this.isRetry = true;
-                    this.tokenRefresh(callback);
+                    this.tokenRefresh(url, method, params, callback);
                 }
             } else {
                 this.isRetry = false;

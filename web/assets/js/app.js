@@ -235,7 +235,7 @@ var AppClientImpl = (function () {
             }
         });
     };
-    AppClientImpl.prototype.tokenRefresh = function (url, method, token, params, callback) {
+    AppClientImpl.prototype.tokenRefresh = function (url, method, params, callback) {
         var _this = this;
         var refreshURL = this.url + '/api/v1/token/refresh';
         var refreshParams = {
@@ -253,6 +253,7 @@ var AppClientImpl = (function () {
         });
     };
     AppClientImpl.prototype.exec = function (url, method, token, params, callback) {
+        var _this = this;
         var data = {
             url: url,
             type: method,
@@ -269,7 +270,7 @@ var AppClientImpl = (function () {
             data.data = JSON.stringify(params);
         }
         $.ajax(data).done(function (data_, status, data) {
-            this.isRetry = false;
+            _this.isRetry = false;
             if (data.status == 204) {
                 callback.success({});
             }
@@ -278,21 +279,21 @@ var AppClientImpl = (function () {
             }
         }).fail(function (data) {
             if (data.status == 204) {
-                this.isRetry = false;
+                _this.isRetry = false;
                 callback.success({});
             }
             else if (data.status == 401) {
-                if (this.isRetry) {
-                    this.isRetry = false;
+                if (_this.isRetry) {
+                    _this.isRetry = false;
                     callback.error(data.status, JSON.parse(data.responseText));
                 }
                 else {
-                    this.isRetry = true;
-                    this.tokenRefresh(callback);
+                    _this.isRetry = true;
+                    _this.tokenRefresh(url, method, params, callback);
                 }
             }
             else {
-                this.isRetry = false;
+                _this.isRetry = false;
                 callback.error(data.status, JSON.parse(data.responseText));
             }
         });
