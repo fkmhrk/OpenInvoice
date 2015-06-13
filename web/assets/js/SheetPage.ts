@@ -182,7 +182,7 @@ class SheetPage implements Page {
         var billDate = app.ractive.get('billDate');
         
         var doneFunc = (id : string) => {
-            //window.location.href = "/php/bill.php?access_token=" + app.accessToken + "&trading_id=" + id;
+            window.location.href = "/php/bill.php?access_token=" + app.accessToken + "&trading_id=" + id;
         };
         if (trading.bill_number == null || trading.bill_number.length == 0) {
             app.client.getNextNumber(app.accessToken, 'bill', new Date(billDate).getTime(), {
