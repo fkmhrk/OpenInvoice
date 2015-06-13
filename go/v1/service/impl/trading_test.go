@@ -367,7 +367,7 @@ func TestTrading0600_GetNextNumber(t *testing.T) {
 			return
 		}
 		body := json(r)
-		assertInt(t, body, "number", 4)
+		assertInt(t, body, "number", 20150004)
 		// args check
 		if seqDAO.NextSeqType != item.Expected {
 			t.Errorf("SeqType must be %s but %d", item.Label, seqDAO.NextSeqType)

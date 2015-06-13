@@ -267,7 +267,7 @@ func (o *tradingService) GetNextNumber(token, seqType string, date int64) s.Resu
 	}
 
 	body := map[string]interface{}{
-		"number": seq.Value,
+		"number": year*10000 + seq.Value,
 	}
 	return jsonResult(200, body)
 }
