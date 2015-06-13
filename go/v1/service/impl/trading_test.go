@@ -1,20 +1,21 @@
 package impl
 
 import (
-	"../../model"
-	m "../../model/mock"
+	m "../../model"
+	mock "../../model/mock"
 	"fmt"
 	"testing"
 )
 
 func TestTrading0000_GetListByUser(t *testing.T) {
-	sessionDAO := &m.SessionDAO{
-		GetByTokenResult: &model.Session{
-			Token: "testToken",
-		},
+	models := mock.NewMock()
+	sessionDAO, _ := models.Session.(*mock.SessionDAO)
+	sessionDAO.GetByTokenResult = &m.Session{
+		Token: "testToken",
 	}
-	var list []*model.Trading
-	list = append(list, &model.Trading{
+
+	var list []*m.Trading
+	list = append(list, &m.Trading{
 		Id:              "trade1111",
 		CompanyId:       "company2233",
 		TitleType:       1,
@@ -30,14 +31,13 @@ func TestTrading0000_GetListByUser(t *testing.T) {
 		AssigneeId:      "user2233",
 		Product:         "product",
 	})
-	list = append(list, &model.Trading{
+	list = append(list, &m.Trading{
 		Id: "trade2222",
 	})
-	tradingDAO := &m.TradingDAO{
-		GetListByUserResult: list,
-	}
+	tradingDAO, _ := models.Trading.(*mock.TradingDAO)
+	tradingDAO.GetListByUserResult = list
 
-	s := NewTradingSerivce(sessionDAO, tradingDAO)
+	s := NewTradingSerivce(sessionDAO, tradingDAO, models)
 
 	token := "token1122"
 	r := s.GetListByUser(token)
@@ -65,24 +65,23 @@ func TestTrading0000_GetListByUser(t *testing.T) {
 }
 
 func TestTrading0100_Create(t *testing.T) {
-	sessionDAO := &m.SessionDAO{
-		GetByTokenResult: &model.Session{
-			Token: "testToken",
-		},
+	models := mock.NewMock()
+	sessionDAO, _ := models.Session.(*mock.SessionDAO)
+	sessionDAO.GetByTokenResult = &m.Session{
+		Token: "testToken",
 	}
-	tradingDAO := &m.TradingDAO{
-		CreateResult: &model.Trading{
-			Id:         "trade1111",
-			CompanyId:  "company2233",
-			Subject:    "subject3344",
-			WorkFrom:   1122,
-			WorkTo:     3344,
-			AssigneeId: "user2233",
-			Product:    "product",
-		},
+	tradingDAO, _ := models.Trading.(*mock.TradingDAO)
+	tradingDAO.CreateResult = &m.Trading{
+		Id:         "trade1111",
+		CompanyId:  "company2233",
+		Subject:    "subject3344",
+		WorkFrom:   1122,
+		WorkTo:     3344,
+		AssigneeId: "user2233",
+		Product:    "product",
 	}
 
-	s := NewTradingSerivce(sessionDAO, tradingDAO)
+	s := NewTradingSerivce(sessionDAO, tradingDAO, models)
 
 	// params
 	token := "token1122"
@@ -114,34 +113,34 @@ func TestTrading0100_Create(t *testing.T) {
 }
 
 func TestTrading0200_Update(t *testing.T) {
-	sessionDAO := &m.SessionDAO{
-		GetByTokenResult: &model.Session{
-			Token:  "testToken",
-			UserId: "user1122",
-		},
+	models := mock.NewMock()
+	sessionDAO, _ := models.Session.(*mock.SessionDAO)
+	sessionDAO.GetByTokenResult = &m.Session{
+		Token:  "testToken",
+		UserId: "user1122",
 	}
-	tradingDAO := &m.TradingDAO{
-		GetByIdResult: &model.Trading{
-			Id:         "trade1111",
-			CompanyId:  "company2233",
-			Subject:    "subject3344",
-			WorkFrom:   2233,
-			WorkTo:     4455,
-			AssigneeId: "user2233",
-			Product:    "product",
-		},
-		UpdateResult: &model.Trading{
-			Id:         "trade1111",
-			CompanyId:  "company2233",
-			Subject:    "subject3344",
-			WorkFrom:   2233,
-			WorkTo:     4455,
-			AssigneeId: "user2233",
-			Product:    "product",
-		},
+	tradingDAO, _ := models.Trading.(*mock.TradingDAO)
+	tradingDAO.GetByIdResult = &m.Trading{
+		Id:         "trade1111",
+		CompanyId:  "company2233",
+		Subject:    "subject3344",
+		WorkFrom:   2233,
+		WorkTo:     4455,
+		AssigneeId: "user2233",
+		Product:    "product",
 	}
 
-	s := NewTradingSerivce(sessionDAO, tradingDAO)
+	tradingDAO.UpdateResult = &m.Trading{
+		Id:         "trade1111",
+		CompanyId:  "company2233",
+		Subject:    "subject3344",
+		WorkFrom:   2233,
+		WorkTo:     4455,
+		AssigneeId: "user2233",
+		Product:    "product",
+	}
+
+	s := NewTradingSerivce(sessionDAO, tradingDAO, models)
 
 	// params
 	token := "token1122"
@@ -174,14 +173,14 @@ func TestTrading0200_Update(t *testing.T) {
 }
 
 func TestTrading0200_GetItemsByTradingId(t *testing.T) {
-	sessionDAO := &m.SessionDAO{
-		GetByTokenResult: &model.Session{
-			Token: "testToken",
-		},
+	models := mock.NewMock()
+	sessionDAO, _ := models.Session.(*mock.SessionDAO)
+	sessionDAO.GetByTokenResult = &m.Session{
+		Token: "testToken",
 	}
-	var list []*model.TradingItem
+	var list []*m.TradingItem
 	for i := 0; i < 2; i++ {
-		list = append(list, &model.TradingItem{
+		list = append(list, &m.TradingItem{
 			Id:        fmt.Sprintf("trade%d", i),
 			Subject:   fmt.Sprintf("subject%d", i),
 			UnitPrice: i*100 + 100,
@@ -191,11 +190,10 @@ func TestTrading0200_GetItemsByTradingId(t *testing.T) {
 			Memo:      fmt.Sprintf("memo%d", i),
 		})
 	}
-	tradingDAO := &m.TradingDAO{
-		GetItemsByIdResult: list,
-	}
+	tradingDAO, _ := models.Trading.(*mock.TradingDAO)
+	tradingDAO.GetItemsByIdResult = list
 
-	s := NewTradingSerivce(sessionDAO, tradingDAO)
+	s := NewTradingSerivce(sessionDAO, tradingDAO, models)
 
 	token := "token1122"
 	tradingId := "tradingId1"
@@ -240,18 +238,17 @@ func TestTrading0200_GetItemsByTradingId(t *testing.T) {
 }
 
 func TestTrading0300_CreateItem(t *testing.T) {
-	sessionDAO := &m.SessionDAO{
-		GetByTokenResult: &model.Session{
-			Token: "testToken",
-		},
+	models := mock.NewMock()
+	sessionDAO, _ := models.Session.(*mock.SessionDAO)
+	sessionDAO.GetByTokenResult = &m.Session{
+		Token: "testToken",
 	}
-	tradingDAO := &m.TradingDAO{
-		CreateItemResult: &model.TradingItem{
-			Id: "item2233",
-		},
+	tradingDAO, _ := models.Trading.(*mock.TradingDAO)
+	tradingDAO.CreateItemResult = &m.TradingItem{
+		Id: "item2233",
 	}
 
-	s := NewTradingSerivce(sessionDAO, tradingDAO)
+	s := NewTradingSerivce(sessionDAO, tradingDAO, models)
 
 	token := "token1122"
 	tradingId := "tradingId1"
@@ -273,18 +270,17 @@ func TestTrading0300_CreateItem(t *testing.T) {
 }
 
 func TestTrading0400_UpdateItem(t *testing.T) {
-	sessionDAO := &m.SessionDAO{
-		GetByTokenResult: &model.Session{
-			Token: "testToken",
-		},
+	models := mock.NewMock()
+	sessionDAO, _ := models.Session.(*mock.SessionDAO)
+	sessionDAO.GetByTokenResult = &m.Session{
+		Token: "testToken",
 	}
-	tradingDAO := &m.TradingDAO{
-		UpdateItemResult: &model.TradingItem{
-			Id: "item2233",
-		},
+	tradingDAO, _ := models.Trading.(*mock.TradingDAO)
+	tradingDAO.UpdateItemResult = &m.TradingItem{
+		Id: "item2233",
 	}
 
-	s := NewTradingSerivce(sessionDAO, tradingDAO)
+	s := NewTradingSerivce(sessionDAO, tradingDAO, models)
 
 	token := "token1122"
 	id := "item1122"
@@ -307,16 +303,15 @@ func TestTrading0400_UpdateItem(t *testing.T) {
 }
 
 func TestTrading0500_DeleteItem(t *testing.T) {
-	sessionDAO := &m.SessionDAO{
-		GetByTokenResult: &model.Session{
-			Token: "testToken",
-		},
+	models := mock.NewMock()
+	sessionDAO, _ := models.Session.(*mock.SessionDAO)
+	sessionDAO.GetByTokenResult = &m.Session{
+		Token: "testToken",
 	}
-	tradingDAO := &m.TradingDAO{
-		SoftDeleteItemResult: nil,
-	}
+	tradingDAO, _ := models.Trading.(*mock.TradingDAO)
+	tradingDAO.SoftDeleteItemResult = nil
 
-	s := NewTradingSerivce(sessionDAO, tradingDAO)
+	s := NewTradingSerivce(sessionDAO, tradingDAO, models)
 
 	token := "token1122"
 	id := "item1122"
@@ -329,5 +324,53 @@ func TestTrading0500_DeleteItem(t *testing.T) {
 	if r.Status() != 204 {
 		t.Errorf("Wrong status : %d", r.Status())
 		return
+	}
+}
+
+func TestTrading0600_GetNextNumber(t *testing.T) {
+	models := mock.NewMock()
+	sessionDAO, _ := models.Session.(*mock.SessionDAO)
+	sessionDAO.GetByTokenResult = &m.Session{
+		Token: "testToken",
+	}
+	envDAO, _ := models.Env.(*mock.EnvDAO)
+	envDAO.GetResult = m.Env{
+		Value: "3",
+	}
+	tradingDAO, _ := models.Trading.(*mock.TradingDAO)
+	seqDAO, _ := models.Seq.(*mock.SeqDAO)
+	seqDAO.NextResult = m.Seq{
+		Value: 4,
+	}
+	s := NewTradingSerivce(sessionDAO, tradingDAO, models)
+
+	table := []struct {
+		Arg      string
+		Expected m.SeqType
+		Label    string
+	}{
+		{"quotation", m.SeqType_Quotation, "m.SeqType_Quotation"},
+		{"delivery", m.SeqType_Delivery, "m.SeqType_Delivery"},
+		{"bill", m.SeqType_Bill, "m.SeqType_Bill"},
+	}
+
+	for _, item := range table {
+		token := "token1122"
+		date := int64(1434162098716) // 2015-6-13
+		r := s.GetNextNumber(token, item.Arg, date)
+		if r == nil {
+			t.Errorf("Result must not be nil")
+			return
+		}
+		if r.Status() != 200 {
+			t.Errorf("Wrong status : %d", r.Status())
+			return
+		}
+		body := json(r)
+		assertInt(t, body, "number", 20150004)
+		// args check
+		if seqDAO.NextSeqType != item.Expected {
+			t.Errorf("SeqType must be %s but %d", item.Label, seqDAO.NextSeqType)
+		}
 	}
 }

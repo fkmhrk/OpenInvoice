@@ -13,4 +13,7 @@ type TradingService interface {
 
 	// Deletes trading item
 	DeleteItem(token, id, tradingId string) Result
+
+	// Gets next number
+	GetNextNumber(token, seqType string, date int64) Result
 }

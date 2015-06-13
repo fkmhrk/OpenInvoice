@@ -6,5 +6,6 @@ type Models struct {
 	Company CompanyDAO
 	Trading TradingDAO
 	Env     EnvDAO
+	Seq     SeqDAO
 	Logger  Logger
 }

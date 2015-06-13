@@ -33,6 +33,8 @@ func SetHandlers(r *mux.Router, services s.Services, u s.UserService, t s.Tradin
 		Methods("POST")
 	r.HandleFunc("/companies/{companyId}", updateCompany(c)).
 		Methods("PUT")
+	r.HandleFunc("/sequences/{seqType}", getNextNumber(services)).
+		Methods("POST")
 	// Environment
 	r.HandleFunc("/environments", getEnvironment(services)).
 		Methods("GET")
