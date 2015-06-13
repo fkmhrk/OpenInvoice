@@ -1,6 +1,7 @@
 package rest
 
 import (
+	m "../model"
 	s "../service"
 	rj "github.com/fkmhrk-go/rawjson"
 	"github.com/gorilla/mux"
@@ -57,9 +58,21 @@ func updateTrading(trading s.TradingService) handler {
 		taxRate, _ := json.Float("tax_rate")
 		product, _ := json.String("product")
 
-		return trading.Update(token, tradingId, companyId,
-			subject, product, titleType, workFrom, workTo, total,
-			quotationDate, billDate, float32(taxRate))
+		return trading.Update(token, s.Trading{
+			m.Trading{
+				Id:            tradingId,
+				CompanyId:     companyId,
+				Subject:       subject,
+				Product:       product,
+				TitleType:     titleType,
+				WorkFrom:      workFrom,
+				WorkTo:        workTo,
+				Total:         total,
+				QuotationDate: quotationDate,
+				BillDate:      billDate,
+				TaxRate:       float32(taxRate),
+			},
+		})
 	})
 }
 
