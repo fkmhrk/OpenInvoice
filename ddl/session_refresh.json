@@ -1,0 +1,23 @@
+{
+    "tables":[
+        {
+            "name" : "session_refresh",
+            "fields" : [
+                { "name" : "token",       "type" : "varchar(32)" },
+                { "name" : "user_id",     "type" : "varchar(32)" },
+                { "name" : "role",        "type" : "varchar(32)" },
+                { "name" : "expire_time", "type" : "long" }
+            ],
+            "primary_keys" : [
+                "token"
+            ]
+        }
+    ],
+    "db" : {
+        "type" : "mysql"
+    },
+    "test" : {
+        "db_type" : "mysql",
+        "db_dsn" : "openinvoice_test:openinvoice@/openinvoice"
+    }
+}

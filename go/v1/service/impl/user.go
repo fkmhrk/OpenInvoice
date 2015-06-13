@@ -6,22 +6,24 @@ import (
 )
 
 type userService struct {
-	userDAO    m.UserDAO
-	sessionDAO m.SessionDAO
+	userDAO           m.UserDAO
+	sessionDAO        m.SessionDAO
+	sessionRefreshDAO m.SessionRefreshDAO
 }
 
 const (
 	TIME_30MIN = 30 * 60
 )
 
-func NewUserSerivce(u m.UserDAO, s m.SessionDAO) *userService {
+func NewUserSerivce(u m.UserDAO, s m.SessionDAO, models *m.Models) *userService {
 	return &userService{
-		userDAO:    u,
-		sessionDAO: s,
+		userDAO:           u,
+		sessionDAO:        s,
+		sessionRefreshDAO: models.SessionRefresh,
 	}
 }
 
-func (s *userService) GetToken(name, pass string) s.Result {
+func (o *userService) GetToken(name, pass string) s.Result {
 	// input check
 	if isEmpty(name) {
 		return errorResult(400, MSG_ERR_NAME_EMPTY)
@@ -30,7 +32,7 @@ func (s *userService) GetToken(name, pass string) s.Result {
 		return errorResult(400, MSG_ERR_PASS_EMPTY)
 	}
 	// get User
-	user, err := s.userDAO.GetByNamePassword(name, pass)
+	user, err := o.userDAO.GetByNamePassword(name, pass)
 	if err != nil {
 		return errorResult(500, MSG_SERVER_ERROR)
 	}
@@ -38,14 +40,20 @@ func (s *userService) GetToken(name, pass string) s.Result {
 		return errorResult(400, MSG_WRONG_IDENTIFIER)
 	}
 	// create session
-	session, err := s.sessionDAO.Create(user.Id, string(user.Role), TIME_30MIN)
+	session, err := o.sessionDAO.Create(user.Id, string(user.Role), TIME_30MIN)
+	if err != nil {
+		return errorResult(500, MSG_SERVER_ERROR)
+	}
+	// create refresh token
+	sessionRefresh, err := o.sessionRefreshDAO.Create(user.Id, string(user.Role))
 	if err != nil {
 		return errorResult(500, MSG_SERVER_ERROR)
 	}
 	body := map[string]interface{}{
-		"id":           user.Id,
-		"access_token": session.Token,
-		"token_type":   "bearer",
+		"id":            user.Id,
+		"access_token":  session.Token,
+		"refresh_token": sessionRefresh.Token,
+		"token_type":    "bearer",
 	}
 	return jsonResult(200, body)
 }

@@ -6,9 +6,11 @@ import (
 
 func NewMock() *m.Models {
 	return &m.Models{
-		Session: &SessionDAO{},
-		Trading: &TradingDAO{},
-		Env:     &EnvDAO{},
-		Seq:     &SeqDAO{},
+		User:           &UserDAO{},
+		Session:        &SessionDAO{},
+		SessionRefresh: &SessionRefreshDAO{},
+		Trading:        &TradingDAO{},
+		Env:            &EnvDAO{},
+		Seq:            &SeqDAO{},
 	}
 }

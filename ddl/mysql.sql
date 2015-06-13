@@ -85,6 +85,17 @@ create table if not exists session(
   primary key(access_token)
 ) engine=InnoDB;
 
+create table if not exists session_refresh(
+  token varchar(48),
+  user_id varchar(32),
+  role text,
+  expire_time bigint,
+  created_time bigint,
+  modified_time bigint,
+  deleted tinyint,
+  primary key(token)
+) engine=InnoDB;
+
 create table if not exists trading_id(
   date varchar(32),
   num int,

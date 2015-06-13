@@ -20,7 +20,7 @@ func InitRouter(r *mux.Router) error {
 	models := mi.NewModels(c)
 	services := si.NewServices(models)
 
-	userService := si.NewUserSerivce(models.User, models.Session)
+	userService := si.NewUserSerivce(models.User, models.Session, models)
 	tradingService := si.NewTradingSerivce(models.Session, models.Trading, models)
 	companyService := si.NewCompanySerivce(models.Session, models.Company)
 	initRouter(r, services, userService, tradingService, companyService)
