@@ -14,6 +14,9 @@ var AppClientImpl = (function () {
         this.accessToken = '';
         this.refreshToken = refreshToken;
     };
+    AppClientImpl.prototype.getAccessToken = function () {
+        return this.accessToken;
+    };
     AppClientImpl.prototype.login = function (username, password, callback) {
         var _this = this;
         var params = {
@@ -1038,7 +1041,7 @@ var SheetPage = (function () {
         var quotationDate = app.ractive.get('quotationDate');
         var doneFunc = function (id) {
             app.ractive.update();
-            window.location.href = "/php/quotation.php?access_token=" + app.accessToken + "&trading_id=" + id;
+            window.location.href = "/php/quotation.php?access_token=" + app.client.getAccessToken() + "&trading_id=" + id;
         };
         if (trading.quotation_number == null || trading.quotation_number.length == 0) {
             app.client.getNextNumber('quotation', new Date(quotationDate).getTime(), {
@@ -1061,7 +1064,7 @@ var SheetPage = (function () {
         var billDate = app.ractive.get('billDate');
         var doneFunc = function (id) {
             app.ractive.update();
-            window.location.href = "/php/bill.php?access_token=" + app.accessToken + "&trading_id=" + id;
+            window.location.href = "/php/bill.php?access_token=" + app.client.getAccessToken() + "&trading_id=" + id;
         };
         if (trading.bill_number == null || trading.bill_number.length == 0) {
             app.client.getNextNumber('bill', new Date(billDate).getTime(), {
