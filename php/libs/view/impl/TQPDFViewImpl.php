@@ -29,7 +29,7 @@ class TQPDFViewImpl implements PDFView {
         $this->pdf = new MBFPDF('P', 'mm', 'A4');
         $this->pdf->AddMBFont(GOTHIC ,'SJIS');
         $this->pdf->AddMBFont(MINCHO ,'SJIS');
-        $pdf->AddMBFont(HIRAKAKU_W6 ,'SJIS');
+        $this->pdf->AddMBFont(HIRAKAKU_W6 ,'SJIS');
         $this->pdf->SetAutoPageBreak(false);
         $this->pdf->SetMargins(0, 0, 0, 0);
         $this->pdf->AddPage('P');
@@ -42,22 +42,29 @@ class TQPDFViewImpl implements PDFView {
         $this->pdf->SetFont(HIRAKAKU_W6, '', 14);
         $this->pdf->SetTextColor($this->accColorR, $this->accColorG, $this->accColorB);
         $this->pdf->SetXY(27, 38);
-        $this->pdf->write(4, s(title));        
+        $this->pdf->write(4, s($title));        
     }
 
     public function writeDate($dateTime) {
-        $this->pdf->SetFont(MINCHO,'', 9);
-        $this->pdf->SetXY(180, 16);
-        $this->pdf->write(4, s(date('Y年m月d日', $dateTime)));
+        $this->pdf->SetFont(GOTHIC,'', 6.5);
+        $this->pdf->SetTextColor(77, 77, 77);
+        $this->pdf->SetDrawColor(153, 153, 153);
+        $this->pdf->SetXY(162, 10);
+        $this->pdf->Cell(28.5, 5.8, s('No.V0123'), B, 2, 'R', 0);
+        
+        $this->pdf->SetXY(162, 15.8);
+        $this->pdf->Cell(28.5, 5.8, s(date('Y年m月d日', $dateTime)), B, 2, 'R', 0);
     }
 
     public function writeCompany($name, $title) {
-        $this->pdf->SetFont(MINCHO,'', 16);
-        $this->pdf->SetXY(16, 32);
-        $this->pdf->write(4, s($name. " ". $title));
+        $this->pdf->SetFont(HIRAKAKU_W6,'', 10);
+        $this->pdf->SetTextColor(0, 0, 0);
+        $this->pdf->SetDrawColor(51, 51, 51);
+        $this->pdf->SetXY(19.4, 59);
+        $this->pdf->Cell(81.8, 8.35, s($name. " ". $title), B, 2, 'L', 0);
     }
 
-    public function writeMyCompany($info) {
+    public function writeMyCompany($info) {        
         $this->pdf->SetFont(MINCHO,'', 12);
         $this->pdf->SetXY(140, 50);
         $this->pdf->MultiCell(54, 8, s($info), 0, 'L', 0);
