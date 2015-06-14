@@ -984,6 +984,9 @@ var SheetPage = (function () {
         };
         var itemObserver = observeItem();
         r.on({
+            'close': function () {
+                window.history.back();
+            },
             'addItem': function () {
                 r.push('tradingItems', {
                     id: null,
