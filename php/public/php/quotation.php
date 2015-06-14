@@ -64,7 +64,7 @@ $view->writeMyCompany($env);
 //$view->writeMyCompany($env['company_name']. "\n". $env['company_address']. "\n". $env['company_tel']);
 
 $summary = $view->writeItemTable(16, 120, $items, $trading['tax_rate']);
-$view->writeProduct($trading['product']);
+$view->writeProduct($trading['work_from'] / 1000, $trading['work_to'] / 1000, $trading['product']);
 $view->writeTotal("御見積金額計 ￥" . number_format($summary['total']));
 $view->output('見積書_'. $company['name']);
 ?>

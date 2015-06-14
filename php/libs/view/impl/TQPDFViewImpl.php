@@ -31,7 +31,6 @@ class TQPDFViewImpl implements PDFView {
         $this->pdf->AddMBFont(MINCHO ,'SJIS');
         $this->pdf->AddMBFont(HIRAKAKU_W3 ,'SJIS');        
         $this->pdf->AddMBFont(HIRAKAKU_W6 ,'SJIS');
-        //$this->pdf->AddMBFont(HIRAMIN_W3 ,'SJIS');        
         $this->pdf->SetAutoPageBreak(false);
         $this->pdf->SetMargins(0, 0, 0, 0);
         $this->pdf->AddPage('P');
@@ -197,7 +196,7 @@ class TQPDFViewImpl implements PDFView {
         return array('sum' => $sum, 'tax' => $tax, 'total' => $total);
     }
 
-    public function writeProduct($product) {
+    public function writeProduct($workFrom, $workTo, $product) {
         $w0 = $this->startX; // $w0は開始位置をあわせるために空白として生成
         $w1 = 70.5;
         $w2 = 29;
@@ -226,7 +225,7 @@ class TQPDFViewImpl implements PDFView {
         $this->pdf->Cell($w1+$w2+$w3+$w4+$w5, $h2, s(''), 0, 1, 'L', 0);
         $this->pdf->SetTextColor(0, 0, 0);
         $this->pdf->Cell($w0, $h2, s(''), 0, 0, 'C', 0);
-        $this->pdf->MultiCell($w1+$w2+$w3+$w4+$w5, $h2, s('2015年2月23日（月）〜2015年3月20日（金）'), 0, 'L', 0);
+        $this->pdf->MultiCell($w1+$w2+$w3+$w4+$w5, $h2, s(date('Y年m月d日', $workFrom). '〜'. date('Y年m月d日', $workTo)), 0, 'L', 0);
         $this->pdf->Cell($w0, $mS, s(''), 0, 1, 'L', 0);  // 行の余白用
 
         $this->pdf->SetTextColor($this->accColorR, $this->accColorG, $this->accColorB);
