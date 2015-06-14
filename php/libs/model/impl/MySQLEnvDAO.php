@@ -12,7 +12,7 @@ class MySQLEnvDAO implements EnvDAO {
     public function getEnv() {
         $stmt = $this->db->prepare("SELECT id,value FROM env ".
                                    "WHERE deleted <> 1 ");
-        $stmt->execute(array($token));
+        $stmt->execute();
         $list = $stmt->fetchAll();
         $env = array();
         foreach ($list as $item) {
