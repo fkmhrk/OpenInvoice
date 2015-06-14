@@ -46,12 +46,12 @@ class TQPDFViewImpl implements PDFView {
         $this->pdf->write(4, s($title));        
     }
 
-    public function writeDate($dateTime) {
+    public function writeDate($number, $dateTime) {
         $this->pdf->SetFont(HIRAKAKU_W3,'', 6.5);
         $this->pdf->SetTextColor(77, 77, 77);
         $this->pdf->SetDrawColor(153, 153, 153);
         $this->pdf->SetXY(162, 10);
-        $this->pdf->Cell(28.5, 5.8, s('No.V0123'), 'B', 2, 'R', 0);
+        $this->pdf->Cell(28.5, 5.8, s('No.'. $number), 'B', 2, 'R', 0);
         
         $this->pdf->SetXY(162, 15.8);
         $this->pdf->Cell(28.5, 5.8, s(date('Y年n月j日', $dateTime)), 'B', 2, 'R', 0);
