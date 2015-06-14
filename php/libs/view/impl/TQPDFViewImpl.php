@@ -196,16 +196,56 @@ class TQPDFViewImpl implements PDFView {
     }
 
     public function writeProduct($product) {
-        $this->pdf->SetXY(16, $this->pdf->GetY() + 8);
-        $this->pdf->Cell(180, 8, s('備考'), 1, 1, 'C', 1);
-        $this->pdf->SetX(16);
-        $this->pdf->MultiCell(180, 8, s($product), 1, 1, 'L', 0);
+        $w0 = $this->startX; // $w0は開始位置をあわせるために空白として生成
+        $w1 = 70.5;
+        $w2 = 29;
+        $w3 = 20.9;
+        $w4 = 20.9;
+        $w5 = 28.5;
+        $h1 = 8;
+        $h2 = 3;
+        
+        $this->pdf->SetFont(GOTHIC,'', 7);
+        $this->pdf->SetTextColor(77, 77, 77);
+        $this->pdf->Cell($w0, $h1, s(''), 0, 0, 'C', 0);
+        $this->pdf->Cell($w1+$w2+$w3+$w4+$w5, $h1, s('＃お支払期限：2015年4月末日'), 0, 1, 'R', 0);
+
+        $this->pdf->Cell($w0, $h1, s(''), 0, 1, 'L', 0);  // 行の余白用
+
+        $this->pdf->SetFont(GOTHIC,'', 8);
+        $this->pdf->SetDrawColor($this->accColorR, $this->accColorG, $this->accColorB);
+
+        $this->pdf->SetTextColor($this->accColorR, $this->accColorG, $this->accColorB);
+        $this->pdf->SetLineWidth(0.5);
+        $this->pdf->Cell($w0, $h1, s(''), 0, 0, 'C', 0);
+        $this->pdf->Cell($w3, $h1, s('作業期間'), B, 1, 'L', 0);
+
+        $this->pdf->Cell($w0, $h2, s(''), 0, 0, 'C', 0);
+        $this->pdf->Cell($w1+$w2+$w3+$w4+$w5, $h2, s(''), 0, 1, 'L', 0);
+        $this->pdf->SetTextColor(0, 0, 0);
+        $this->pdf->Cell($w0, $h2, s(''), 0, 0, 'C', 0);
+        $this->pdf->MultiCell($w1+$w2+$w3+$w4+$w5, $h2, s('2015年2月23日（月）〜2015年3月20日（金）'), 0, 'L', 0);
+        $this->pdf->Cell($w0, $mS, s(''), 0, 1, 'L', 0);  // 行の余白用
+
+        $this->pdf->SetTextColor($this->accColorR, $this->accColorG, $this->accColorB);
+        $this->pdf->SetLineWidth(0.5);
+        $this->pdf->Cell($w0, $h1, s(''), 0, 0, 'C', 0);
+        $this->pdf->Cell($w3, $h1, s('成果物'), B, 1, 'L', 0);
+        //空白行
+        $this->pdf->Cell($w0, $h2, s(''), 0, 0, 'C', 0);
+        $this->pdf->Cell($w1+$w2+$w3+$w4+$w5, $h2, s(''), 0, 1, 'L', 0);
+        //内容
+        $this->pdf->SetTextColor(0, 0, 0);
+        $this->pdf->Cell($w0, $h2, s(''), 0, 0, 'C', 0);
+        $this->pdf->MultiCell($w1+$w2+$w3+$w4+$w5, $h2, s($product), 0, 'L', 0);
+    
+        $this->pdf->Cell($w0, $mS+$mM, s(''), 0, 1, 'L', 0);  // 行の余白用
     }
 
     public function writeTotal($total) {
-        $this->pdf->SetFont(MINCHO,'', 16);
-        $this->pdf->SetXY(16, 100);
-        $this->pdf->write(4, s($total));
+        //$this->pdf->SetFont(MINCHO,'', 16);
+        //$this->pdf->SetXY(16, 100);
+        //$this->pdf->write(4, s($total));
     }
 
     public function output($name) {
