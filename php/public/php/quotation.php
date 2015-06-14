@@ -5,6 +5,7 @@ require_once (dirname(__FILE__). '/../../libs/model/impl/MySQLSessionDAO.php');
 require_once (dirname(__FILE__). '/../../libs/model/impl/MySQLTradingDAO.php');
 require_once (dirname(__FILE__). '/../../libs/model/impl/MySQLTradingItemDAO.php');
 require_once (dirname(__FILE__). '/../../libs/model/impl/MySQLCompanyDAO.php');
+require_once (dirname(__FILE__). '/../../libs/model/impl/MySQLEnvDAO.php');
 
 require_once (dirname(__FILE__). '/../../libs/view/impl/PDFViewImpl.php');
 
@@ -22,10 +23,13 @@ $sessionDAO = new MySQLSessionDAO($db);
 $tradingDAO = new MySQLTradingDAO($db);
 $tradingItemDAO = new MySQLTradingItemDAO($db);
 $companyDAO = new MySQLCompanyDAO($db);
+$envDAO = new MySQLEnvDAO($db);
 
 $view = new PDFViewImpl();
 
 // execute
+$env = $envDAO->getEnv();
+
 $session = $sessionDAO->getSession($token);
 if ($session === null) {
     echo 'Wrong token';
@@ -56,7 +60,7 @@ if ($company === null) {
 $view->writeTitle("御見積書");
 $view->writeDate($trading['quotation_date'] / 1000);
 $view->writeCompany($company['name'], $title);
-$view->writeMyCompany("サンプル株式会社\n東京\n03-1111-2222");
+$view->writeMyCompany($env['company_name']. "\n". $env['company_address']. "\n". $env['company_tel']);
 
 $summary = $view->writeItemTable(16, 120, $items, $trading['tax_rate']);
 $view->writeProduct($trading['product']);
