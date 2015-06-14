@@ -28,7 +28,7 @@ $envDAO = new MySQLEnvDAO($db);
 $view = new PDFViewImpl();
 
 // execute
-$env = $envDAO.getEnv();
+$env = $envDAO->getEnv();
 
 $session = $sessionDAO->getSession($token);
 if ($session === null) {
@@ -60,7 +60,7 @@ if ($company === null) {
 $view->writeTitle("御見積書");
 $view->writeDate($trading['quotation_date'] / 1000);
 $view->writeCompany($company['name'], $title);
-$view->writeMyCompany("サンプル株式会社\n東京\n03-1111-2222");
+$view->writeMyCompany($env['company_name']. "\n". $env['company_address']. "\n". $env['company_tel']);
 
 $summary = $view->writeItemTable(16, 120, $items, $trading['tax_rate']);
 $view->writeProduct($trading['product']);
