@@ -29,7 +29,9 @@ class TQPDFViewImpl implements PDFView {
         $this->pdf = new MBFPDF('P', 'mm', 'A4');
         $this->pdf->AddMBFont(GOTHIC ,'SJIS');
         $this->pdf->AddMBFont(MINCHO ,'SJIS');
+        $this->pdf->AddMBFont(HIRAKAKU_W3 ,'SJIS');        
         $this->pdf->AddMBFont(HIRAKAKU_W6 ,'SJIS');
+        //$this->pdf->AddMBFont(HIRAMIN_W3 ,'SJIS');        
         $this->pdf->SetAutoPageBreak(false);
         $this->pdf->SetMargins(0, 0, 0, 0);
         $this->pdf->AddPage('P');
@@ -46,7 +48,7 @@ class TQPDFViewImpl implements PDFView {
     }
 
     public function writeDate($dateTime) {
-        $this->pdf->SetFont(GOTHIC,'', 6.5);
+        $this->pdf->SetFont(HIRAKAKU_W3,'', 6.5);
         $this->pdf->SetTextColor(77, 77, 77);
         $this->pdf->SetDrawColor(153, 153, 153);
         $this->pdf->SetXY(162, 10);
@@ -69,7 +71,7 @@ class TQPDFViewImpl implements PDFView {
         $this->pdf->SetXY(140.5, 54);
         $this->pdf->write(6, s($info['company_name']));
         
-        $this->pdf->SetFont(GOTHIC,'', 7);
+        $this->pdf->SetFont(HIRAKAKU_W3,'', 7);
         $this->pdf->SetXY(140.5, 60.5);
         $this->pdf->write(4.3, s('〒'. $info['company_zip']. ' '. $info['company_address']));
         $this->pdf->SetXY(140.5, 64.8);
@@ -97,7 +99,7 @@ class TQPDFViewImpl implements PDFView {
         $startTableY = 78;
         
         // 見出し ----------------------------------------------------
-        $this->pdf->SetFont(GOTHIC,'', 8);
+        $this->pdf->SetFont(HIRAKAKU_W3,'', 8);
         $this->pdf->SetTextColor($this->accColorR, $this->accColorG, $this->accColorB);
         $this->pdf->SetDrawColor($this->accColorR, $this->accColorG, $this->accColorB);
         $this->pdf->SetXY(0, $startTableY);
@@ -124,7 +126,7 @@ class TQPDFViewImpl implements PDFView {
             $sum += $price;
 
             if ($i == 0) {
-                $this->pdf->SetFont(GOTHIC,'', 8);
+                $this->pdf->SetFont(HIRAKAKU_W3,'', 8);
                 $this->pdf->SetTextColor(0, 0, 0);
                 $this->pdf->Cell($w0, $h1, s(''), 0, 0, 'C', 0);
                 $this->pdf->Cell($w1, $h1, s($item['subject']), 0, 0, 'L', 0);
@@ -133,7 +135,7 @@ class TQPDFViewImpl implements PDFView {
                 $this->pdf->Cell($w4, $h1, s($item['degree']), 0, 0, 'C', 0);
                 $this->pdf->Cell($w5, $h1, s('¥'. number_format($price)), 0, 1, 'R', 0);
                 
-                $this->pdf->SetFont(GOTHIC,'', 7);
+                $this->pdf->SetFont(HIRAKAKU_W3,'', 7);
                 $this->pdf->SetTextColor(77, 77, 77);
                 $this->pdf->Cell($w0, $h2, s(''), 0, 0, 'C', 0);
                 $this->pdf->MultiCell($w1, $h2, s($item['memo']), 0, 1, 'L', 0);
@@ -143,7 +145,7 @@ class TQPDFViewImpl implements PDFView {
                 $this->pdf->Cell($w0, $h3, s(''), 0, 0, 'C', 0);
                 $this->pdf->Cell($w1+$w2+$w3+$w4+$w5, $h3, s(''), 'B', 1, 'L', 0);
             } else {
-                $this->pdf->SetFont(GOTHIC,'', 8);
+                $this->pdf->SetFont(HIRAKAKU_W3,'', 8);
                 $this->pdf->SetTextColor(0, 0, 0);
                 $this->pdf->Cell($w0, $h1, s(''), 0, 0, 'C', 0);
                 $this->pdf->Cell($w1, $h1, s($item['subject']), 0, 0, 'L', 0);
@@ -152,7 +154,7 @@ class TQPDFViewImpl implements PDFView {
                 $this->pdf->Cell($w4, $h1, s($item['degree']), 0, 0, 'C', 0);
                 $this->pdf->Cell($w5, $h1, s('¥'. number_format($price)), 0, 1, 'R', 0);
                 
-                $this->pdf->SetFont(GOTHIC,'', 7);
+                $this->pdf->SetFont(HIRAKAKU_W3,'', 7);
                 $this->pdf->SetTextColor(77, 77, 77);
                 $this->pdf->Cell($w0, $h2, s(''), 0, 0, 'C', 0);
                 $this->pdf->MultiCell($w1, $h2, s($item['memo']), 0, 1, 'L', 0);
@@ -205,14 +207,14 @@ class TQPDFViewImpl implements PDFView {
         $h1 = 8;
         $h2 = 3;
         
-        $this->pdf->SetFont(GOTHIC,'', 7);
+        $this->pdf->SetFont(HIRAKAKU_W3,'', 7);
         $this->pdf->SetTextColor(77, 77, 77);
         $this->pdf->Cell($w0, $h1, s(''), 0, 0, 'C', 0);
         $this->pdf->Cell($w1+$w2+$w3+$w4+$w5, $h1, s('＃お支払期限：2015年4月末日'), 0, 1, 'R', 0);
 
         $this->pdf->Cell($w0, $h1, s(''), 0, 1, 'L', 0);  // 行の余白用
 
-        $this->pdf->SetFont(GOTHIC,'', 8);
+        $this->pdf->SetFont(HIRAKAKU_W3,'', 8);
         $this->pdf->SetDrawColor($this->accColorR, $this->accColorG, $this->accColorB);
 
         $this->pdf->SetTextColor($this->accColorR, $this->accColorG, $this->accColorB);
