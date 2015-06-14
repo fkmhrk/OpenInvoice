@@ -18,6 +18,10 @@ class AppClientImpl implements Client {
         this.accessToken = '';
         this.refreshToken = refreshToken;
     }
+
+    getAccessToken() : string {
+        return this.accessToken;
+    }
     
     login(username : string, password : string, callback : ItemCallback<string>) {
         var params : any = {

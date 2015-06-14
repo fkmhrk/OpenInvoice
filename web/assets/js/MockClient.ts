@@ -69,6 +69,10 @@ var tradingItemList = {
 class MockClient implements Client {
     setRefreshToken(refreshToken : string) {
     }
+
+    getAccessToken() : string {
+        return '';
+    }
     
     /**
      * Logs in with username and password.

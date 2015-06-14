@@ -4,6 +4,11 @@ interface Client {
      * Sets refresh token
      */
     setRefreshToken(refreshToken : string);
+
+    /**
+     * Gets access token
+     */
+    getAccessToken() : string;
     
     /**
      * Logs in with username and password.
