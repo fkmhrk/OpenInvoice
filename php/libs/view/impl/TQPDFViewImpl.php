@@ -37,7 +37,7 @@ class TQPDFViewImpl implements PDFView {
 
     public function writeTitle($title) {
         $this->pdf->SetFillColor($this->accColorR, $this->accColorG, $this->accColorB);
-        $this->pdf->Rect($this->startX, 10.0, 1.0, 33.0, F);
+        $this->pdf->Rect($this->startX, 10.0, 1.0, 33.0, 'F');
 
         $this->pdf->SetFont(HIRAKAKU_W6, '', 14);
         $this->pdf->SetTextColor($this->accColorR, $this->accColorG, $this->accColorB);
@@ -50,10 +50,10 @@ class TQPDFViewImpl implements PDFView {
         $this->pdf->SetTextColor(77, 77, 77);
         $this->pdf->SetDrawColor(153, 153, 153);
         $this->pdf->SetXY(162, 10);
-        $this->pdf->Cell(28.5, 5.8, s('No.V0123'), B, 2, 'R', 0);
+        $this->pdf->Cell(28.5, 5.8, s('No.V0123'), 'B', 2, 'R', 0);
         
         $this->pdf->SetXY(162, 15.8);
-        $this->pdf->Cell(28.5, 5.8, s(date('Y年m月d日', $dateTime)), B, 2, 'R', 0);
+        $this->pdf->Cell(28.5, 5.8, s(date('Y年m月d日', $dateTime)), 'B', 2, 'R', 0);
     }
 
     public function writeCompany($name, $title) {
@@ -61,7 +61,7 @@ class TQPDFViewImpl implements PDFView {
         $this->pdf->SetTextColor(0, 0, 0);
         $this->pdf->SetDrawColor(51, 51, 51);
         $this->pdf->SetXY(19.4, 59);
-        $this->pdf->Cell(81.8, 8.35, s($name. " ". $title), B, 2, 'L', 0);
+        $this->pdf->Cell(81.8, 8.35, s($name. " ". $title), 'B', 2, 'L', 0);
     }
 
     public function writeMyCompany($info) {
@@ -82,7 +82,7 @@ class TQPDFViewImpl implements PDFView {
         $h3 = 2;      // 余白行
         $hBank = 12;  // 振込先用
         
-        $w0 = $startX; // $w0は開始位置をあわせるために空白として生成
+        $w0 = $this->startX; // $w0は開始位置をあわせるために空白として生成
         $w1 = 70.5;
         $w2 = 29;
         $w3 = 20.9;
@@ -100,13 +100,13 @@ class TQPDFViewImpl implements PDFView {
         $this->pdf->SetFont(GOTHIC,'', 8);
         $this->pdf->SetTextColor($this->accColorR, $this->accColorG, $this->accColorB);
         $this->pdf->SetDrawColor($this->accColorR, $this->accColorG, $this->accColorB);
-        $this->pdf->SetXY(0, $this->startTableY);
+        $this->pdf->SetXY(0, $startTableY);
         $this->pdf->Cell($w0, $h1, s(''), 0, 0, 'C', 0);
-        $this->pdf->Cell($w1, $h1, s('項目 / 明細'), B, 0, 'C', 0);
-        $this->pdf->Cell($w2, $h1, s('単価'), B, 0, 'C', 0);
-        $this->pdf->Cell($w3, $h1, s('数量'), B, 0, 'C', 0);
-        $this->pdf->Cell($w4, $h1, s('単位'), B, 0, 'C', 0);
-        $this->pdf->Cell($w5, $h1, s('金額'), B, 1, 'C', 0);
+        $this->pdf->Cell($w1, $h1, s('項目 / 明細'), 'B', 0, 'C', 0);
+        $this->pdf->Cell($w2, $h1, s('単価'), 'B', 0, 'C', 0);
+        $this->pdf->Cell($w3, $h1, s('数量'), 'B', 0, 'C', 0);
+        $this->pdf->Cell($w4, $h1, s('単位'), 'B', 0, 'C', 0);
+        $this->pdf->Cell($w5, $h1, s('金額'), 'B', 1, 'C', 0);
 
         $sum = 0;
         $tax = 0;
@@ -141,7 +141,7 @@ class TQPDFViewImpl implements PDFView {
                 //空白行
                 $this->pdf->SetDrawColor(153, 153, 153);
                 $this->pdf->Cell($w0, $h3, s(''), 0, 0, 'C', 0);
-                $this->pdf->Cell($w1+$w2+$w3+$w4+$w5, $h3, s(''), B, 1, 'L', 0);
+                $this->pdf->Cell($w1+$w2+$w3+$w4+$w5, $h3, s(''), 'B', 1, 'L', 0);
             } else {
             }
             /*
