@@ -127,7 +127,7 @@ class TQPDFViewImpl implements PDFView {
                 $this->pdf->SetFont(GOTHIC,'', 8);
                 $this->pdf->SetTextColor(0, 0, 0);
                 $this->pdf->Cell($w0, $h1, s(''), 0, 0, 'C', 0);
-                $this->pdf->Cell($w1, $h1, s($item['subject']. '（2/24〜3/20）'), 0, 0, 'L', 0);
+                $this->pdf->Cell($w1, $h1, s($item['subject']), 0, 0, 'L', 0);
                 $this->pdf->Cell($w2, $h1, s('¥'. number_format($item['unit_price'])), 0, 0, 'R', 0);
                 $this->pdf->Cell($w3, $h1, s($item['amount']), 0, 0, 'C', 0);
                 $this->pdf->Cell($w4, $h1, s($item['degree']), 0, 0, 'C', 0);
@@ -136,13 +136,31 @@ class TQPDFViewImpl implements PDFView {
                 $this->pdf->SetFont(GOTHIC,'', 7);
                 $this->pdf->SetTextColor(77, 77, 77);
                 $this->pdf->Cell($w0, $h2, s(''), 0, 0, 'C', 0);
-                $this->pdf->MultiCell($w1, $h2, s($item['product']), 0, 1, 'L', 0);
+                $this->pdf->MultiCell($w1, $h2, s($item['memo']), 0, 1, 'L', 0);
                 
                 //空白行
                 $this->pdf->SetDrawColor(153, 153, 153);
                 $this->pdf->Cell($w0, $h3, s(''), 0, 0, 'C', 0);
                 $this->pdf->Cell($w1+$w2+$w3+$w4+$w5, $h3, s(''), 'B', 1, 'L', 0);
             } else {
+                $this->pdf->SetFont(GOTHIC,'', 8);
+                $this->pdf->SetTextColor(0, 0, 0);
+                $this->pdf->Cell($w0, $h1, s(''), 0, 0, 'C', 0);
+                $this->pdf->Cell($w1, $h1, s($item['subject']), 0, 0, 'L', 0);
+                $this->pdf->Cell($w2, $h1, s('¥'. number_format($item['unit_price'])), 0, 0, 'R', 0);
+                $this->pdf->Cell($w3, $h1, s($item['amount']), 0, 0, 'C', 0);
+                $this->pdf->Cell($w4, $h1, s($item['degree']), 0, 0, 'C', 0);
+                $this->pdf->Cell($w5, $h1, s('¥'. number_format($price)), 0, 1, 'R', 0);
+                
+                $this->pdf->SetFont(GOTHIC,'', 7);
+                $this->pdf->SetTextColor(77, 77, 77);
+                $this->pdf->Cell($w0, $h2, s(''), 0, 0, 'C', 0);
+                $this->pdf->MultiCell($w1, $h2, s($item['memo']), 0, 1, 'L', 0);
+                
+                //空白行
+                $this->pdf->SetDrawColor(153, 153, 153);
+                $this->pdf->Cell($w0, $h3, s(''), 0, 0, 'C', 0);
+                $this->pdf->Cell($w1+$w2+$w3+$w4+$w5, $h3, s(''), B, 1, 'L', 0);                
             }
             /*
             $this->pdf->SetX(16);
