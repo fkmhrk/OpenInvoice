@@ -36,6 +36,9 @@ DEFINE("PGOTHIC", 'MS-PGothic');
 DEFINE("UIGOTHIC",'MS-UIGothic');
 DEFINE("MINCHO",  'MS-Mincho');
 DEFINE("PMINCHO", 'MS-PMincho');
+// for Mac
+DEFINE("HIRAKAKU_W6",  'HiraKakuPro-W6');
+DEFINE("HIRAMIN_W6",  'HiraMinPro-W6');
 
 class MBFPDF extends FPDF
 {
