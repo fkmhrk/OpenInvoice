@@ -5,6 +5,7 @@ require_once (dirname(__FILE__). '/../../libs/model/impl/MySQLSessionDAO.php');
 require_once (dirname(__FILE__). '/../../libs/model/impl/MySQLTradingDAO.php');
 require_once (dirname(__FILE__). '/../../libs/model/impl/MySQLTradingItemDAO.php');
 require_once (dirname(__FILE__). '/../../libs/model/impl/MySQLCompanyDAO.php');
+require_once (dirname(__FILE__). '/../../libs/model/impl/MySQLEnvDAO.php');
 
 require_once (dirname(__FILE__). '/../../libs/view/impl/PDFViewImpl.php');
 
@@ -22,10 +23,13 @@ $sessionDAO = new MySQLSessionDAO($db);
 $tradingDAO = new MySQLTradingDAO($db);
 $tradingItemDAO = new MySQLTradingItemDAO($db);
 $companyDAO = new MySQLCompanyDAO($db);
+$envDAO = new MySQLEnvDAO($db);
 
 $view = new PDFViewImpl();
 
 // execute
+$env = $envDAO.getEnv();
+
 $session = $sessionDAO->getSession($token);
 if ($session === null) {
     echo 'Wrong token';
