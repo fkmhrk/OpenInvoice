@@ -72,7 +72,7 @@
 	      <td>{{bill_number}}</td>
 	      <td>
 		<a class="btn" title="削除"><i class="fa fa-trash-o"></i></a>
-		<a on-click="copySheet:{{.}}" class="btn" title="コピー"><i class="fa fa-copy"></i></a>
+                <a on-click="copySheet:{{.}}" class="btn" title="コピー"><i class="fa fa-copy"></i></a>
 	      </td>
 	    </tr>
             <!-- 繰り返しの終わり -->
@@ -84,7 +84,7 @@
   </script>
 
 
-  <script id="sheetTemplate" type="text/ractive">    
+  <script id="sheetTemplate" type="text/ractive">
     <section id="sheet">
       <header>
 	<div class="inner">
@@ -139,7 +139,7 @@
 				<dt><input type="date" value=""></dt>
 				<dd class="pdf_attach"><i class="fa fa-list-alt"></i>添え状</dd>
 			</dl>
-		</section>          
+		</section>
 	  <section id="sum">
 	    <dl>
 	      <dt>小計　&yen;</dt>
@@ -150,12 +150,11 @@
 	      <dd><input type="text" disabled value="{{trading.total}}"></dd>
 	    </dl>
 	  </section>
-          
       	</div>
 
       	<section id="inputArea">
       	  <div class="inner">
-            {{#tradingItems:i}}            
+            {{#tradingItems:i}}
 	    <div class="inputBox">
 	      <article>
 		<ul class="table">
@@ -174,21 +173,19 @@
 		  </select>
 		</p>
 		<p class="delete" title="項目削除" on-click="deleteItem:{{i}}"><i class="fa fa-trash"></i></p>
-                
 	      </article>
             </div>
             {{/}}
 	  </div>
 	  <p class="addInput" on-click="addItem"><i class="fa fa-plus-circle"></i>項目追加</p>
 
-		</section>
-      	
+	</section>
       </section>
 
     </section>
   </script>
 
-  <script id="settingTemplate" type="text/ractive">    
+  <script id="settingTemplate" type="text/ractive">
     <section id="setting" on-click="windowClicked">
       <header>
         <h1>設定</h1>
@@ -303,8 +300,8 @@
         </section>
       </div>
     </section>
-  </script>        
-    
+  </script>
+
   <script id="companyListTemplate" type="text/ractive">
     <section id="setting" class="listTemplate" on-click="windowClicked">
       <header>
@@ -353,7 +350,7 @@
       </div>
     </section>
   </script>
-    
+
   <script id="addCompanyTemplate" type="text/ractive">
     <section id="setting" class="listTemplate addDialog" on-click="windowClicked">
       <header>
@@ -381,9 +378,7 @@
         </section>
       </div>
     </section>
-  </script>      
-  
-
+  </script>
 
   <script src="https://code.jquery.com/jquery-1.9.0.min.js"></script>
   <script src="./assets/js/jquery.tooltipster.min.js"></script>
@@ -400,7 +395,7 @@
 
 	</script>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/ractive/0.7.1/ractive.js"></script>        
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ractive/0.7.1/ractive.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.7.0/underscore-min.js" type="text/javascript"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.1.2/backbone-min.js" type="text/javascript"></script>
   <script src="./assets/js/app.js"></script>
