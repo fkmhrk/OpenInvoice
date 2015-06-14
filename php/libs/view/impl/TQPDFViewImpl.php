@@ -162,28 +162,36 @@ class TQPDFViewImpl implements PDFView {
                 $this->pdf->Cell($w0, $h3, s(''), 0, 0, 'C', 0);
                 $this->pdf->Cell($w1+$w2+$w3+$w4+$w5, $h3, s(''), B, 1, 'L', 0);                
             }
-            /*
-            $this->pdf->SetX(16);
-            $this->pdf->Cell(10, 8, s('' + $no), 1, 0, 'C', 0);
-            $this->pdf->Cell(70, 8, s($item['subject']), 1, 0, 'L', 0);
-            $this->pdf->Cell(20, 8, s($item['amount']), 1, 0, 'R', 0);
-            $this->pdf->Cell(20, 8, s($item['degree']), 1, 0, 'L', 0);
-            $this->pdf->Cell(30, 8, s('￥'. number_format($item['unit_price'])), 1, 0, 'R', 0);
-            $this->pdf->Cell(30, 8, s('￥'. number_format($price)), 1, 1, 'R', 0);
-            */
             ++$no;
         }
         $total = $sum + $tax;
-        
-        $this->pdf->SetX(136);
-        $this->pdf->Cell(30, 8, s('小計'), 1, 0, 'R', 1);
-        $this->pdf->Cell(30, 8, s('￥'. number_format($sum)), 1, 1, 'R', 0);
-        $this->pdf->SetX(136);
-        $this->pdf->Cell(30, 8, s('消費税'), 1, 0, 'R', 1);
-        $this->pdf->Cell(30, 8, s('￥'. number_format($tax)), 1, 1, 'R', 0);
-        $this->pdf->SetX(136);
-        $this->pdf->Cell(30, 8, s('合計'), 1, 0, 'R', 1);
-        $this->pdf->Cell(30, 8, s('￥'. number_format($total)), 1, 1, 'R', 0);
+
+        $this->pdf->Cell($w0+$w1+$w2+$w3+$w4+$w5, $h3, s(''), 0, 1, 'L', 0);
+
+        $this->pdf->SetFont(HIRAKAKU_W6,'', 8);
+        $this->pdf->SetTextColor(77, 77, 77);
+        $this->pdf->Cell($w0, $h2+$h3, s(''), 0, 0, 'C', 0);
+        $this->pdf->Cell($w1+$w2+$w3+$w4, $h2+$h3, s('小計金額'), 0, 0, 'R', 0);
+        $this->pdf->SetTextColor(0, 0, 0);
+        $this->pdf->Cell($w5, $h2+$h3, s('¥'. number_format($sum)), 0, 1, 'R', 0);
+
+        $this->pdf->SetTextColor(77, 77, 77);
+        $this->pdf->Cell($w0, $h2+$h3, s(''), 0, 0, 'C', 0);
+        $this->pdf->Cell($w1+$w2+$w3+$w4, $h2+$h3, s('消費税（8％）'), 0, 0, 'R', 0);
+        $this->pdf->SetTextColor(0, 0, 0);
+        $this->pdf->Cell($w5, $h2+$h3, s('¥'. number_format($tax)), 0, 1, 'R', 0);
+
+        //空白行
+        $this->pdf->Cell($w0+$w1+$w2+$w3+$w4+$w5, $h3, s(''), 0, 1, 'L', 0);
+
+        // 合計 ----------------------------------------------------
+        $this->pdf->SetFont(HIRAKAKU_W6,'', 10);
+        $this->pdf->SetTextColor($this->accColorR, $this->accColorG, $this->accColorB);
+        $this->pdf->SetDrawColor($this->accColorR, $this->accColorG, $this->accColorB);
+        $this->pdf->Cell($w0, $h1+$h2, s(''), 0, 0, 'C', 0);
+        $this->pdf->Cell($w1+$w2+$w3+$w4, $h1+$h2, s('ご請求金額'), TB, 0, 'R', 0);
+        $this->pdf->Cell($w5, $h1+$h2, s('¥'. number_format($total)), TB, 1, 'R', 0);
+
         return array('sum' => $sum, 'tax' => $tax, 'total' => $total);
     }
 
