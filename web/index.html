@@ -71,7 +71,7 @@
 	      <td>{{quotation_number}}</td>
 	      <td>{{bill_number}}</td>
 	      <td>
-		<a href="#" class="btn" title="削除"><i class="fa fa-trash-o"></i></a>
+		<a class="btn" title="削除"><i class="fa fa-trash-o"></i></a>
 		<a on-click="copySheet:{{.}}" class="btn" title="コピー"><i class="fa fa-copy"></i></a>
 	      </td>
 	    </tr>
@@ -90,7 +90,7 @@
 	<div class="inner">
 	  <h1>{{myCompanyName}}</h1>
 	  <ul class="actionBtn">
-	    <li><a href="#" title="閉じる"><i class="fa fa-remove"></i></a></li>
+	    <li><a on-click="close" title="閉じる"><i class="fa fa-remove"></i></a></li>
 	  </ul>
 	  <p class="sum">合計金額 &yen;<span>{{trading.total}}</span></p>
 	  <p class="save" on-click="save"><i class="fa fa-check"></i>保存</p>

@@ -105,6 +105,9 @@ class SheetPage implements Page {
         var itemObserver = observeItem();
         
         r.on({
+            'close' : () => {
+                window.history.back();
+            },
             'addItem' : () => {
                 r.push('tradingItems', {
                     id : null,
