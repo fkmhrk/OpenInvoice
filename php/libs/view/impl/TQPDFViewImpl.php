@@ -264,6 +264,33 @@ class TQPDFViewImpl implements PDFView {
         $this->pdf->Cell($w0, $mS+$mM, s(''), 0, 1, 'L', 0);  // 行の余白用
     }
 
+    public function writeBankInfo($info) {
+        $w0 = $this->startX; // $w0は開始位置をあわせるために空白として生成
+        $w1 = 70.5;
+        $w2 = 29;
+        $w3 = 20.9;
+        $w4 = 20.9;
+        $w5 = 28.5;
+        $h1 = 8;
+        $hBank = 12;  // 振込先用
+
+        $bankType = ($info['company_bank_type'] == '1') ? '普通' :
+            ($info['company_bank_type'] == '2') ? '当座' : '定期';
+        
+        $this->pdf->Cell($w0, $h1, s(''), 0, 0, 'C', 0);
+        $this->pdf->Cell($w1+$w2+$w4+$w5, $h1, s('いつもお引き立ていただきありがとうございます。今後ともどうぞよろしくお願いいたします。'), 0, 1, 'L', 0);
+        
+        $this->pdf->SetTextColor($this->accColorR, $this->accColorG, $this->accColorB);
+        $this->pdf->SetLineWidth(0.2);
+        $this->pdf->Cell($w0, $hBank, s(''), 0, 0, 'C', 0);
+        $this->pdf->Cell($w3, $hBank, s('お振込先'), LTB, 0, 'C', 0);
+        $this->pdf->SetTextColor(0, 0, 0);
+        $this->pdf->Cell($w1+$w2+$w4+$w5, $hBank, s($info['company_bankname']. ' '. $bankType.
+                                                    ' '. $info['company_bank_num']. '　'. $info['company_bank_name']), RTB, 0, 'L', 0);
+        
+        $this->pdf->Cell($w0, $mM, s(''), 0, 1, 'L', 0);  // 行の余白用        
+    }    
+
     public function writeTotal($total) {
         //$this->pdf->SetFont(MINCHO,'', 16);
         //$this->pdf->SetXY(16, 100);
