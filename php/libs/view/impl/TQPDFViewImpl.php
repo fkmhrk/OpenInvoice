@@ -274,9 +274,8 @@ class TQPDFViewImpl implements PDFView {
         $h1 = 8;
         $hBank = 12;  // 振込先用
 
-        print_r($info);
         $bankType = ($info['company_bank_type'] == '1') ? '普通' :
-            ($info['company_bank_type'] == '2') ? '当座' : '定期';
+            (($info['company_bank_type'] == '2') ? '当座' : '定期');
         
         $this->pdf->Cell($w0, $h1, s(''), 0, 0, 'C', 0);
         $this->pdf->Cell($w1+$w2+$w4+$w5, $h1, s('いつもお引き立ていただきありがとうございます。今後ともどうぞよろしくお願いいたします。'), 0, 1, 'L', 0);
