@@ -233,6 +233,8 @@ class TQPDFViewImpl implements PDFView {
         $w5 = 28.5;
         $h1 = 8;
         $h2 = 3;
+        $mS = 2;
+        $mM = 5;
         
         $this->pdf->SetFont(HIRAKAKU_W3,'', 8);
         $this->pdf->SetDrawColor($this->accColorR, $this->accColorG, $this->accColorB);
