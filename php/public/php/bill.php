@@ -7,7 +7,7 @@ require_once (dirname(__FILE__). '/../../libs/model/impl/MySQLTradingItemDAO.php
 require_once (dirname(__FILE__). '/../../libs/model/impl/MySQLCompanyDAO.php');
 require_once (dirname(__FILE__). '/../../libs/model/impl/MySQLEnvDAO.php');
 
-require_once (dirname(__FILE__). '/../../libs/view/impl/PDFViewImpl.php');
+require_once (dirname(__FILE__). '/../../libs/view/impl/TQPDFViewImpl.php');
 
 date_default_timezone_set('Asia/Tokyo');
 
@@ -25,7 +25,7 @@ $tradingItemDAO = new MySQLTradingItemDAO($db);
 $companyDAO = new MySQLCompanyDAO($db);
 $envDAO = new MySQLEnvDAO($db);
 
-$view = new PDFViewImpl();
+$view = new TQPDFViewImpl();
 
 // execute
 $env = $envDAO->getEnv();
