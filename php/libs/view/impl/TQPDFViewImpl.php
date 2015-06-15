@@ -65,7 +65,7 @@ class TQPDFViewImpl implements PDFView {
         $this->pdf->Cell(81.8, 8.35, s($name. " ". $title), 'B', 2, 'L', 0);
     }
 
-    public function writeMyCompany($info) {
+    public function writeMyCompany($info, $user) {
         $this->pdf->SetFont(HIRAKAKU_W6, '', 8);
         $this->pdf->SetXY(140.5, 54);
         $this->pdf->write(6, s($info['company_name']));
@@ -74,7 +74,7 @@ class TQPDFViewImpl implements PDFView {
         $this->pdf->SetXY(140.5, 60.5);
         $this->pdf->write(4.3, s('〒'. $info['company_zip']. ' '. $info['company_address']));
         $this->pdf->SetXY(140.5, 64.8);
-        $this->pdf->write(4.3, s('担当：サンプル / '. $info['company_tel']));        
+        $this->pdf->write(4.3, s('担当：'. $user['display_name']. ' / '. $info['company_tel']));        
     }
     
     public function writeItemTable($x, $y, $items, $taxRate) {
