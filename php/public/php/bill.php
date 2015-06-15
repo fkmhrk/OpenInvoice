@@ -56,12 +56,12 @@ if ($company === null) {
 }
 
 $view->writeTitle("請求書");
-$view->writeDate($trading['quotation_date'] / 1000);
+$view->writeDate($trading['bill_number'], $trading['bill_date'] / 1000);
 $view->writeCompany($company['name'], $title);
-$view->writeMyCompany($env['company_name']. "\n". $env['company_address']. "\n". $env['company_tel']);
+$view->writeMyCompany($env);
 
 $summary = $view->writeItemTable(16, 120, $items, $trading['tax_rate']);
-
+$view->writeProduct($trading['work_from'] / 1000, $trading['work_to'] / 1000, $trading['product']);
 $view->writeTotal("御請求金額計 ￥" . number_format($summary['total']));
 $view->output('請求書_'. $company['name']);
 ?>
