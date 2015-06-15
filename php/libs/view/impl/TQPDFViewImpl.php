@@ -196,6 +196,38 @@ class TQPDFViewImpl implements PDFView {
         return array('sum' => $sum, 'tax' => $tax, 'total' => $total);
     }
 
+    public function writeTheTimeForPayment($time, $limitType) {
+        $w0 = $this->startX; // $w0は開始位置をあわせるために空白として生成
+        $w1 = 70.5;
+        $w2 = 29;
+        $w3 = 20.9;
+        $w4 = 20.9;
+        $w5 = 28.5;
+        $h1 = 8;
+        $h2 = 3;
+
+        $date = new DateTime(null, new DateTimeZone('Asia/Tokyo'));
+        $date->setTimestamp($time);
+        $year = (int)$date->format('Y');
+        $month = (int)$date->format('n');
+        if ($limitType == 1) {
+            $month += 1;
+        } else {
+            $month += 2;            
+        }
+        if ($month > 12) {
+            $year++;
+            $month -= 12;
+        }
+        
+        $this->pdf->SetFont(HIRAKAKU_W3,'', 7);
+        $this->pdf->SetTextColor(77, 77, 77);
+        $this->pdf->Cell($w0, $h1, s(''), 0, 0, 'C', 0);
+        $this->pdf->Cell($w1+$w2+$w3+$w4+$w5, $h1, s('＃お支払期限：'. $year. '年'. $month. '月末日'), 0, 1, 'R', 0);
+
+        $this->pdf->Cell($w0, $h1, s(''), 0, 1, 'L', 0);  // 行の余白用
+    }
+
     public function writeProduct($workFrom, $workTo, $product) {
         $w0 = $this->startX; // $w0は開始位置をあわせるために空白として生成
         $w1 = 70.5;
@@ -206,13 +238,6 @@ class TQPDFViewImpl implements PDFView {
         $h1 = 8;
         $h2 = 3;
         
-        $this->pdf->SetFont(HIRAKAKU_W3,'', 7);
-        $this->pdf->SetTextColor(77, 77, 77);
-        $this->pdf->Cell($w0, $h1, s(''), 0, 0, 'C', 0);
-        $this->pdf->Cell($w1+$w2+$w3+$w4+$w5, $h1, s('＃お支払期限：2015年4月末日'), 0, 1, 'R', 0);
-
-        $this->pdf->Cell($w0, $h1, s(''), 0, 1, 'L', 0);  // 行の余白用
-
         $this->pdf->SetFont(HIRAKAKU_W3,'', 8);
         $this->pdf->SetDrawColor($this->accColorR, $this->accColorG, $this->accColorB);
 
