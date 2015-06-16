@@ -5,9 +5,10 @@ require_once (dirname(__FILE__). '/../../libs/model/impl/MySQLSessionDAO.php');
 require_once (dirname(__FILE__). '/../../libs/model/impl/MySQLTradingDAO.php');
 require_once (dirname(__FILE__). '/../../libs/model/impl/MySQLTradingItemDAO.php');
 require_once (dirname(__FILE__). '/../../libs/model/impl/MySQLCompanyDAO.php');
+require_once (dirname(__FILE__). '/../../libs/model/impl/MySQLUserDAO.php');
 require_once (dirname(__FILE__). '/../../libs/model/impl/MySQLEnvDAO.php');
 
-require_once (dirname(__FILE__). '/../../libs/view/impl/PDFViewImpl.php');
+require_once (dirname(__FILE__). '/../../libs/view/impl/TQPDFViewImpl.php');
 
 date_default_timezone_set('Asia/Tokyo');
 
@@ -23,9 +24,10 @@ $sessionDAO = new MySQLSessionDAO($db);
 $tradingDAO = new MySQLTradingDAO($db);
 $tradingItemDAO = new MySQLTradingItemDAO($db);
 $companyDAO = new MySQLCompanyDAO($db);
+$userDAO = new MySQLUserDAO($db);
 $envDAO = new MySQLEnvDAO($db);
 
-$view = new PDFViewImpl();
+$view = new TQPDFViewImpl();
 
 // execute
 $env = $envDAO->getEnv();
@@ -55,13 +57,20 @@ if ($company === null) {
     $company = array('name' => '(不明な会社)');
 }
 
+$user = $userDAO->getById($trading['assignee']);
+if ($user === null) {
+    $user = array('display_name' => '(不明な担当者)');
+}
+
 $view->writeTitle("請求書");
-$view->writeDate($trading['quotation_date'] / 1000);
+$view->writeDate($trading['bill_number'], $trading['bill_date'] / 1000);
 $view->writeCompany($company['name'], $title);
-$view->writeMyCompany($env['company_name']. "\n". $env['company_address']. "\n". $env['company_tel']);
+$view->writeMyCompany($env, $user);
 
 $summary = $view->writeItemTable(16, 120, $items, $trading['tax_rate']);
-
+$view->writeTheTimeForPayment($trading['bill_date'] / 1000, $env['pay_limit']);
+$view->writeProduct($trading['work_from'] / 1000, $trading['work_to'] / 1000, $trading['product']);
 $view->writeTotal("御請求金額計 ￥" . number_format($summary['total']));
+$view->writeBankInfo($env);
 $view->output('請求書_'. $company['name']);
 ?>
