@@ -100,16 +100,20 @@
       	<div class="wrapper">
       	  <section id="basicInfo">
 	    <p>
-	      <select id="company" value="{{trading.company_id}}">
-		<option id="">会社名</option>
-                {{#companies}}
-                <option value="{{id}}">{{name}}</option>
-                {{/}}
-	      </select>
-	      <select id="titleType" value="{{trading.title_type}}">
-		<option value="0">御中</option>
-		<option value="1">様</option>
-	      </select>
+	      <span class="selectbox">
+		<select id="company" value="{{trading.company_id}}">
+		  <option id="">会社名</option>
+	          {{#companies}}
+	          <option value="{{id}}">{{name}}</option>
+	          {{/}}
+		</select>
+	      </span>
+	      <span class="selectbox">
+		<select id="titleType" value="{{trading.title_type}}">
+		  <option value="0">御中</option>
+		  <option value="1">様</option>
+		</select>
+	      </span>
 	      <span class="addList" on-click="addCompany"><i class="fa fa-plus-circle"></i>クライアント追加</span>
 	    </p>
 	    <ul>
@@ -119,11 +123,13 @@
 	      <li><textarea placeholder="備考"></textarea></li>
 	      <li>
 		<span>担当者</span>
-		<select value="{{trading.assignee}}">
-                  {{#users}}
-                  <option value="{{id}}">{{display_name}}</option>
-                  {{/}}
-		</select>
+		<span class="selectbox">
+		  <select value="{{trading.assignee}}">
+		    {{#users}}
+		    <option value="{{id}}">{{display_name}}</option>
+		    {{/}}
+		  </select>
+		</span>
 		<span class="addList" on-click="addUser"><i class="fa fa-plus-circle"></i>担当者追加</span>
 	      </li>
 	    </ul>
@@ -166,19 +172,20 @@
 		</ul>
 		<p class="note"><textarea placeholder="備考" value="{{tradingItems[i].memo}}"></textarea></p>
 		<p class="tax">
-		  <select id="tax_type{{i}}">
-		    <option value="1">税抜</option>
-		    <option value="2">税込</option>
-		    <option value="0">非課税</option>
-		  </select>
+		  <span class="selectbox">
+		    <select id="tax_type{{i}}">
+		      <option value="1">税抜</option>
+		      <option value="2">税込</option>
+		      <option value="0">非課税</option>
+		    </select>
+		  </span>
 		</p>
 		<p class="delete" title="項目削除" on-click="deleteItem:{{i}}"><i class="fa fa-trash"></i></p>
 	      </article>
             </div>
             {{/}}
 	  </div>
-	  <p class="addInput" on-click="addItem"><i class="fa fa-plus-circle"></i>項目追加</p>
-
+          <p class="addInput" on-click="addItem"><span><i class="fa fa-plus"></i></span></p>
 	</section>
       </section>
 
@@ -256,8 +263,8 @@
       </header>
       <div class="inner">
         <section id="addUser">
-          <p><input type="text" placeholder="担当者名"></p>
-          <p><input type="text" placeholder="TEL"></p>
+          <p><input type="text" placeholder="担当者名"><input type="text" placeholder="ユーザーID（半角英数字）"></p>
+          <p><input type="text" placeholder="TEL"><input type="password" placeholder="パスワード"></p>
           <p class="addBtn"><i class="fa fa-plus"></i>追加</p>
         </section>
         <section class="list">
@@ -265,16 +272,19 @@
             <tr>
               <th>担当者名</th>
               <th>TEL</th>
+              <th>ユーザーID</th>
               <th></th>
             </tr>
             <tr>
               <td>担当者1</td>
               <td>080-1111-2222</td>
+              <td>user1</td>
               <td><a href="#" class="btn" title="削除"><i class="fa fa-trash-o"></i></a></td>
             </tr>
             <tr>
               <td>担当者2</td>
               <td>080-2222-3333</td>
+              <td>user2</td>
               <td><a href="#" class="btn" title="削除"><i class="fa fa-trash-o"></i></a></td>
             </tr>
           </table>

@@ -1625,7 +1625,30 @@ input, textarea {
   box-sizing: border-box; }
 
 .inputS {
-  width: 2rem; }
+  width: 3rem; }
+
+.selectbox {
+  position: relative; }
+  .selectbox select {
+    -moz-appearance: none;
+    -webkit-appearance: none;
+    appearance: none;
+    background: #fff;
+    border: 1px solid #ccc;
+    padding: 0.5rem 2rem 0.5rem 0.5rem;
+    border-radius: 3px;
+    font-size: 1rem;
+    box-sizing: border-box;
+    cursor: pointer; }
+  .selectbox:before {
+    content: '\f0d7';
+    font-family: FontAwesome;
+    font-style: 2rem;
+    display: block;
+    position: absolute;
+    top: 0;
+    right: 10px;
+    pointer-events: none; }
 
 #container {
   position: absolute;
@@ -1836,7 +1859,7 @@ header .save {
 #sheet {
   background-color: #e0e4e4; }
   #sheet input[type=date] {
-    width: 150px;
+    width: 160px;
     padding: 0.5rem;
     font-family: Arial; }
   #sheet header {
@@ -1899,14 +1922,14 @@ header .save {
       #sheet .wrapper #basicInfo li span {
         margin-right: 0.5rem; }
     #sheet .wrapper #pdf {
-      width: 320px;
+      width: 340px;
       position: absolute;
       right: 0;
       top: 100px;
       font-size: 12px; }
       #sheet .wrapper #pdf dt {
         display: inline-block;
-        width: 190px;
+        width: 210px;
         margin-bottom: 8px;
         margin-right: 5px;
         text-align: right;
@@ -1918,7 +1941,7 @@ header .save {
           #sheet .wrapper #pdf dt input[type=date] {
             width: 120px; }
           #sheet .wrapper #pdf dt input[type=text] {
-            width: 70px;
+            width: 90px;
             color: #999; }
         #sheet .wrapper #pdf dt::before {
           content: "";
@@ -1967,14 +1990,14 @@ header .save {
           #sheet .wrapper #pdf dd.pdf_attach:hover {
             background-color: #bc3b0c; }
     #sheet .wrapper #sum {
-      width: 292px;
+      width: 312px;
       position: absolute;
       right: 0;
       bottom: 2rem; }
       #sheet .wrapper #sum dt {
         text-align: right;
         display: inline-block;
-        width: 8.5rem;
+        width: 9.5rem;
         margin-bottom: 0.5rem;
         color: #626666; }
         #sheet .wrapper #sum dt:last-of-type {
@@ -2040,7 +2063,7 @@ header .save {
         #sheet #inputArea .inputBox article .note textarea {
           width: 712px;
           margin-top: 0.5rem; }
-        #sheet #inputArea .inputBox article .easy-select-box {
+        #sheet #inputArea .inputBox article .tax {
           position: absolute;
           bottom: 6px;
           left: 800px; }
@@ -2062,17 +2085,35 @@ header .save {
             background-color: #c1272d;
             color: #fff; }
     #sheet #inputArea .addInput {
+      /* text-align: center;
+			background-color: $dark-gray-bgColor;
+			color: #fff;
+			font-size: 1.05rem;
+			padding: 1rem 0;
+			transition: background-color 0.3s;
+			cursor: pointer;
+			&:hover{
+				background-color: darken($dark-gray-bgColor, 10%);
+			}
+			i{
+				margin-right: 0.5rem;
+			} */
       text-align: center;
-      background-color: #626666;
-      color: #fff;
-      font-size: 1.05rem;
-      padding: 1rem 0;
-      transition: background-color 0.3s;
-      cursor: pointer; }
+      padding: 2rem;
+      cursor: pointer;
+      transition: 0.3s;
+      background-color: rgba(30, 51, 51, 0.05);
+      position: relative;
+      z-index: 10; }
+      #sheet #inputArea .addInput span {
+        border: 2px dashed #c7cece;
+        color: #c7cece;
+        display: block;
+        padding: 1rem;
+        border-radius: 10px;
+        font-size: 2rem; }
       #sheet #inputArea .addInput:hover {
-        background-color: #494c4c; }
-      #sheet #inputArea .addInput i {
-        margin-right: 0.5rem; }
+        background-color: #f8f9f9; }
 
 #dialogs .dialog {
   width: 960px;
@@ -2162,7 +2203,8 @@ header .save {
         #dialogs .dialog #setting.listTemplate #addUser p {
           margin-bottom: 0.5rem; }
           #dialogs .dialog #setting.listTemplate #addUser p input {
-            width: 260px; }
+            width: 260px;
+            margin: 0 1rem; }
       #dialogs .dialog #setting.listTemplate #addCompany p {
         margin-bottom: 0.3rem; }
       #dialogs .dialog #setting.listTemplate #addCompany .names {
