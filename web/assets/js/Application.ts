@@ -7,6 +7,7 @@ class App {
     client : Client;
     ractive : Ractive;
     dialogs : Ractive;
+    snackbars : Ractive;
     page : Page;
 
     accessToken : string;
@@ -50,11 +51,25 @@ class App {
             }
         });
     }
+    // snack bar
+    addSnack(item : string) {
+        this.snackbars.push('snackbars', item);
+        var closeFunc = () => {
+            var list = this.snackbars.get('snackbars');
+            if (list.length == 0) { return; }
+            this.snackbars.splice('snackbars', 0, 1);
+            if (this.snackbars.get('snackbars').length > 0) {
+                setTimeout(closeFunc, 3000);
+            }
+        }
+        setTimeout(closeFunc, 3000);
+    }
     start() {
         this.client = createClient();
         var refreshToken = localStorage.getItem('refreshToken');
         this.client.setRefreshToken(refreshToken);
         this.initDialog();
+        this.initSnackbar();
         this.loadMyCompanyName();
     }
     private initDialog() {
@@ -71,6 +86,21 @@ class App {
                 this.closeDialog();
             }
         });            
+    }
+    private initSnackbar() {
+        // snackbarsの準備
+        this.snackbars = new Ractive({
+            el : '#snacks',
+            template : '#snackbarsTemplate',
+            data : {
+                snackbars : [],
+            }
+        });
+        this.snackbars.on({
+            'close' : (e : any, index : number) => {
+                this.snackbars.splice('snackbars', index, 1);
+            }
+        });                    
     }
     private loadMyCompanyName() {
         if (this.myCompanyName != null && this.myCompanyName.length > 0) {

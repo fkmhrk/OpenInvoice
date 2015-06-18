@@ -5,22 +5,12 @@ class SettingsDialog implements Dialog {
     ractive : Ractive;
     
     attach(app : App, el : HTMLElement) {
-        var es = (node : any) => {
-            $(node).easySelectBox({speed: 200});
-            return {
-                teardown : function() {
-                    // nop?
-                }
-            }
-        };        
         this.ractive = new Ractive({
             // どの箱に入れるかをIDで指定
             el : el,
             // 指定した箱に、どのHTMLを入れるかをIDで指定
             template : '#settingTemplate',
-            decorators: {
-                easyselect: es,
-            },
+            decorators: { },
             data : {
                 tax_rate : app.environment.tax_rate,
                 quotation_limit : app.environment.quotation_limit,
@@ -70,6 +60,7 @@ class SettingsDialog implements Dialog {
         app.client.saveEnvironment(env, {
             success : () => {
                 app.environment = env;
+                app.addSnack('設定を保存しました！');
                 app.closeDialog();
             },
             error : (status : number, msg : string) => {

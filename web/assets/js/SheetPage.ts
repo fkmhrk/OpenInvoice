@@ -271,6 +271,7 @@ class SheetPage implements Page {
     private saveItems(app : App, id : string, list : Array<TradingItem>,
                       doneFunc : (id : string) => void) {
         if (list.length == 0) {
+            app.addSnack('保存しました！');
             doneFunc(id);
             return;
         }

@@ -1667,15 +1667,18 @@ input, textarea {
   display: none; }
 
 #snacks {
-  background-color: #333;
-  padding: 14px 24px;
-  color: #fff;
   position: absolute;
   z-index: 50;
-  border-radius: 3px;
-  box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
   left: 20px;
   bottom: 20px; }
+  #snacks ul {
+    background-color: #333;
+    padding: 14px 24px 4px;
+    color: #fff;
+    border-radius: 3px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2); }
+    #snacks ul li {
+      margin-bottom: 10px; }
 
 header h1 {
   font-size: 1.05rem;
