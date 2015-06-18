@@ -406,11 +406,28 @@ var App = (function () {
             }
         });
     };
+    // snack bar
+    App.prototype.addSnack = function (item) {
+        var _this = this;
+        this.snackbars.push('snackbars', item);
+        var closeFunc = function () {
+            var list = _this.snackbars.get('snackbars');
+            if (list.length == 0) {
+                return;
+            }
+            _this.snackbars.splice('snackbars', 0, 1);
+            if (_this.snackbars.get('snackbars').length > 0) {
+                setTimeout(closeFunc, 3000);
+            }
+        };
+        setTimeout(closeFunc, 3000);
+    };
     App.prototype.start = function () {
         this.client = createClient();
         var refreshToken = localStorage.getItem('refreshToken');
         this.client.setRefreshToken(refreshToken);
         this.initDialog();
+        this.initSnackbar();
         this.loadMyCompanyName();
     };
     App.prototype.initDialog = function () {
@@ -426,6 +443,22 @@ var App = (function () {
         this.dialogs.on({
             'closeClick': function () {
                 _this.closeDialog();
+            }
+        });
+    };
+    App.prototype.initSnackbar = function () {
+        var _this = this;
+        // snackbarsの準備
+        this.snackbars = new Ractive({
+            el: '#snacks',
+            template: '#snackbarsTemplate',
+            data: {
+                snackbars: []
+            }
+        });
+        this.snackbars.on({
+            'close': function (e, index) {
+                _this.snackbars.splice('snackbars', index, 1);
             }
         });
     };
@@ -664,22 +697,12 @@ var SettingsDialog = (function () {
     }
     SettingsDialog.prototype.attach = function (app, el) {
         var _this = this;
-        var es = function (node) {
-            $(node).easySelectBox({ speed: 200 });
-            return {
-                teardown: function () {
-                    // nop?
-                }
-            };
-        };
         this.ractive = new Ractive({
             // どの箱に入れるかをIDで指定
             el: el,
             // 指定した箱に、どのHTMLを入れるかをIDで指定
             template: '#settingTemplate',
-            decorators: {
-                easyselect: es
-            },
+            decorators: {},
             data: {
                 tax_rate: app.environment.tax_rate,
                 quotation_limit: app.environment.quotation_limit,
@@ -728,6 +751,7 @@ var SettingsDialog = (function () {
         app.client.saveEnvironment(env, {
             success: function () {
                 app.environment = env;
+                app.addSnack('設定を保存しました！');
                 app.closeDialog();
             },
             error: function (status, msg) {
@@ -1171,6 +1195,7 @@ var SheetPage = (function () {
     SheetPage.prototype.saveItems = function (app, id, list, doneFunc) {
         var _this = this;
         if (list.length == 0) {
+            app.addSnack('保存しました！');
             doneFunc(id);
             return;
         }
