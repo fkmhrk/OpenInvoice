@@ -22,12 +22,29 @@ class TopPage implements Page {
         _.each(sheets, (item : Trading) => {
             total += item.total;
         });
+        var fabDecorate = (node : any) => {
+	    $(node).hover(function(){
+		$(this).find(".menu").toggleClass("current");
+		$(this).find(".submenu").toggleClass("current");
+		$(this).next("span").fadeIn();
+	    }, function(){
+		$(this).find(".menu").toggleClass("current");
+		$(this).find(".submenu").toggleClass("current");
+		$(this).next("span").fadeOut();
+	    });
+            return {
+                teardown : () => {}
+            };
+        };
         // Racriveオブジェクトを作る
         app.ractive = new Ractive({
             // どの箱に入れるかをIDで指定
             el : '#container',
             // 指定した箱に、どのHTMLを入れるかをIDで指定
             template : '#topTemplate',
+            decorators : {
+                fab : fabDecorate,
+            },
             // データを設定。テンプレートで使います。
             data : {
                 myCompanyName : app.myCompanyName,
@@ -41,6 +58,10 @@ class TopPage implements Page {
         tooltipster();
 
         app.ractive.on({
+            'addSheet' : (e : any, item : Trading) => {
+                // #sheetに遷移する
+                app.router.navigate('sheets/new', {trigger:true});
+            },
             'showSheet' : (e : any, item : Trading) => {
                 // #sheetに遷移する
                 app.router.navigate('sheets/' + item.id, {trigger:true});
