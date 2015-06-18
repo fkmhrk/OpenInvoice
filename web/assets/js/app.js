@@ -810,12 +810,29 @@ var TopPage = (function () {
         _.each(sheets, function (item) {
             total += item.total;
         });
+        var fabDecorate = function (node) {
+            $(node).hover(function () {
+                $(this).find(".menu").toggleClass("current");
+                $(this).find(".submenu").toggleClass("current");
+                $(this).next("span").fadeIn();
+            }, function () {
+                $(this).find(".menu").toggleClass("current");
+                $(this).find(".submenu").toggleClass("current");
+                $(this).next("span").fadeOut();
+            });
+            return {
+                teardown: function () { }
+            };
+        };
         // Racriveオブジェクトを作る
         app.ractive = new Ractive({
             // どの箱に入れるかをIDで指定
             el: '#container',
             // 指定した箱に、どのHTMLを入れるかをIDで指定
             template: '#topTemplate',
+            decorators: {
+                fab: fabDecorate
+            },
             // データを設定。テンプレートで使います。
             data: {
                 myCompanyName: app.myCompanyName,
@@ -827,6 +844,10 @@ var TopPage = (function () {
         });
         tooltipster();
         app.ractive.on({
+            'addSheet': function (e, item) {
+                // #sheetに遷移する
+                app.router.navigate('sheets/new', { trigger: true });
+            },
             'showSheet': function (e, item) {
                 // #sheetに遷移する
                 app.router.navigate('sheets/' + item.id, { trigger: true });
@@ -893,7 +914,18 @@ var SheetPage = (function () {
     }
     SheetPage.prototype.onCreate = function (app) {
         var item;
-        if (app.tradingsMap === undefined || (item = app.tradingsMap[this.id]) === null) {
+        if (app.environment == null) {
+            window.history.back();
+            return;
+        }
+        if (this.id == 'new') {
+            var trading = new Trading();
+            trading.id = null;
+            trading.tax_rate = Number(app.environment['tax_rate']);
+            this.show(app, trading, []);
+            return;
+        }
+        if (app.tradingsMap === undefined || (item = app.tradingsMap[this.id]) === undefined) {
             window.history.back();
             return;
         }

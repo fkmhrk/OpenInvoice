@@ -14,7 +14,18 @@ class SheetPage implements Page {
     }
     onCreate(app : App) {
         var item : Trading;
-        if (app.tradingsMap === undefined || (item = app.tradingsMap[this.id]) === null) {
+        if (app.environment == null) {
+            window.history.back();
+            return;
+        }
+        if (this.id == 'new') {
+            var trading = new Trading();
+            trading.id = null;
+            trading.tax_rate = Number(app.environment['tax_rate']);
+            this.show(app, trading, []);
+            return;
+        }
+        if (app.tradingsMap === undefined || (item = app.tradingsMap[this.id]) === undefined) {
             window.history.back();
             return;
         }

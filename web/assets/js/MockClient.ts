@@ -171,7 +171,9 @@ class MockClient implements Client {
      * Gets Environment
      */
     getEnvironment(callback : ItemCallback<Environment>) {
-        callback.success(new Environment());
+        var env = new Environment();
+        env.tax_rate = "8";
+        callback.success(env);
     }
 
     /**
