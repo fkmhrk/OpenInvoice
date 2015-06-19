@@ -895,6 +895,7 @@ var TopPage = (function () {
             },
             'deleteSheet': function (e, index) {
                 _this.deleteSheet(app, index);
+                return false;
             },
             'copySheet': function (e, item) {
                 // #sheetに遷移する

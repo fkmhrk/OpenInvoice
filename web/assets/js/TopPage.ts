@@ -68,6 +68,7 @@ class TopPage implements Page {
             },
             'deleteSheet' : (e : any, index : number) => {
                 this.deleteSheet(app, index);
+                return false;
             },
             'copySheet' : (e : any, item : Trading) => {
                 // #sheetに遷移する
