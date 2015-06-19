@@ -83,7 +83,7 @@
             <!-- 繰り返しで表示 -->
             <!-- sheetsという配列をぐるぐるまわす -->
             <!-- 1つ1つのフィールドの内容を出すには、{{フィールド名}} -->
-            {{#sheets}}
+            {{#sheets:i}}
 	    <tr on-click="showSheet:{{.}}">
 	      <td>{{toDateStr(modified_time)}}</td>
 	      <td>{{company[company_id].name}}<span>{{subject}}</span></td>
@@ -91,7 +91,7 @@
 	      <td>{{quotation_number}}</td>
 	      <td>{{bill_number}}</td>
 	      <td>
-		<a class="btn" title="削除"><i class="fa fa-trash-o"></i></a>
+		<a on-click="deleteSheet:{{i}}"class="btn" title="削除"><i class="fa fa-trash-o"></i></a>
                 <a on-click="copySheet:{{.}}" class="btn" title="コピーして新規シート作成"><i class="fa fa-copy"></i></a>
 	      </td>
 	    </tr>
