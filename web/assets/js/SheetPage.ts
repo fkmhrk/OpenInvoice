@@ -66,6 +66,7 @@ class SheetPage implements Page {
                 'workTo' : Utils.toDateStr(trading.work_to),
                 'quotationDate' : Utils.toDateStr(trading.quotation_date),
                 'billDate' : Utils.toDateStr(trading.bill_date),
+                'deliveryDate' : Utils.toDateStr(trading.delivery_date),
                 'companies' : app.companies,
                 'users' : app.users,
                 'tradingItems' : itemList,
