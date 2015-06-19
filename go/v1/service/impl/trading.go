@@ -309,9 +309,12 @@ func (s *tradingService) toJson(t *m.Trading) map[string]interface{} {
 		"quotation_number": t.QuotationNumber,
 		"bill_date":        t.BillDate,
 		"bill_number":      t.BillNumber,
+		"delivery_date":    t.DeliveryDate,
+		"delivery_number":  t.DeliveryNumber,
 		"tax_rate":         t.TaxRate,
 		"assignee":         t.AssigneeId,
 		"product":          t.Product,
+		"memo":             t.Memo,
 		"modified_time":    t.ModifiedTime * 1000,
 	}
 }

@@ -34,7 +34,8 @@ func assertTrading(t *testing.T, item rj.RawJsonObject,
 	id, companyId, subject string, titleType int,
 	workFrom, workTo, total, quotationDate int64, quotationNumber string,
 	billDate int64, billNumber string,
-	taxRate float64, assignee, product string) {
+	deliveryDate int64, deliveryNumber string,
+	taxRate float64, assignee, product, memo string) {
 	assertString(t, item, "id", id)
 	assertString(t, item, "company_id", companyId)
 	assertString(t, item, "subject", subject)
@@ -46,9 +47,12 @@ func assertTrading(t *testing.T, item rj.RawJsonObject,
 	assertString(t, item, "quotation_number", quotationNumber)
 	assertLong(t, item, "bill_date", billDate)
 	assertString(t, item, "bill_number", billNumber)
+	assertLong(t, item, "delivery_date", deliveryDate)
+	assertString(t, item, "delivery_number", deliveryNumber)
 	assertFloat(t, item, "tax_rate", taxRate)
 	assertString(t, item, "assignee", assignee)
 	assertString(t, item, "product", product)
+	assertString(t, item, "memo", memo)
 }
 
 func getCaller() string {

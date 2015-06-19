@@ -28,9 +28,12 @@ func TestTrading0000_GetListByUser(t *testing.T) {
 		QuotationNumber: "A100",
 		BillDate:        200,
 		BillNumber:      "B200",
+		DeliveryDate:    300,
+		DeliveryNumber:  "C300",
 		TaxRate:         8.0,
 		AssigneeId:      "user2233",
 		Product:         "product",
+		Memo:            "memo",
 	})
 	list = append(list, &m.Trading{
 		Id: "trade2222",
@@ -62,7 +65,8 @@ func TestTrading0000_GetListByUser(t *testing.T) {
 		"subject3344", 1, 1122, 3344, 1980,
 		100, "A100",
 		200, "B200",
-		8.0, "user2233", "product")
+		300, "C300",
+		8.0, "user2233", "product", "memo")
 }
 
 func TestTrading0100_Create(t *testing.T) {
