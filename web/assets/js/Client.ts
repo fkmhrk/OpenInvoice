@@ -54,6 +54,11 @@ interface Client {
     saveTradingItem(tradingId : string, item : TradingItem, callback : ItemCallback<string>);
 
     /**
+     * Deletes Trading
+     */
+    deleteTrading(tradingId : string, callback : Callback);
+    
+    /**
      * Deltes Trading item of specified Trading
      */
     deleteTradingItem(tradingId : string, itemId : string, callback : ItemCallback<string>);

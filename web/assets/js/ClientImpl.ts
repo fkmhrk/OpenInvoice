@@ -107,6 +107,23 @@ class AppClientImpl implements Client {
             this.updateTradingItem(tradingId, item, callback);
         }            
     }
+
+    deleteTrading(tradingId : string, callback : Callback) {
+        var url = this.url + '/api/v1/tradings/' + tradingId;
+        this.exec(url, 'DELETE', this.accessToken, null, {
+            success : (json : any) => {
+                callback.success();
+            },
+            error : (status : any, body : any) => {
+                if (status == 404) {
+                    callback.success();
+                } else {
+                    callback.error(status, body.msg);
+                }
+            }
+        });                    
+    }
+    
     deleteTradingItem(tradingId : string, itemId : string, callback : ItemCallback<string>) {
         var url = this.url + '/api/v1/tradings/' + tradingId +
             '/items/' + itemId;

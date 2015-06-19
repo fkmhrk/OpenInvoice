@@ -99,6 +99,22 @@ var AppClientImpl = (function () {
             this.updateTradingItem(tradingId, item, callback);
         }
     };
+    AppClientImpl.prototype.deleteTrading = function (tradingId, callback) {
+        var url = this.url + '/api/v1/tradings/' + tradingId;
+        this.exec(url, 'DELETE', this.accessToken, null, {
+            success: function (json) {
+                callback.success();
+            },
+            error: function (status, body) {
+                if (status == 404) {
+                    callback.success();
+                }
+                else {
+                    callback.error(status, body.msg);
+                }
+            }
+        });
+    };
     AppClientImpl.prototype.deleteTradingItem = function (tradingId, itemId, callback) {
         var url = this.url + '/api/v1/tradings/' + tradingId +
             '/items/' + itemId;
