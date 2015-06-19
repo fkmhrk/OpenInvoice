@@ -220,6 +220,7 @@ class SheetPage implements Page {
         var workTo = app.ractive.get('workTo');
         var quotationDate = app.ractive.get('quotationDate');
         var billDate = app.ractive.get('billDate');
+        var deliveryDate = app.ractive.get('deliveryDate');
         var tradingItems = app.ractive.get('tradingItems');
 
         // modify type
@@ -228,6 +229,7 @@ class SheetPage implements Page {
         trading.work_to = new Date(workTo).getTime();
         trading.quotation_date = new Date(quotationDate).getTime();
         trading.bill_date = new Date(billDate).getTime();
+        trading.delivery_date = new Date(deliveryDate).getTime();
         trading.tax_rate = Number(trading.tax_rate);
         console.log(trading);
         app.client.saveTrading(trading, {
