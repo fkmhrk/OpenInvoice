@@ -451,9 +451,12 @@ func (d *tradingDAO) scanTrading(rows *sql.Rows) m.Trading {
 		QuotationNumber: quotationNumber,
 		BillDate:        billDate,
 		BillNumber:      billNumber,
+		DeliveryDate:    deliveryDate,
+		DeliveryNumber:  deliveryNumber,
 		TaxRate:         taxRate,
 		AssigneeId:      assignee,
 		Product:         product,
+		Memo:            memo,
 		CreatedTime:     created,
 		ModifiedTime:    modified,
 	}
