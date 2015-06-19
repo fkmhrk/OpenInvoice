@@ -47,16 +47,13 @@ func (s *tradingService) GetListByUser(token string) s.Result {
 	return jsonResult(200, body)
 }
 
-func (s *tradingService) Create(token, companyId, subject, product string, titleType int, workFrom, workTo, total, quotationDate, billDate int64, taxRate float32) s.Result {
+func (s *tradingService) Create(token, companyId, subject, product, memo string, titleType int, workFrom, workTo, total, quotationDate, billDate, deliveryDate int64, taxRate float32) s.Result {
 	// input check
 	if len(companyId) == 0 {
 		return errorResult(400, MSG_ERR_COMPANY_ID_EMPTY)
 	}
 	if len(subject) == 0 {
 		return errorResult(400, MSG_ERR_SUBJECT_EMPTY)
-	}
-	if len(product) == 0 {
-		return errorResult(400, MSG_ERR_PRODUCT_EMPTY)
 	}
 
 	// get session
@@ -68,7 +65,7 @@ func (s *tradingService) Create(token, companyId, subject, product string, title
 		return errorResult(401, MSG_WRONG_TOKEN)
 	}
 	// create
-	item, err := s.tradingDAO.Create(companyId, subject, titleType, workFrom, workTo, total, quotationDate, billDate, taxRate, session.UserId, product)
+	item, err := s.tradingDAO.Create(companyId, subject, titleType, workFrom, workTo, total, quotationDate, billDate, deliveryDate, taxRate, session.UserId, product, memo)
 	if err != nil {
 		return errorResult(500, MSG_SERVER_ERROR)
 	}

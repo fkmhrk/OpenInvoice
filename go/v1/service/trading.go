@@ -6,7 +6,7 @@ import (
 
 type TradingService interface {
 	GetListByUser(token string) Result
-	Create(token, companyId, subject, product string, titleType int, workFrom, workTo, total, quotationDate, billDate int64, taxRate float32) Result
+	Create(token, companyId, subject, product, memo string, titleType int, workFrom, workTo, total, quotationDate, billDate, deliveryDate int64, taxRate float32) Result
 	Update(token string, trading Trading) Result
 
 	// Deletes trading and child items

@@ -82,7 +82,7 @@ func TestTrading0100_Create(t *testing.T) {
 		Product:    "product",
 	}
 
-	s := NewTradingSerivce(sessionDAO, tradingDAO, models)
+	service := NewTradingSerivce(sessionDAO, tradingDAO, models)
 
 	// params
 	token := "token1122"
@@ -90,14 +90,16 @@ func TestTrading0100_Create(t *testing.T) {
 	titleType := 1
 	subject := "subject3344"
 	product := "product4455"
+	memo := "memo"
 	workFrom := int64(100)
 	workTo := int64(200)
 	total := int64(1980)
 	quotationDate := int64(300)
 	billDate := int64(400)
+	deliveryDate := int64(500)
 	taxRate := float32(8)
 
-	r := s.Create(token, companyId, subject, product, titleType, workFrom, workTo, total, quotationDate, billDate, taxRate)
+	r := service.Create(token, companyId, subject, product, memo, titleType, workFrom, workTo, total, quotationDate, billDate, deliveryDate, taxRate)
 	if r == nil {
 		t.Errorf("Result must not be nil")
 		return
