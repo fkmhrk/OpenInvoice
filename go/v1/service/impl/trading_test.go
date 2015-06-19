@@ -28,9 +28,12 @@ func TestTrading0000_GetListByUser(t *testing.T) {
 		QuotationNumber: "A100",
 		BillDate:        200,
 		BillNumber:      "B200",
+		DeliveryDate:    300,
+		DeliveryNumber:  "C300",
 		TaxRate:         8.0,
 		AssigneeId:      "user2233",
 		Product:         "product",
+		Memo:            "memo",
 	})
 	list = append(list, &m.Trading{
 		Id: "trade2222",
@@ -62,7 +65,8 @@ func TestTrading0000_GetListByUser(t *testing.T) {
 		"subject3344", 1, 1122, 3344, 1980,
 		100, "A100",
 		200, "B200",
-		8.0, "user2233", "product")
+		300, "C300",
+		8.0, "user2233", "product", "memo")
 }
 
 func TestTrading0100_Create(t *testing.T) {
@@ -82,7 +86,7 @@ func TestTrading0100_Create(t *testing.T) {
 		Product:    "product",
 	}
 
-	s := NewTradingSerivce(sessionDAO, tradingDAO, models)
+	service := NewTradingSerivce(sessionDAO, tradingDAO, models)
 
 	// params
 	token := "token1122"
@@ -90,14 +94,16 @@ func TestTrading0100_Create(t *testing.T) {
 	titleType := 1
 	subject := "subject3344"
 	product := "product4455"
+	memo := "memo"
 	workFrom := int64(100)
 	workTo := int64(200)
 	total := int64(1980)
 	quotationDate := int64(300)
 	billDate := int64(400)
+	deliveryDate := int64(500)
 	taxRate := float32(8)
 
-	r := s.Create(token, companyId, subject, product, titleType, workFrom, workTo, total, quotationDate, billDate, taxRate)
+	r := service.Create(token, companyId, subject, product, memo, titleType, workFrom, workTo, total, quotationDate, billDate, deliveryDate, taxRate)
 	if r == nil {
 		t.Errorf("Result must not be nil")
 		return

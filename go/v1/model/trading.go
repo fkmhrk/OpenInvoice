@@ -3,7 +3,7 @@ package model
 type TradingDAO interface {
 	GetListByUser(userId string) ([]*Trading, error)
 	GetById(id, userId string) (*Trading, error)
-	Create(companyId, subject string, titleType int, workFrom, workTo, total, quotationDate, billDate int64, taxRate float32, assignee, product string) (*Trading, error)
+	Create(companyId, subject string, titleType int, workFrom, workTo, total, quotationDate, billDate, deliveryDate int64, taxRate float32, assignee, product, memo string) (*Trading, error)
 	Update(trading Trading) (*Trading, error)
 
 	// Deletes trading and child items
@@ -31,9 +31,12 @@ type Trading struct {
 	QuotationNumber string
 	BillDate        int64
 	BillNumber      string
+	DeliveryDate    int64
+	DeliveryNumber  string
 	TaxRate         float32
 	AssigneeId      string
 	Product         string
+	Memo            string
 	CreatedTime     int64
 	ModifiedTime    int64
 }
