@@ -1194,6 +1194,7 @@ var SheetPage = (function () {
         console.log(trading);
         app.client.saveTrading(trading, {
             success: function (id) {
+                trading.modified_time = new Date().getTime();
                 app.tradingsMap[id] = trading;
                 var deleted = app.ractive.get('deletedItems');
                 _this.deleteItems(app, id, deleted, doneFunc);
