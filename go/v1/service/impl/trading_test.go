@@ -389,3 +389,28 @@ func TestTrading0600_GetNextNumber(t *testing.T) {
 		}
 	}
 }
+
+func TestTrading0700_Delete(t *testing.T) {
+	models := mock.NewMock()
+	sessionDAO, _ := models.Session.(*mock.SessionDAO)
+	sessionDAO.GetByTokenResult = &m.Session{
+		Token: "testToken",
+	}
+	tradingDAO, _ := models.Trading.(*mock.TradingDAO)
+	tradingDAO.DeleteResult = nil
+
+	s := NewTradingSerivce(sessionDAO, tradingDAO, models)
+	token := "token1122"
+	r := s.Delete(token, "trade1122")
+	if r == nil {
+		t.Errorf("Result must not be nil")
+		return
+	}
+	if r.Status() != 204 {
+		t.Errorf("Wrong status : %d", r.Status())
+		return
+	}
+	if r.Body() != "" {
+		t.Errorf("Body must be empty but %s", r.Body())
+	}
+}

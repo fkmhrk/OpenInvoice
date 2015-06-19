@@ -9,6 +9,9 @@ type TradingService interface {
 	Create(token, companyId, subject, product string, titleType int, workFrom, workTo, total, quotationDate, billDate int64, taxRate float32) Result
 	Update(token string, trading Trading) Result
 
+	// Deletes trading and child items
+	Delete(token, tradingId string) Result
+
 	// Gets trading items
 	GetItemListByTradingId(token, tradingId string) Result
 	CreateItem(token, tradingId, subject, degree, memo string, sortOrder, unitPrice, amount, taxType int) Result
