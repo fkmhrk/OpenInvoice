@@ -232,6 +232,7 @@ class SheetPage implements Page {
         console.log(trading);
         app.client.saveTrading(trading, {
             success : (id : string) => {
+                trading.modified_time = new Date().getTime();
                 app.tradingsMap[id] = trading;
                 var deleted = app.ractive.get('deletedItems');
                 this.deleteItems(app, id, deleted, doneFunc);
