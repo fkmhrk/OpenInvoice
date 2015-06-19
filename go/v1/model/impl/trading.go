@@ -13,7 +13,8 @@ const (
 		"work_from,work_to,total," +
 		"quotation_date,quotation_number," +
 		"bill_date,bill_number," +
-		"tax_rate,assignee,product," +
+		"delivery_date,delivery_number," +
+		"tax_rate,assignee,product,memo," +
 		"created_time, modified_time FROM trading"
 )
 
@@ -76,7 +77,7 @@ func (d *tradingDAO) GetById(id, userId string) (*m.Trading, error) {
 	return &item, nil
 }
 
-func (d *tradingDAO) Create(companyId, subject string, titleType int, workFrom, workTo, total, quotationDate, billDate int64, taxRate float32, assignee, product string) (*m.Trading, error) {
+func (d *tradingDAO) Create(companyId, subject string, titleType int, workFrom, workTo, total, quotationDate, billDate, deliveryDate int64, taxRate float32, assignee, product, memo string) (*m.Trading, error) {
 	tr, err := d.connection.Begin()
 	if err != nil {
 		return nil, err
@@ -88,13 +89,15 @@ func (d *tradingDAO) Create(companyId, subject string, titleType int, workFrom, 
 		"work_from,work_to,total," +
 		"quotation_date,quotation_number," +
 		"bill_date,bill_number," +
-		"tax_rate,assignee,product," +
+		"delivery_date,delivery_number," +
+		"tax_rate,assignee,product,memo," +
 		"created_time,modified_time,deleted)" +
 		"VALUES(?,?,?,?," +
 		"?,?,?," +
 		"?,''," +
 		"?,''," +
-		"?,?,?," +
+		"?,''," +
+		"?,?,?,?," +
 		"unix_timestamp(now()),unix_timestamp(now()),0)")
 	if err != nil {
 		return nil, err
@@ -106,7 +109,8 @@ func (d *tradingDAO) Create(companyId, subject string, titleType int, workFrom, 
 			workFrom, workTo, total,
 			quotationDate,
 			billDate,
-			taxRate, assignee, product)
+			deliveryDate,
+			taxRate, assignee, product, memo)
 		return err
 	})
 	if err != nil {
@@ -418,14 +422,15 @@ func (d *tradingDAO) scanTrading(rows *sql.Rows) m.Trading {
 	var id, companyId, subject, product string
 	var titleType int
 	var taxRate float32
-	var assignee, quotationNumber, billNumber string
-	var workFrom, workTo, total, quotationDate, billDate, created, modified int64
+	var assignee, quotationNumber, billNumber, deliveryNumber, memo string
+	var workFrom, workTo, total, quotationDate, billDate, deliveryDate, created, modified int64
 
 	err := rows.Scan(&id, &companyId, &titleType, &subject,
 		&workFrom, &workTo, &total,
 		&quotationDate, &quotationNumber,
 		&billDate, &billNumber,
-		&taxRate, &assignee, &product,
+		&deliveryDate, &deliveryNumber,
+		&taxRate, &assignee, &product, &memo,
 		&created, &modified)
 	if err != nil {
 		d.logger.Errorf("Failed to scan trading :%s", err)
