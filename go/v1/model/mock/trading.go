@@ -9,6 +9,7 @@ type TradingDAO struct {
 	GetByIdResult        *m.Trading
 	CreateResult         *m.Trading
 	UpdateResult         *m.Trading
+	DeleteResult         error
 	GetItemsByIdResult   []*m.TradingItem
 	CreateItemResult     *m.TradingItem
 	UpdateItemResult     *m.TradingItem
@@ -29,6 +30,10 @@ func (d *TradingDAO) Create(companyId, subject string, titleType int, workFrom, 
 
 func (d *TradingDAO) Update(trading m.Trading) (*m.Trading, error) {
 	return d.UpdateResult, nil
+}
+
+func (d *TradingDAO) Delete(id string) error {
+	return d.DeleteResult
 }
 
 func (d *TradingDAO) GetItemsById(tradingId string) ([]*m.TradingItem, error) {
