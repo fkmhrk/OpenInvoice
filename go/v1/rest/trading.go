@@ -82,6 +82,16 @@ func updateTrading(trading s.TradingService) handler {
 	})
 }
 
+func deleteTrading(services s.Services) handler {
+	return makeHandler(func(token, tType string, req *http.Request) s.Result {
+		// read path param
+		vars := mux.Vars(req)
+		tradingId := vars["tradingId"]
+
+		return services.Trading.Delete(token, tradingId)
+	})
+}
+
 func getTradingItems(trading s.TradingService) handler {
 	return makeHandler(func(token, tType string,
 		req *http.Request) s.Result {

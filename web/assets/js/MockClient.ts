@@ -163,6 +163,14 @@ class MockClient implements Client {
     }
 
     /**
+     * Deletes Trading
+     */
+    deleteTrading(tradingId : string, callback : Callback) {
+        console.log('Delete traing id=' + tradingId);
+        callback.success();
+    }
+
+    /**
      * Deltes Trading item of specified Trading
      */
     deleteTradingItem(tradingId : string, itemId : string, callback : ItemCallback<string>) { }

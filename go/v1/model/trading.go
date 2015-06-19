@@ -6,6 +6,9 @@ type TradingDAO interface {
 	Create(companyId, subject string, titleType int, workFrom, workTo, total, quotationDate, billDate int64, taxRate float32, assignee, product string) (*Trading, error)
 	Update(trading Trading) (*Trading, error)
 
+	// Deletes trading and child items
+	Delete(id string) error
+
 	// Gets all trading items by trading ID
 	GetItemsById(tradingId string) ([]*TradingItem, error)
 	CreateItem(tradingId, subject, degree, memo string, sortOrder, unitPrice, Amount, taxType int) (*TradingItem, error)

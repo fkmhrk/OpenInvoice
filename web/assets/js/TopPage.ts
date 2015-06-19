@@ -66,6 +66,9 @@ class TopPage implements Page {
                 // #sheetに遷移する
                 app.router.navigate('sheets/' + item.id, {trigger:true});
             },
+            'deleteSheet' : (e : any, index : number) => {
+                this.deleteSheet(app, index);
+            },
             'copySheet' : (e : any, item : Trading) => {
                 // #sheetに遷移する
                 app.router.navigate('sheets/' + item.id + '/copy', {trigger:true});
@@ -89,5 +92,21 @@ class TopPage implements Page {
                 app.showDialog(new SettingsDialog());
             },            
         });        
+    }
+
+    private deleteSheet(app : App, index : number) {
+        if (!window.confirm('このシートを削除しますか？')) {
+            return;
+        }
+        var item : Trading = app.ractive.get('sheets')[index];
+        app.client.deleteTrading(item.id, {
+            success : () => {
+                app.ractive.splice('sheets', index, 1);
+                app.addSnack('削除しました！');
+            },
+            error : (status : number, msg : string) => {
+                console.log('Failed to delete item status=' + status);
+            }
+        });
     }
 }

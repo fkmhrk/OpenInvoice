@@ -164,6 +164,26 @@ func (d *tradingDAO) Update(trading m.Trading) (*m.Trading, error) {
 	return &trading, nil
 }
 
+func (d *tradingDAO) Delete(id string) error {
+	tr, err := d.connection.Begin()
+	if err != nil {
+		return err
+	}
+	defer tr.Rollback()
+	// deletes item
+	err = d.softAllDeleteItem(tr, id)
+	if err != nil {
+		return err
+	}
+	// delete trading
+	err = d.softDelete(tr, id)
+	if err != nil {
+		return err
+	}
+	tr.Commit()
+	return nil
+}
+
 func (d *tradingDAO) GetItemsById(tradingId string) ([]*m.TradingItem, error) {
 	db := d.connection.Connect()
 	st, err := db.Prepare("SELECT id,sort_order,subject,unit_price,amount," +
@@ -429,4 +449,38 @@ func (d *tradingDAO) scanTrading(rows *sql.Rows) m.Trading {
 		CreatedTime:     created,
 		ModifiedTime:    modified,
 	}
+}
+
+func (d *tradingDAO) softDelete(tr *sql.Tx, tradingId string) error {
+	st, err := tr.Prepare("UPDATE trading SET " +
+		"deleted=1 " +
+		"WHERE id=? AND deleted <> 1")
+	if err != nil {
+		return err
+	}
+	defer st.Close()
+
+	// execute
+	_, err = st.Exec(tradingId)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (d *tradingDAO) softAllDeleteItem(tr *sql.Tx, tradingId string) error {
+	st, err := tr.Prepare("UPDATE trading_item SET " +
+		"deleted=1 " +
+		"WHERE trading_id=? AND deleted <> 1")
+	if err != nil {
+		return err
+	}
+	defer st.Close()
+
+	// execute
+	_, err = st.Exec(tradingId)
+	if err != nil {
+		return err
+	}
+	return nil
 }

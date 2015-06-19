@@ -123,6 +123,33 @@ func (s *tradingService) Update(token string, trading s.Trading) s.Result {
 	return jsonResult(200, body)
 }
 
+func (o *tradingService) Delete(token, tradingId string) s.Result {
+	// input check
+	if len(tradingId) == 0 {
+		return errorResult(400, MSG_ERR_ID_EMPTY)
+	}
+
+	// get session
+	session, err := o.sessionDAO.GetByToken(token)
+	if err != nil {
+		return errorResult(500, MSG_SERVER_ERROR)
+	}
+	if session == nil {
+		return errorResult(401, MSG_WRONG_TOKEN)
+	}
+
+	// delete
+	err = o.tradingDAO.Delete(tradingId)
+	if err != nil {
+		return errorResult(500, MSG_SERVER_ERROR)
+	}
+
+	return &result{
+		status: 204,
+		body:   "",
+	}
+}
+
 func (s *tradingService) GetItemListByTradingId(token, tradingId string) s.Result {
 	// input check
 	session, err := s.sessionDAO.GetByToken(token)

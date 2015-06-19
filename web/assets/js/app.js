@@ -99,6 +99,22 @@ var AppClientImpl = (function () {
             this.updateTradingItem(tradingId, item, callback);
         }
     };
+    AppClientImpl.prototype.deleteTrading = function (tradingId, callback) {
+        var url = this.url + '/api/v1/tradings/' + tradingId;
+        this.exec(url, 'DELETE', this.accessToken, null, {
+            success: function (json) {
+                callback.success();
+            },
+            error: function (status, body) {
+                if (status == 404) {
+                    callback.success();
+                }
+                else {
+                    callback.error(status, body.msg);
+                }
+            }
+        });
+    };
     AppClientImpl.prototype.deleteTradingItem = function (tradingId, itemId, callback) {
         var url = this.url + '/api/v1/tradings/' + tradingId +
             '/items/' + itemId;
@@ -829,6 +845,7 @@ var TopPage = (function () {
         });
     };
     TopPage.prototype.show = function (app) {
+        var _this = this;
         var sheets = app.getTradings();
         var total = 0;
         _.each(sheets, function (item) {
@@ -876,6 +893,9 @@ var TopPage = (function () {
                 // #sheetに遷移する
                 app.router.navigate('sheets/' + item.id, { trigger: true });
             },
+            'deleteSheet': function (e, index) {
+                _this.deleteSheet(app, index);
+            },
             'copySheet': function (e, item) {
                 // #sheetに遷移する
                 app.router.navigate('sheets/' + item.id + '/copy', { trigger: true });
@@ -897,6 +917,21 @@ var TopPage = (function () {
             },
             'showSetting': function (e) {
                 app.showDialog(new SettingsDialog());
+            }
+        });
+    };
+    TopPage.prototype.deleteSheet = function (app, index) {
+        if (!window.confirm('このシートを削除しますか？')) {
+            return;
+        }
+        var item = app.ractive.get('sheets')[index];
+        app.client.deleteTrading(item.id, {
+            success: function () {
+                app.ractive.splice('sheets', index, 1);
+                app.addSnack('削除しました！');
+            },
+            error: function (status, msg) {
+                console.log('Failed to delete item status=' + status);
             }
         });
     };
