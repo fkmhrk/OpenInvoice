@@ -146,7 +146,8 @@ func (d *tradingDAO) Update(trading m.Trading) (*m.Trading, error) {
 		"work_from=?,work_to=?,total=?," +
 		"quotation_date=?,quotation_number=?," +
 		"bill_date=?,bill_number=?," +
-		"tax_rate=?,assignee=?,product=?," +
+		"delivery_date=?,delivery_number=?," +
+		"tax_rate=?,assignee=?,product=?,memo=?," +
 		"modified_time=unix_timestamp(now()) " +
 		"WHERE id=? AND deleted <> 1")
 	if err != nil {
@@ -158,7 +159,9 @@ func (d *tradingDAO) Update(trading m.Trading) (*m.Trading, error) {
 		trading.WorkFrom, trading.WorkTo, trading.Total,
 		trading.QuotationDate, trading.QuotationNumber,
 		trading.BillDate, trading.BillNumber,
-		trading.TaxRate, trading.AssigneeId, trading.Product, trading.Id)
+		trading.DeliveryDate, trading.DeliveryNumber,
+		trading.TaxRate, trading.AssigneeId, trading.Product, trading.Memo,
+		trading.Id)
 	if err != nil {
 		return nil, err
 	}
