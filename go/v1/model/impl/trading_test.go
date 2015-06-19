@@ -281,3 +281,69 @@ func TestTrading0300_Update(t *testing.T) {
 		t.Errorf("Wrong Product : %s", item3.Product)
 	}
 }
+
+func TestTrading0400_Delete(t *testing.T) {
+	db, err := connect()
+	if err != nil {
+		t.Errorf("Failed to connect")
+		return
+	}
+	defer db.Close()
+	// prepare
+	userId := "user1122"
+	quotationDate := int64(1111)
+	billDate := int64(2222)
+	taxRate := float32(8)
+	deleteTradingByUser(db, userId)
+	// create trading
+	dao := createTradingDAO(db)
+	trading, err := dao.Create("company1111", "subject2222", 1,
+		1234, 5678, 4980, quotationDate, billDate, taxRate, userId, "product3333")
+	if err != nil {
+		t.Errorf("Failed to create trading : %s", err)
+		return
+	}
+	// add item
+	for i := 0; i < 2; i++ {
+		_, err = dao.CreateItem(trading.Id, "item", "m/m", "memo", i, 100, i, 1)
+		if err != nil {
+			t.Errorf("Failed to create trading item : %s", err)
+			return
+		}
+	}
+	// check
+	itemList, err := dao.GetItemsById(trading.Id)
+	if err != nil {
+		t.Errorf("Failed to get items : %s", err)
+		return
+	}
+	if len(itemList) != 2 {
+		t.Errorf("ItemList must be 2 but %d", len(itemList))
+		return
+	}
+	// delete
+	err = dao.Delete(trading.Id)
+	if err != nil {
+		t.Errorf("Failed to delete trading : %s", err)
+		return
+	}
+	// check
+	itemList2, err := dao.GetItemsById(trading.Id)
+	if err != nil {
+		t.Errorf("Failed to get items : %s", err)
+		return
+	}
+	if len(itemList2) != 0 {
+		t.Errorf("ItemList must be 0 but %d", len(itemList2))
+		return
+	}
+	trading2, err := dao.GetById(trading.Id, userId)
+	if err != nil {
+		t.Errorf("Failed to get trading : %s", err)
+		return
+	}
+	if trading2 != nil {
+		t.Errorf("Trading is not deleted...")
+		return
+	}
+}
