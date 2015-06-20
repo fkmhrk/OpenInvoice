@@ -10,10 +10,10 @@ type companyService struct {
 	companyDAO m.CompanyDAO
 }
 
-func NewCompanySerivce(s m.SessionDAO, c m.CompanyDAO) *companyService {
+func NewCompanySerivce(models *m.Models) *companyService {
 	return &companyService{
-		sessionDAO: s,
-		companyDAO: c,
+		sessionDAO: models.Session,
+		companyDAO: models.Company,
 	}
 }
 
@@ -79,6 +79,26 @@ func (s *companyService) Update(token, id, name, zip, address, phone, unit strin
 		"id": company.Id,
 	}
 	return jsonResult(200, body)
+}
+
+func (o *companyService) Delete(token, id string) s.Result {
+	// input check
+	session, err := o.sessionDAO.GetByToken(token)
+	if err != nil {
+		return errorResult(500, MSG_SERVER_ERROR)
+	}
+	if session == nil {
+		return errorResult(401, MSG_WRONG_TOKEN)
+	}
+	// delete
+	err = o.companyDAO.Delete(id)
+	if err != nil {
+		return errorResult(500, s.ERR_SERVER_ERROR)
+	}
+	return &result{
+		status: 204,
+		body:   "",
+	}
 }
 
 func (s *companyService) toJson(c *m.Company) map[string]interface{} {
