@@ -6,6 +6,7 @@ type CompanyDAO interface {
 	GetById(id string) (*Company, error)
 	Create(name, zip, address, phone, unit string) (*Company, error)
 	Update(id, name, zip, address, phone, unit string) (*Company, error)
+	Delete(id string) error
 }
 
 type Company struct {
