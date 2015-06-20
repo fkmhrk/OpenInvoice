@@ -29,6 +29,10 @@ class CompanyListDialog implements Dialog {
                 this.showEditDialog(app, item);
                 return false;
             },
+            'deleteCompany' : (e : any, index : number) => {
+                this.deleteCompany(app, index);
+                return false;
+            },
             'submit' : () => {
                 this.save(app);
             }
@@ -82,5 +86,21 @@ class CompanyListDialog implements Dialog {
         this.ractive.set('address', '');
         this.ractive.set('tel', '');
         this.ractive.set('fax', '');
+    }
+
+    private deleteCompany(app : App, index : number) {
+        if (!window.confirm('この会社情報を削除しますか？')) {
+            return;
+        }
+        var company = this.ractive.get('companyList')[index];
+        app.client.deleteCompany(company.id, {
+            success : () => {
+                this.ractive.splice('companyList', index, 1);
+                app.addSnack('削除しました！');
+            },
+            error : (status : number, msg : string) => {
+                console.log('Failed to delete company status=' + status);
+            }
+        });
     }
 }

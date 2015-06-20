@@ -6,44 +6,53 @@ import (
 	"net/http"
 )
 
+const (
+	method_GET    = "GET"
+	method_POST   = "POST"
+	method_PUT    = "PUT"
+	method_DELETE = "DELETE"
+)
+
 type handler func(http.ResponseWriter, *http.Request)
 
 func SetHandlers(r *mux.Router, services s.Services, u s.UserService, t s.TradingService, c s.CompanyService) {
 	r.HandleFunc("/token", getToken(u)).
-		Methods("POST")
+		Methods(method_POST)
 	r.HandleFunc("/token/refresh", refreshToken(services)).
-		Methods("POST")
+		Methods(method_POST)
 	r.HandleFunc("/users", getUsers(u)).
-		Methods("GET")
+		Methods(method_GET)
 	r.HandleFunc("/tradings", getTradings(t)).
-		Methods("GET")
+		Methods(method_GET)
 	r.HandleFunc("/tradings", createTrading(t)).
-		Methods("POST")
+		Methods(method_POST)
 	r.HandleFunc("/tradings/{tradingId}", updateTrading(t)).
-		Methods("PUT")
+		Methods(method_PUT)
 	r.HandleFunc("/tradings/{tradingId}", deleteTrading(services)).
-		Methods("DELETE")
+		Methods(method_DELETE)
 	r.HandleFunc("/tradings/{tradingId}/items", getTradingItems(t)).
-		Methods("GET")
+		Methods(method_GET)
 	r.HandleFunc("/tradings/{tradingId}/items", createTradingItem(t)).
-		Methods("POST")
+		Methods(method_POST)
 	r.HandleFunc("/tradings/{tradingId}/items/{itemId}", updateTradingItem(t)).
-		Methods("PUT")
+		Methods(method_PUT)
 	r.HandleFunc("/tradings/{tradingId}/items/{itemId}", deleteTradingItem(t)).
-		Methods("DELETE")
+		Methods(method_DELETE)
 	r.HandleFunc("/companies", getCompanies(c)).
-		Methods("GET")
+		Methods(method_GET)
 	r.HandleFunc("/companies", createCompany(c)).
-		Methods("POST")
+		Methods(method_POST)
 	r.HandleFunc("/companies/{companyId}", updateCompany(c)).
-		Methods("PUT")
+		Methods(method_PUT)
+	r.HandleFunc("/companies/{companyId}", deleteCompany(services)).
+		Methods(method_DELETE)
 	r.HandleFunc("/sequences/{seqType}", getNextNumber(services)).
-		Methods("POST")
+		Methods(method_POST)
 	// Environment
 	r.HandleFunc("/environments", getEnvironment(services)).
-		Methods("GET")
+		Methods(method_GET)
 	r.HandleFunc("/environments", saveEnvironment(services)).
-		Methods("PUT")
+		Methods(method_PUT)
 	r.HandleFunc("/myCompany/name", getMyCompanyName(services)).
-		Methods("GET")
+		Methods(method_GET)
 }

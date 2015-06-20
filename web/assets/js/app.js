@@ -140,6 +140,17 @@ var AppClientImpl = (function () {
             this.updateCompany(item, callback);
         }
     };
+    AppClientImpl.prototype.deleteCompany = function (id, callback) {
+        var url = this.url + '/api/v1/companies/' + id;
+        this.exec(url, 'DELETE', this.accessToken, null, {
+            success: function (json) {
+                callback.success();
+            },
+            error: function (status, body) {
+                callback.error(status, body.msg);
+            }
+        });
+    };
     AppClientImpl.prototype.getEnvironment = function (callback) {
         var url = this.url + '/api/v1/environments';
         this.exec(url, 'GET', this.accessToken, null, {
@@ -653,6 +664,10 @@ var CompanyListDialog = (function () {
                 _this.showEditDialog(app, item);
                 return false;
             },
+            'deleteCompany': function (e, index) {
+                _this.deleteCompany(app, index);
+                return false;
+            },
             'submit': function () {
                 _this.save(app);
             }
@@ -703,6 +718,22 @@ var CompanyListDialog = (function () {
         this.ractive.set('address', '');
         this.ractive.set('tel', '');
         this.ractive.set('fax', '');
+    };
+    CompanyListDialog.prototype.deleteCompany = function (app, index) {
+        var _this = this;
+        if (!window.confirm('この会社情報を削除しますか？')) {
+            return;
+        }
+        var company = this.ractive.get('companyList')[index];
+        app.client.deleteCompany(company.id, {
+            success: function () {
+                _this.ractive.splice('companyList', index, 1);
+                app.addSnack('削除しました！');
+            },
+            error: function (status, msg) {
+                console.log('Failed to delete company status=' + status);
+            }
+        });
     };
     return CompanyListDialog;
 })();

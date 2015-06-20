@@ -9,6 +9,7 @@ type CompanyDAO struct {
 	GetByIdResult *m.Company
 	CreateResult  *m.Company
 	UpdateResult  *m.Company
+	DeleteResult  error
 }
 
 func (d *CompanyDAO) GetList() ([]*m.Company, error) {
@@ -25,4 +26,8 @@ func (d *CompanyDAO) Create(name, zip, address, phone, unit string) (*m.Company,
 
 func (d *CompanyDAO) Update(id, name, zip, address, phone, unit string) (*m.Company, error) {
 	return d.UpdateResult, nil
+}
+
+func (d *CompanyDAO) Delete(id string) error {
+	return d.DeleteResult
 }

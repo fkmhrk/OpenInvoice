@@ -141,6 +141,48 @@ func (d *companyDAO) Update(id, name, zip, address, phone, unit string) (*m.Comp
 	}, nil
 }
 
+func (d *companyDAO) Delete(id string) error {
+	tr, err := d.connection.Begin()
+	if err != nil {
+		return err
+	}
+	defer tr.Rollback()
+	err = d.execDelete(tr, id)
+	if err != nil {
+		return err
+	}
+	tr.Commit()
+	return nil
+}
+
+func (d *companyDAO) execDelete(tr *sql.Tx, id string) error {
+	// update company id to ""
+	st, err := tr.Prepare("UPDATE trading SET " +
+		"company_id='',modified_time=unix_timestamp(now()) " +
+		"WHERE company_id=?")
+	if err != nil {
+		return err
+	}
+	defer st.Close()
+
+	_, err = st.Exec(id)
+	if err != nil {
+		return err
+	}
+
+	// set delete flag
+	st2, err := tr.Prepare("UPDATE company SET " +
+		"deleted=1, modified_time=unix_timestamp(now()) " +
+		"WHERE id=?")
+	if err != nil {
+		return err
+	}
+	defer st2.Close()
+
+	_, err = st2.Exec(id)
+	return err
+}
+
 func (d *companyDAO) readRow(rows *sql.Rows) *m.Company {
 	var id, name, zip, address, phone, unit string
 	rows.Scan(&id, &name, &zip, &address, &phone, &unit)

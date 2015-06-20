@@ -109,7 +109,15 @@ class MockClient implements Client {
         }
         companyList[item.id] = item;
         callback.success(item.id);
-    }    
+    }
+
+    /**
+     * Deletes comapny
+     */
+    deleteCompany(id : string, callback : Callback) {
+        console.log('DeleteCompany id=' + id);
+        callback.success();
+    }
     
     /**
      * Gets Tradings

@@ -29,7 +29,12 @@ interface Client {
      * Saves company
      * @return item is Company ID
      */
-    saveCompany(item : Company, callback : ItemCallback<string>);    
+    saveCompany(item : Company, callback : ItemCallback<string>);
+
+    /**
+     * Deletes comapny
+     */
+    deleteCompany(id : string, callback : Callback);
     
     /**
      * Gets Tradings

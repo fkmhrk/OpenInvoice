@@ -1,21 +1,21 @@
 package impl
 
 import (
-	"../../model"
-	m "../../model/mock"
+	m "../../model"
+	"../../model/mock"
 	"fmt"
 	"testing"
 )
 
 func TestCompany0000_GetList(t *testing.T) {
-	sessionDAO := &m.SessionDAO{
-		GetByTokenResult: &model.Session{
-			Token: "testToken",
-		},
+	models := mock.NewMock()
+	sessionDAO, _ := models.Session.(*mock.SessionDAO)
+	sessionDAO.GetByTokenResult = &m.Session{
+		Token: "testToken",
 	}
-	var list []*model.Company
+	var list []*m.Company
 	for i := 0; i < 3; i++ {
-		list = append(list, &model.Company{
+		list = append(list, &m.Company{
 			Id:      fmt.Sprintf("company%d", i),
 			Name:    fmt.Sprintf("Name%d", i),
 			Zip:     fmt.Sprintf("Zip%d", i),
@@ -24,11 +24,10 @@ func TestCompany0000_GetList(t *testing.T) {
 			Unit:    fmt.Sprintf("Unit%d", i),
 		})
 	}
-	companyDAO := &m.CompanyDAO{
-		GetListResult: list,
-	}
+	companyDAO, _ := models.Company.(*mock.CompanyDAO)
+	companyDAO.GetListResult = list
 
-	s := NewCompanySerivce(sessionDAO, companyDAO)
+	s := NewCompanySerivce(models)
 
 	token := "token1122"
 	r := s.GetList(token)
@@ -56,23 +55,22 @@ func TestCompany0000_GetList(t *testing.T) {
 }
 
 func TestCompany0100_Create(t *testing.T) {
-	sessionDAO := &m.SessionDAO{
-		GetByTokenResult: &model.Session{
-			Token: "testToken",
-		},
+	models := mock.NewMock()
+	sessionDAO, _ := models.Session.(*mock.SessionDAO)
+	sessionDAO.GetByTokenResult = &m.Session{
+		Token: "testToken",
 	}
-	companyDAO := &m.CompanyDAO{
-		CreateResult: &model.Company{
-			Id:      "company",
-			Name:    "Name",
-			Zip:     "Zip",
-			Address: "Address",
-			Phone:   "Phone",
-			Unit:    "Unit",
-		},
+	companyDAO, _ := models.Company.(*mock.CompanyDAO)
+	companyDAO.CreateResult = &m.Company{
+		Id:      "company",
+		Name:    "Name",
+		Zip:     "Zip",
+		Address: "Address",
+		Phone:   "Phone",
+		Unit:    "Unit",
 	}
 
-	s := NewCompanySerivce(sessionDAO, companyDAO)
+	s := NewCompanySerivce(models)
 
 	token := "token1122"
 	r := s.Create(token, "name", "zip", "address", "phone", "unit")
@@ -92,23 +90,22 @@ func TestCompany0100_Create(t *testing.T) {
 }
 
 func TestCompany0200_Update(t *testing.T) {
-	sessionDAO := &m.SessionDAO{
-		GetByTokenResult: &model.Session{
-			Token: "testToken",
-		},
+	models := mock.NewMock()
+	sessionDAO, _ := models.Session.(*mock.SessionDAO)
+	sessionDAO.GetByTokenResult = &m.Session{
+		Token: "testToken",
 	}
-	companyDAO := &m.CompanyDAO{
-		UpdateResult: &model.Company{
-			Id:      "company",
-			Name:    "Name",
-			Zip:     "Zip",
-			Address: "Address",
-			Phone:   "Phone",
-			Unit:    "Unit",
-		},
+	companyDAO, _ := models.Company.(*mock.CompanyDAO)
+	companyDAO.UpdateResult = &m.Company{
+		Id:      "company",
+		Name:    "Name",
+		Zip:     "Zip",
+		Address: "Address",
+		Phone:   "Phone",
+		Unit:    "Unit",
 	}
 
-	s := NewCompanySerivce(sessionDAO, companyDAO)
+	s := NewCompanySerivce(models)
 
 	token := "token1122"
 	r := s.Update(token, "id", "name", "zip", "address", "phone", "unit")
@@ -124,5 +121,32 @@ func TestCompany0200_Update(t *testing.T) {
 	json := json(r)
 	if v, _ := json.String("id"); v != "company" {
 		t.Errorf("Wrong id : %s", v)
+	}
+}
+
+func TestCompany0300_Delete(t *testing.T) {
+	models := mock.NewMock()
+	sessionDAO, _ := models.Session.(*mock.SessionDAO)
+	sessionDAO.GetByTokenResult = &m.Session{
+		Token: "testToken",
+	}
+	companyDAO, _ := models.Company.(*mock.CompanyDAO)
+	companyDAO.DeleteResult = nil
+
+	s := NewCompanySerivce(models)
+
+	token := "token1122"
+	result := s.Delete(token, "company1")
+	if result == nil {
+		t.Errorf("Result must not be nil")
+		return
+	}
+	if result.Status() != 204 {
+		t.Errorf("Wrong status : %d", result.Status())
+		return
+	}
+	if result.Body() != "" {
+		t.Errorf("Body must be empty but %s", result.Body())
+		return
 	}
 }
