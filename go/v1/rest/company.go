@@ -50,6 +50,16 @@ func updateCompany(company s.CompanyService) handler {
 	})
 }
 
+func deleteCompany(services s.Services) handler {
+	return makeHandler(func(token, tType string, req *http.Request) s.Result {
+		// read path param
+		vars := mux.Vars(req)
+		id := vars["companyId"]
+
+		return services.Company.Delete(token, id)
+	})
+}
+
 func getNextNumber(services s.Services) handler {
 	return makeHandler(func(token, tType string, req *http.Request) s.Result {
 		// read path param
