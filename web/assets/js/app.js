@@ -1222,7 +1222,7 @@ var SheetPage = (function () {
         if (trading.delivery_number == null || trading.delivery_number.length == 0) {
             app.client.getNextNumber('delivery', new Date(deliveryDate).getTime(), {
                 success: function (val) {
-                    trading.delivery_number = '' + val + '-V';
+                    trading.delivery_number = '' + val + '-D';
                     _this.save(app, doneFunc);
                 },
                 error: function (status, msg) {

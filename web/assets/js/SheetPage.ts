@@ -230,7 +230,7 @@ class SheetPage implements Page {
         if (trading.delivery_number == null || trading.delivery_number.length == 0) {
             app.client.getNextNumber('delivery', new Date(deliveryDate).getTime(), {
                 success : (val : number) => {
-                    trading.delivery_number = '' + val + '-V';
+                    trading.delivery_number = '' + val + '-D';
                     this.save(app, doneFunc);
                 },
                 error : (status : number, msg : string) => {
