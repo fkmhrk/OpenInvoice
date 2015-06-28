@@ -63,7 +63,7 @@ if ($user === null) {
 }
 
 $view->writeTitle("納品書");
-$view->writeDate($trading['bill_number'], $trading['bill_date'] / 1000);
+$view->writeDate($trading['delivery_number'], $trading['delivery_date'] / 1000);
 $view->writeCompany($company['name'], $title);
 $view->writeMyCompany($env, $user);
 
@@ -71,6 +71,5 @@ $summary = $view->writeItemTable(16, 120, $items, $trading['tax_rate']);
 $view->writeTheTimeForPayment($trading['bill_date'] / 1000, $env['pay_limit']);
 $view->writeProduct($trading['work_from'] / 1000, $trading['work_to'] / 1000, $trading['product']);
 $view->writeTotal("御請求金額計 ￥" . number_format($summary['total']));
-$view->writeBankInfo($env);
-$view->output('請求書_'. $company['name']);
+$view->output('納品書_'. $company['name']);
 ?>
