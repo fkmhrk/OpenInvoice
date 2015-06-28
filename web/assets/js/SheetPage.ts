@@ -227,7 +227,7 @@ class SheetPage implements Page {
             app.ractive.update();
             window.location.href = "/php/delivery.php?access_token=" + app.client.getAccessToken() + "&trading_id=" + id;
         };
-        if (trading.bill_number == null || trading.bill_number.length == 0) {
+        if (trading.delivery_number == null || trading.delivery_number.length == 0) {
             app.client.getNextNumber('delivery', new Date(deliveryDate).getTime(), {
                 success : (val : number) => {
                     trading.delivery_number = '' + val + '-V';
