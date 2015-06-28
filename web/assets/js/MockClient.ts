@@ -6,6 +6,7 @@ var globalSeq = {
     'tradingItem' : 1,
     'quotationNumber' : 1,
     'billNumber' : 1,
+    'deliveryNumber' : 1,
 };
 
 var userList : Array<User> = [{
