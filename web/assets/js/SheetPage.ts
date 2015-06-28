@@ -143,7 +143,10 @@ class SheetPage implements Page {
             },
             'printBill' : () => {
                 this.printBill(app);
-            },            
+            },
+            'printDelivery' : () => {
+                this.printDelivery(app);
+            },
         });
         r.on('deleteItem', function(e, index) {
             itemObserver.cancel();
@@ -215,6 +218,30 @@ class SheetPage implements Page {
             this.save(app, doneFunc);
         }        
     }
+    
+    private printDelivery(app : App) {
+        var trading = app.ractive.get('trading');
+        var deliveryDate = app.ractive.get('deliveryDate');
+        
+        var doneFunc = (id : string) => {
+            app.ractive.update();
+            window.location.href = "/php/delivery.php?access_token=" + app.client.getAccessToken() + "&trading_id=" + id;
+        };
+        if (trading.bill_number == null || trading.bill_number.length == 0) {
+            app.client.getNextNumber('delivery', new Date(deliveryDate).getTime(), {
+                success : (val : number) => {
+                    trading.delivery_number = '' + val + '-V';
+                    this.save(app, doneFunc);
+                },
+                error : (status : number, msg : string) => {
+                    console.log('Failed to get next delivery number status=' + status);
+                }
+            });
+        } else {
+            this.save(app, doneFunc);
+        }
+    }
+    
     private save(app : App, doneFunc : (id : string) => void) {
         var trading = app.ractive.get('trading');
         var workFrom = app.ractive.get('workFrom');

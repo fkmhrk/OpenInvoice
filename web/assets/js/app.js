@@ -1134,6 +1134,9 @@ var SheetPage = (function () {
             },
             'printBill': function () {
                 _this.printBill(app);
+            },
+            'printDelivery': function () {
+                _this.printDelivery(app);
             }
         });
         r.on('deleteItem', function (e, index) {
@@ -1201,6 +1204,29 @@ var SheetPage = (function () {
                 },
                 error: function (status, msg) {
                     console.log('Failed to get next bill number status=' + status);
+                }
+            });
+        }
+        else {
+            this.save(app, doneFunc);
+        }
+    };
+    SheetPage.prototype.printDelivery = function (app) {
+        var _this = this;
+        var trading = app.ractive.get('trading');
+        var deliveryDate = app.ractive.get('deliveryDate');
+        var doneFunc = function (id) {
+            app.ractive.update();
+            window.location.href = "/php/delivery.php?access_token=" + app.client.getAccessToken() + "&trading_id=" + id;
+        };
+        if (trading.bill_number == null || trading.bill_number.length == 0) {
+            app.client.getNextNumber('delivery', new Date(deliveryDate).getTime(), {
+                success: function (val) {
+                    trading.delivery_number = '' + val + '-V';
+                    _this.save(app, doneFunc);
+                },
+                error: function (status, msg) {
+                    console.log('Failed to get next delivery number status=' + status);
                 }
             });
         }
