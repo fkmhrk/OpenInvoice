@@ -110,7 +110,7 @@ func (s *userService) GetUsers(token string) s.Result {
 	return jsonResult(200, body)
 }
 
-func (s *userService) Create(token, loginName, displayName, role, password string) s.Result {
+func (s *userService) Create(token, loginName, displayName, password string) s.Result {
 	// get session
 	session, err := s.sessionDAO.GetByToken(token)
 	if err != nil {
@@ -123,7 +123,7 @@ func (s *userService) Create(token, loginName, displayName, role, password strin
 		return errorResult(403, MSG_NOT_AUTHORIZED)
 	}
 	// create
-	user, err := s.userDAO.Create(loginName, displayName, role, password)
+	user, err := s.userDAO.Create(loginName, displayName, "Read,Write", password)
 	if err != nil {
 		return errorResult(500, MSG_SERVER_ERROR)
 	}
