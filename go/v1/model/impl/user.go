@@ -2,8 +2,6 @@ package impl
 
 import (
 	m "../"
-	"errors"
-	"github.com/go-sql-driver/mysql"
 )
 
 type userDAO struct {
@@ -109,23 +107,12 @@ func (d *userDAO) Create(loginName, displayName, role, password string) (*m.User
 
 	var id string
 	hashedPassword := hashPassword(password)
-	for i := 0; i < 10; i++ {
-		id = generateId(32)
+	insertWithUUID(32, func(id string) error {
 		_, err = st.Exec(id, loginName, displayName, role, hashedPassword)
-		if err == nil {
-			break
-		}
-		id = ""
-		if err2, ok := err.(*mysql.MySQLError); ok {
-			if err2.Number != 1062 {
-				return nil, err2
-			}
-		} else {
-			return nil, err
-		}
-	}
-	if len(id) == 0 {
-		return nil, errors.New("Failed to create")
+		return err
+	})
+	if err != nil {
+		return nil, err
 	}
 
 	tr.Commit()
