@@ -108,19 +108,11 @@ func TestUser0100_GetList(t *testing.T) {
 		t.Errorf("Wrong length : %d", len(userList))
 	}
 	item, _ := userList.Object(0)
-	if v, _ := item.String("id"); v != "user0" {
-		t.Errorf("Wrong id : %s", v)
-	}
-	if v, _ := item.String("display_name"); v != "name0" {
-		t.Errorf("Wrong display_name : %s", v)
-	}
+	assertString(t, item, "id", "user0")
+	assertString(t, item, "display_name", "name0")
 	item, _ = userList.Object(1)
-	if v, _ := item.String("id"); v != "user1" {
-		t.Errorf("Wrong id : %s", v)
-	}
-	if v, _ := item.String("display_name"); v != "name1" {
-		t.Errorf("Wrong display_name : %s", v)
-	}
+	assertString(t, item, "id", "user1")
+	assertString(t, item, "display_name", "name1")
 }
 
 func TestUser0200_Create(t *testing.T) {
@@ -132,7 +124,8 @@ func TestUser0200_Create(t *testing.T) {
 	}
 	userDAO, _ := models.User.(*mock.UserDAO)
 	userDAO.CreateResult = &m.User{
-		Id: "id1234",
+		Id:          "id1234",
+		DisplayName: "loginName",
 	}
 
 	s := NewUserSerivce(userDAO, sessionDAO, models)
@@ -148,9 +141,8 @@ func TestUser0200_Create(t *testing.T) {
 		return
 	}
 	json := json(r)
-	if v, _ := json.String("id"); v != "id1234" {
-		t.Errorf("Wrong id : %s", v)
-	}
+	assertString(t, json, "id", "id1234")
+	assertString(t, json, "display_name", "loginName")
 }
 
 func TestUser0201_Create_Not_Admin(t *testing.T) {
@@ -173,7 +165,7 @@ func TestUser0201_Create_Not_Admin(t *testing.T) {
 		t.Errorf("Result must not be nil")
 		return
 	}
-	if r.Status() != 401 {
+	if r.Status() != 403 {
 		t.Errorf("Wrong status : %d", r.Status())
 		return
 	}

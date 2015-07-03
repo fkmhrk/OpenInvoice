@@ -120,7 +120,7 @@ func (s *userService) Create(token, loginName, displayName, role, password strin
 		return errorResult(401, MSG_WRONG_TOKEN)
 	}
 	if !session.Role.IsAdmin() {
-		return errorResult(401, MSG_NOT_AUTHORIZED)
+		return errorResult(403, MSG_NOT_AUTHORIZED)
 	}
 	// create
 	user, err := s.userDAO.Create(loginName, displayName, role, password)
@@ -129,7 +129,8 @@ func (s *userService) Create(token, loginName, displayName, role, password strin
 	}
 
 	body := map[string]interface{}{
-		"id": user.Id,
+		"id":           user.Id,
+		"display_name": user.DisplayName,
 	}
 	return jsonResult(201, body)
 }
