@@ -17,7 +17,7 @@ func NewUserDAO(connection *Connection) *userDAO {
 func (d *userDAO) GetByNamePassword(name, password string) (*m.User, error) {
 	db := d.connection.Connect()
 	st, err := db.Prepare("SELECT id,login_name,display_name," +
-		"role,password," +
+		"role,tel,password," +
 		"created_time, modified_time FROM user " +
 		"where login_name=? AND deleted <> 1 LIMIT 1")
 	if err != nil {
@@ -35,9 +35,9 @@ func (d *userDAO) GetByNamePassword(name, password string) (*m.User, error) {
 		return nil, nil
 	}
 
-	var idDB, nameDB, displayName, role, passwordDB string
+	var idDB, nameDB, displayName, role, tel, passwordDB string
 	var createDB, modifiedDB int64
-	rows.Scan(&idDB, &nameDB, &displayName, &role,
+	rows.Scan(&idDB, &nameDB, &displayName, &role, &tel,
 		&passwordDB, &createDB, &modifiedDB)
 
 	if hashPassword(password) != passwordDB {
@@ -50,6 +50,7 @@ func (d *userDAO) GetByNamePassword(name, password string) (*m.User, error) {
 		LoginName:    nameDB,
 		DisplayName:  displayName,
 		Role:         m.Role(role),
+		Tel:          tel,
 		CreatedTime:  createDB,
 		ModifiedTime: modifiedDB,
 	}, nil
@@ -88,7 +89,7 @@ func (d *userDAO) GetList() ([]*m.User, error) {
 	return list, nil
 }
 
-func (d *userDAO) Create(loginName, displayName, role, password string) (*m.User, error) {
+func (d *userDAO) Create(loginName, displayName, role, tel, password string) (*m.User, error) {
 	tr, err := d.connection.Begin()
 	if err != nil {
 		return nil, err
@@ -96,19 +97,18 @@ func (d *userDAO) Create(loginName, displayName, role, password string) (*m.User
 	defer tr.Rollback()
 
 	st, err := tr.Prepare("INSERT INTO user(" +
-		"id,login_name,display_name,role,password," +
+		"id,login_name,display_name,role,tel,password," +
 		"created_time,modified_time,deleted)" +
-		"VALUES(?,?,?,?,?," +
+		"VALUES(?,?,?,?,?,?," +
 		"unix_timestamp(now()),unix_timestamp(now()),0)")
 	if err != nil {
 		return nil, err
 	}
 	defer st.Close()
 
-	var id string
 	hashedPassword := hashPassword(password)
-	insertWithUUID(32, func(id string) error {
-		_, err = st.Exec(id, loginName, displayName, role, hashedPassword)
+	id, err := insertWithUUID(32, func(id string) error {
+		_, err = st.Exec(id, loginName, displayName, role, tel, hashedPassword)
 		return err
 	})
 	if err != nil {
@@ -122,6 +122,7 @@ func (d *userDAO) Create(loginName, displayName, role, password string) (*m.User
 		LoginName:   loginName,
 		DisplayName: displayName,
 		Role:        m.Role(role),
+		Tel:         tel,
 	}, nil
 
 }

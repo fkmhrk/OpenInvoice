@@ -3,7 +3,7 @@ package model
 type UserDAO interface {
 	GetByNamePassword(name, password string) (*User, error)
 	GetList() ([]*User, error)
-	Create(loginName, displayName, role, password string) (*User, error)
+	Create(loginName, displayName, role, tel, password string) (*User, error)
 }
 
 type User struct {
@@ -11,6 +11,7 @@ type User struct {
 	LoginName    string
 	DisplayName  string
 	Role         Role
+	Tel          string
 	CreatedTime  int64
 	ModifiedTime int64
 }
