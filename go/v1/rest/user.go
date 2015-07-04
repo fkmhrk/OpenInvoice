@@ -18,8 +18,9 @@ func createUser(services s.Services) handler {
 		// read input
 		loginName, _ := json.String("login_name")
 		displayName, _ := json.String("display_name")
+		tel, _ := json.String("tel")
 		password, _ := json.String("password")
 
-		return services.User.Create(token, loginName, displayName, password)
+		return services.User.Create(token, loginName, displayName, tel, password)
 	})
 }
