@@ -17,7 +17,7 @@ func assertSessionRefresh(t *testing.T, item *m.SessionRefresh, token, userId, r
 	if item.UserId != userId {
 		t.Errorf("userId must be %s but %s", userId, item.UserId)
 	}
-	if item.Role != role {
+	if item.Role != m.Role(role) {
 		t.Errorf("role must be %s but %s", role, item.Role)
 	}
 	if item.ExpireTime != expireTime {

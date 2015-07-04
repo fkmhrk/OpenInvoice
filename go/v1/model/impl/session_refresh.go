@@ -41,7 +41,7 @@ func (d *session_refreshDAO) Create(userId, role string) (m.SessionRefresh, erro
 	return m.SessionRefresh{
 		Token:      token,
 		UserId:     userId,
-		Role:       role,
+		Role:       m.Role(role),
 		ExpireTime: 0,
 	}, nil
 }
@@ -83,7 +83,7 @@ func (d *session_refreshDAO) Update(token, userId, role string) (m.SessionRefres
 	return m.SessionRefresh{
 		Token:      token,
 		UserId:     userId,
-		Role:       role,
+		Role:       m.Role(role),
 		ExpireTime: 0,
 	}, nil
 }
@@ -113,7 +113,7 @@ func (d *session_refreshDAO) scan(rows *sql.Rows) m.SessionRefresh {
 	return m.SessionRefresh{
 		Token:      token,
 		UserId:     userId,
-		Role:       role,
+		Role:       m.Role(role),
 		ExpireTime: expireTime,
 	}
 }

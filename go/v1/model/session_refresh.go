@@ -10,7 +10,7 @@ type SessionRefreshDAO interface {
 type SessionRefresh struct {
 	Token      string
 	UserId     string
-	Role       string
+	Role       Role
 	ExpireTime int64
 }
 
