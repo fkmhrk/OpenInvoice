@@ -18,6 +18,6 @@ func (d *UserDAO) GetList() ([]*m.User, error) {
 	return d.GetListResult, nil
 }
 
-func (d *UserDAO) Create(loginName, displayName, role, password string) (*m.User, error) {
+func (d *UserDAO) Create(loginName, displayName, role, tel, password string) (*m.User, error) {
 	return d.CreateResult, nil
 }

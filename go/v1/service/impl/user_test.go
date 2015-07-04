@@ -131,7 +131,7 @@ func TestUser0200_Create(t *testing.T) {
 	s := NewUserSerivce(userDAO, sessionDAO, models)
 
 	token := "token1122"
-	r := s.Create(token, "loginName", "disp", "pass1122")
+	r := s.Create(token, "loginName", "disp", "08011112222", "pass1122")
 	if r == nil {
 		t.Errorf("Result must not be nil")
 		return
@@ -160,7 +160,7 @@ func TestUser0201_Create_Not_Admin(t *testing.T) {
 	s := NewUserSerivce(userDAO, sessionDAO, models)
 
 	token := "token1122"
-	r := s.Create(token, "loginName", "disp", "pass1122")
+	r := s.Create(token, "loginName", "disp", "08011112222", "pass1122")
 	if r == nil {
 		t.Errorf("Result must not be nil")
 		return
