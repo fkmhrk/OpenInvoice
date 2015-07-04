@@ -101,7 +101,9 @@ func (s *userService) GetUsers(token string) s.Result {
 	for _, t := range users {
 		list = append(list, map[string]interface{}{
 			"id":           t.Id,
+			"login_name":   t.LoginName,
 			"display_name": t.DisplayName,
+			"tel":          t.Tel,
 		})
 	}
 	body := map[string]interface{}{
@@ -130,7 +132,9 @@ func (s *userService) Create(token, loginName, displayName, tel, password string
 
 	body := map[string]interface{}{
 		"id":           user.Id,
+		"login_name":   user.LoginName,
 		"display_name": user.DisplayName,
+		"tel":          user.Tel,
 	}
 	return jsonResult(201, body)
 }
