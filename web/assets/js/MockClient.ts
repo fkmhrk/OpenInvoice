@@ -71,7 +71,20 @@ var tradingItemList = {
 };
 
 class MockClient implements Client {
+    is_Admin : boolean;
+
+    constructor() {
+        this.is_Admin = false;
+    }
+    
     setRefreshToken(refreshToken : string) {
+    }
+
+    /**
+     * Determines whether this account is admin.
+     */
+    isAdmin() : boolean {
+        return this.is_Admin;
     }
 
     getAccessToken() : string {
@@ -83,6 +96,9 @@ class MockClient implements Client {
      */
     login(username : string, password : string, callback : ItemCallback<string>) {
         if (!ClientValidator.isValidLogin(username, password, callback)) { return; }
+        if (username == 'admin') {
+            this.is_Admin = true;
+        }
         callback.success('token1122');
     }
 

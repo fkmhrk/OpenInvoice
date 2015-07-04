@@ -7,10 +7,12 @@ class AppClientImpl implements Client {
     url : string;
     accessToken : string;
     refreshToken : string;
+    is_admin : boolean;
     isRetry : boolean;
     
     constructor(url : string) {
         this.url = url;
+        this.is_admin = false;
         this.isRetry = false;
     }
 
@@ -18,6 +20,10 @@ class AppClientImpl implements Client {
         if (refreshToken == null) { return; }
         this.accessToken = '';
         this.refreshToken = refreshToken;
+    }
+
+    isAdmin() : boolean {
+        return this.is_admin;
     }
 
     getAccessToken() : string {
@@ -34,6 +40,7 @@ class AppClientImpl implements Client {
             success : (json : any) => {
                 this.accessToken = json.access_token;
                 this.refreshToken = json.refresh_token;
+                this.is_admin = json.is_admin;
                 callback.success(json.refresh_token);
             },
             error : (status : any, body : any) => {
@@ -319,6 +326,7 @@ class AppClientImpl implements Client {
         this.exec(refreshURL, 'POST', null, refreshParams, {
             success : (json : any) => {
                 this.accessToken = json.access_token;
+                this.is_admin = json.is_admin;
                 this.isRetry = true;
                 this.exec(url, method, this.accessToken, params, callback);
             },

@@ -11,7 +11,8 @@ func TestUser0000_GetToken(t *testing.T) {
 	models := mock.NewMock()
 	userDAO, _ := models.User.(*mock.UserDAO)
 	userDAO.GetByNamePasswordResult = &m.User{
-		Id: "testUser",
+		Id:   "testUser",
+		Role: m.Role("Read,Write"),
 	}
 	sessionDAO, _ := models.Session.(*mock.SessionDAO)
 	sessionDAO.CreateResult = &m.Session{
@@ -40,6 +41,44 @@ func TestUser0000_GetToken(t *testing.T) {
 	assertString(t, json, "token_type", "bearer")
 	assertString(t, json, "access_token", "testToken")
 	assertString(t, json, "refresh_token", "tokenRefresh")
+	assertBool(t, json, "isAdmin", false)
+}
+
+func TestUser0001_GetToken_Admin(t *testing.T) {
+	models := mock.NewMock()
+	userDAO, _ := models.User.(*mock.UserDAO)
+	userDAO.GetByNamePasswordResult = &m.User{
+		Id:   "testUser",
+		Role: m.Role("Admin,Read,Write"),
+	}
+	sessionDAO, _ := models.Session.(*mock.SessionDAO)
+	sessionDAO.CreateResult = &m.Session{
+		Token: "testToken",
+	}
+	sessionRefreshDAO, _ := models.SessionRefresh.(*mock.SessionRefreshDAO)
+	sessionRefreshDAO.CreateResult = m.SessionRefresh{
+		Token: "tokenRefresh",
+	}
+
+	s := NewUserSerivce(userDAO, sessionDAO, models)
+
+	name := "user1122"
+	pass := "pass2233"
+	r := s.GetToken(name, pass)
+	if r == nil {
+		t.Errorf("Result must not be nil")
+		return
+	}
+	if r.Status() != 200 {
+		t.Errorf("Wrong status : %d", r.Status())
+		return
+	}
+	json := json(r)
+	assertString(t, json, "id", "testUser")
+	assertString(t, json, "token_type", "bearer")
+	assertString(t, json, "access_token", "testToken")
+	assertString(t, json, "refresh_token", "tokenRefresh")
+	assertBool(t, json, "isAdmin", true)
 }
 
 func TestUser0100_RefreshToken(t *testing.T) {
@@ -71,6 +110,7 @@ func TestUser0100_RefreshToken(t *testing.T) {
 	assertString(t, json, "id", "user1122")
 	assertString(t, json, "token_type", "bearer")
 	assertString(t, json, "access_token", "testToken")
+	assertBool(t, json, "isAdmin", true)
 }
 
 func TestUser0100_GetList(t *testing.T) {

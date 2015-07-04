@@ -210,6 +210,7 @@ var baseURL = '';
 var AppClientImpl = (function () {
     function AppClientImpl(url) {
         this.url = url;
+        this.is_admin = false;
         this.isRetry = false;
     }
     AppClientImpl.prototype.setRefreshToken = function (refreshToken) {
@@ -218,6 +219,9 @@ var AppClientImpl = (function () {
         }
         this.accessToken = '';
         this.refreshToken = refreshToken;
+    };
+    AppClientImpl.prototype.isAdmin = function () {
+        return this.is_admin;
     };
     AppClientImpl.prototype.getAccessToken = function () {
         return this.accessToken;
@@ -235,6 +239,7 @@ var AppClientImpl = (function () {
             success: function (json) {
                 _this.accessToken = json.access_token;
                 _this.refreshToken = json.refresh_token;
+                _this.is_admin = json.is_admin;
                 callback.success(json.refresh_token);
             },
             error: function (status, body) {
@@ -514,6 +519,7 @@ var AppClientImpl = (function () {
         this.exec(refreshURL, 'POST', null, refreshParams, {
             success: function (json) {
                 _this.accessToken = json.access_token;
+                _this.is_admin = json.is_admin;
                 _this.isRetry = true;
                 _this.exec(url, method, _this.accessToken, params, callback);
             },
@@ -1174,6 +1180,7 @@ var TopPage = (function () {
             // データを設定。テンプレートで使います。
             data: {
                 myCompanyName: app.myCompanyName,
+                is_admin: app.client.isAdmin(),
                 'company': app.companyMap,
                 'sheets': sheets,
                 'toDateStr': Utils.toDateStr,
@@ -1318,6 +1325,7 @@ var SheetPage = (function () {
             decorators: {},
             data: {
                 myCompanyName: app.myCompanyName,
+                is_admin: app.client.isAdmin(),
                 'trading': trading,
                 'workFrom': Utils.toDateStr(trading.work_from),
                 'workTo': Utils.toDateStr(trading.work_to),
