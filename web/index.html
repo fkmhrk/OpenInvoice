@@ -283,9 +283,9 @@
       </header>
       <div class="inner">
         <section id="addUser">
-          <p><input type="text" placeholder="担当者名"><input type="text" placeholder="ユーザーID（半角英数字）"></p>
-          <p><input type="text" placeholder="TEL"><input type="password" placeholder="パスワード"></p>
-          <p class="addBtn"><i class="fa fa-plus"></i>追加</p>
+          <p><input type="text" placeholder="担当者名" value="{{displayName}}"><input type="text" placeholder="ユーザーID（半角英数字）" value="{{loginName}}"></p>
+          <p><input type="text" placeholder="TEL" value="{{tel}}"><input type="password" placeholder="パスワード" value="{{password}}"></p>
+          <p class="addBtn" on-click="create"><i class="fa fa-plus"></i>追加</p>
         </section>
         <section class="list">
           <table>
@@ -295,18 +295,14 @@
               <th>ユーザーID</th>
               <th></th>
             </tr>
+            {{#userList}}
             <tr>
-              <td>担当者1</td>
-              <td>080-1111-2222</td>
-              <td>user1</td>
-              <td><a href="#" class="btn" title="削除"><i class="fa fa-trash-o"></i></a></td>
+              <td>{{display_name}}</td>
+              <td>{{tel}}</td>
+              <td>{{login_name}}</td>
+              <td><a class="btn" title="削除"><i class="fa fa-trash-o"></i></a></td>
             </tr>
-            <tr>
-              <td>担当者2</td>
-              <td>080-2222-3333</td>
-              <td>user2</td>
-              <td><a href="#" class="btn" title="削除"><i class="fa fa-trash-o"></i></a></td>
-            </tr>
+            {{/}}
           </table>
         </section>
       </div>

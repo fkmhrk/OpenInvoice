@@ -26,8 +26,8 @@ func deleteUserByName(db *sql.DB, name string) {
 
 func insertUser(db *sql.DB, id, name, password string) {
 	s, err := db.Prepare("INSERT INTO user" +
-		"(id,login_name,display_name,role,password,deleted)" +
-		"VALUES(?,?,'demo','Read',?,0)")
+		"(id,login_name,display_name,role,tel,password,created_time,modified_time,deleted)" +
+		"VALUES(?,?,'demo','Read','',?,0,0,0)")
 	if err != nil {
 		fmt.Printf("error %s", err)
 		return
@@ -155,16 +155,17 @@ func TestUserDAO_0200_Create(t *testing.T) {
 	// prepare
 	loginName := "test0100"
 	displayName := "Demo user"
+	tel := "08011112222"
 	password := "pass1234"
 	deleteUserByName(db, loginName)
 
 	dao := createUserDAO(db)
-	user, err := dao.Create(loginName, displayName, "Read", password)
+	user, err := dao.Create(loginName, displayName, "Read", tel, password)
 	if err != nil {
 		t.Errorf("Failed to create user : %s", err)
 		return
 	}
-	assertUser(t, user, user.Id, loginName, displayName, "Read")
+	assertUser(t, user, user.Id, loginName, displayName, "Read", tel)
 	// login
 
 	user2, err := dao.GetByNamePassword(loginName, password)
@@ -172,7 +173,7 @@ func TestUserDAO_0200_Create(t *testing.T) {
 		t.Errorf("Failed to get user : %s", err)
 		return
 	}
-	assertUser(t, user2, user.Id, loginName, displayName, "Read")
+	assertUser(t, user2, user.Id, loginName, displayName, "Read", tel)
 	if !user2.Role.CanRead() {
 		t.Errorf("This user must be able to Read")
 		return

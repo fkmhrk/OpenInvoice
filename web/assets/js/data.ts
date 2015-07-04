@@ -1,6 +1,8 @@
 class User {
     id : string;
+    login_name : string;
     display_name : string;
+    tel : string;
 }
 
 class Company {

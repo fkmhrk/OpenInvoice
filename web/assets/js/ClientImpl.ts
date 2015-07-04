@@ -67,6 +67,25 @@ class AppClientImpl implements Client {
             }
         });
     }
+
+    createUser(loginName : string, displayName : string, tel : string,
+               password : string, callback : ItemCallback<User>) {
+        var url = this.url + '/api/v1/users';
+        var params = {
+            login_name : loginName,
+            display_name : displayName,
+            tel : tel,
+            password : password,
+        };
+        this.exec(url, 'POST', this.accessToken, params, {
+            success : (json : any) => {
+                callback.success(json);
+            },
+            error : (status : any, body : any) => {
+                callback.error(status, body.msg);
+            }
+        });        
+    }    
     
     getUsers(callback : ItemListCallback<User>) {
         var url = this.url + '/api/v1/users';

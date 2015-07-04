@@ -11,7 +11,9 @@ var globalSeq = {
 
 var userList : Array<User> = [{
     id : "user1",
+    login_name : "user1",
     display_name : "担当者1",
+    tel : "08011112222",
 }];
 
 var companyList = {
@@ -80,6 +82,20 @@ class MockClient implements Client {
      */
     login(username : string, password : string, callback : ItemCallback<string>) {
         callback.success('token1122');
+    }
+
+    /**
+     * Creates user. This API requires Admin token.
+     */
+    createUser(loginName : string, displayName : string, tel : string,
+               password : string, callback : ItemCallback<User>) {
+        console.log('createUser');
+        var user = new User();
+        user.id = '';
+        user.login_name = loginName;        
+        user.display_name = displayName;
+        user.tel = tel;
+        callback.success(user);
     }
 
    /**

@@ -2,8 +2,11 @@ package impl
 
 import (
 	m "../"
-	"errors"
-	"github.com/go-sql-driver/mysql"
+	"database/sql"
+)
+
+const (
+	select_user = "SELECT id,login_name,display_name,role,tel,password,created_time,modified_time FROM user "
 )
 
 type userDAO struct {
@@ -18,10 +21,7 @@ func NewUserDAO(connection *Connection) *userDAO {
 
 func (d *userDAO) GetByNamePassword(name, password string) (*m.User, error) {
 	db := d.connection.Connect()
-	st, err := db.Prepare("SELECT id,login_name,display_name," +
-		"role,password," +
-		"created_time, modified_time FROM user " +
-		"where login_name=? AND deleted <> 1 LIMIT 1")
+	st, err := db.Prepare(select_user + "WHERE login_name=? AND deleted <> 1 LIMIT 1")
 	if err != nil {
 		return nil, err
 	}
@@ -37,31 +37,21 @@ func (d *userDAO) GetByNamePassword(name, password string) (*m.User, error) {
 		return nil, nil
 	}
 
-	var idDB, nameDB, displayName, role, passwordDB string
-	var createDB, modifiedDB int64
-	rows.Scan(&idDB, &nameDB, &displayName, &role,
-		&passwordDB, &createDB, &modifiedDB)
-
+	user, passwordDB, err := d.scan(rows)
+	if err != nil {
+		return nil, err
+	}
 	if hashPassword(password) != passwordDB {
 		return nil, nil
 		// return nil, errors.New("Invalid Name / Password")
 	}
 
-	return &m.User{
-		Id:           idDB,
-		LoginName:    nameDB,
-		DisplayName:  displayName,
-		Role:         m.Role(role),
-		CreatedTime:  createDB,
-		ModifiedTime: modifiedDB,
-	}, nil
+	return user, nil
 }
 
 func (d *userDAO) GetList() ([]*m.User, error) {
 	db := d.connection.Connect()
-	st, err := db.Prepare("SELECT id,login_name,display_name,role," +
-		"created_time, modified_time FROM user " +
-		"WHERE deleted <> 1")
+	st, err := db.Prepare(select_user + "WHERE deleted <> 1")
 	if err != nil {
 		return nil, err
 	}
@@ -73,24 +63,18 @@ func (d *userDAO) GetList() ([]*m.User, error) {
 	}
 	defer rows.Close()
 
-	var list []*m.User
-	var id, name, display, role string
-	var create, modified int64
+	list := make([]*m.User, 0)
 	for rows.Next() {
-		rows.Scan(&id, &name, &display, &role, &create, &modified)
-		list = append(list, &m.User{
-			Id:           id,
-			LoginName:    name,
-			DisplayName:  display,
-			Role:         m.Role(role),
-			CreatedTime:  create,
-			ModifiedTime: modified,
-		})
+		item, _, err := d.scan(rows)
+		if err != nil {
+			return nil, err
+		}
+		list = append(list, item)
 	}
 	return list, nil
 }
 
-func (d *userDAO) Create(loginName, displayName, role, password string) (*m.User, error) {
+func (d *userDAO) Create(loginName, displayName, role, tel, password string) (*m.User, error) {
 	tr, err := d.connection.Begin()
 	if err != nil {
 		return nil, err
@@ -98,34 +82,22 @@ func (d *userDAO) Create(loginName, displayName, role, password string) (*m.User
 	defer tr.Rollback()
 
 	st, err := tr.Prepare("INSERT INTO user(" +
-		"id,login_name,display_name,role,password," +
+		"id,login_name,display_name,role,tel,password," +
 		"created_time,modified_time,deleted)" +
-		"VALUES(?,?,?,?,?," +
+		"VALUES(?,?,?,?,?,?," +
 		"unix_timestamp(now()),unix_timestamp(now()),0)")
 	if err != nil {
 		return nil, err
 	}
 	defer st.Close()
 
-	var id string
 	hashedPassword := hashPassword(password)
-	for i := 0; i < 10; i++ {
-		id = generateId(32)
-		_, err = st.Exec(id, loginName, displayName, role, hashedPassword)
-		if err == nil {
-			break
-		}
-		id = ""
-		if err2, ok := err.(*mysql.MySQLError); ok {
-			if err2.Number != 1062 {
-				return nil, err2
-			}
-		} else {
-			return nil, err
-		}
-	}
-	if len(id) == 0 {
-		return nil, errors.New("Failed to create")
+	id, err := insertWithUUID(32, func(id string) error {
+		_, err = st.Exec(id, loginName, displayName, role, tel, hashedPassword)
+		return err
+	})
+	if err != nil {
+		return nil, err
 	}
 
 	tr.Commit()
@@ -135,6 +107,26 @@ func (d *userDAO) Create(loginName, displayName, role, password string) (*m.User
 		LoginName:   loginName,
 		DisplayName: displayName,
 		Role:        m.Role(role),
+		Tel:         tel,
 	}, nil
 
+}
+
+func (o *userDAO) scan(rows *sql.Rows) (*m.User, string, error) {
+	var id, loginName, displayName, role, tel, password string
+	var createTime, modifiedTime int64
+	err := rows.Scan(&id, &loginName, &displayName, &role, &tel,
+		&password, &createTime, &modifiedTime)
+	if err != nil {
+		return nil, "", err
+	}
+	return &m.User{
+		Id:           id,
+		LoginName:    loginName,
+		DisplayName:  displayName,
+		Role:         m.Role(role),
+		Tel:          tel,
+		CreatedTime:  createTime,
+		ModifiedTime: modifiedTime,
+	}, password, nil
 }

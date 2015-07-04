@@ -101,7 +101,9 @@ func (s *userService) GetUsers(token string) s.Result {
 	for _, t := range users {
 		list = append(list, map[string]interface{}{
 			"id":           t.Id,
+			"login_name":   t.LoginName,
 			"display_name": t.DisplayName,
+			"tel":          t.Tel,
 		})
 	}
 	body := map[string]interface{}{
@@ -110,7 +112,7 @@ func (s *userService) GetUsers(token string) s.Result {
 	return jsonResult(200, body)
 }
 
-func (s *userService) Create(token, loginName, displayName, role, password string) s.Result {
+func (s *userService) Create(token, loginName, displayName, tel, password string) s.Result {
 	// get session
 	session, err := s.sessionDAO.GetByToken(token)
 	if err != nil {
@@ -120,16 +122,19 @@ func (s *userService) Create(token, loginName, displayName, role, password strin
 		return errorResult(401, MSG_WRONG_TOKEN)
 	}
 	if !session.Role.IsAdmin() {
-		return errorResult(401, MSG_NOT_AUTHORIZED)
+		return errorResult(403, MSG_NOT_AUTHORIZED)
 	}
 	// create
-	user, err := s.userDAO.Create(loginName, displayName, role, password)
+	user, err := s.userDAO.Create(loginName, displayName, "Read,Write", tel, password)
 	if err != nil {
 		return errorResult(500, MSG_SERVER_ERROR)
 	}
 
 	body := map[string]interface{}{
-		"id": user.Id,
+		"id":           user.Id,
+		"login_name":   user.LoginName,
+		"display_name": user.DisplayName,
+		"tel":          user.Tel,
 	}
 	return jsonResult(201, body)
 }
