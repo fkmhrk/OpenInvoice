@@ -268,6 +268,12 @@ class SheetPage implements Page {
                 this.deleteItems(app, id, deleted, doneFunc);
             },
             error : (status : number, msg : string) => {
+                switch (status) {
+                case 1001: app.addSnack('件名を入力してください。'); break;
+                case 1002: app.addSnack('作業終了日は作業開始日より後にしてください。'); break;
+                case 1003: app.addSnack('消費税率は0以上にしてください。'); break;
+                default: app.addSnack('保存に失敗しました。');
+                }
                 console.log('Failed to save trading status=' + status);
             }
         });
@@ -314,6 +320,11 @@ class SheetPage implements Page {
                 this.saveItems(app, id, list, doneFunc);
             },
             error : (status : number, msg : string) => {
+                switch (status) {
+                case 1002: app.addSnack('項目名を入力してください。'); break;
+                case 1003: app.addSnack('税区分が不正です。'); break;
+                default : app.addSnack('保存に失敗しました。');
+                }
                 console.log('Failed to save items status=' + status);
             }
         });

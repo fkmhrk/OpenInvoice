@@ -47,7 +47,15 @@ class UserListDialog implements Dialog {
                 app.addSnack('ユーザーを作成しました！');
             },
             error : (status : number, msg : string) => {
-                app.addSnack('ユーザー作成に失敗しました');
+                switch (status) {
+                case 1000: app.addSnack('ユーザー名を入力してください'); break;                    
+                case 1001: app.addSnack('担当者名を入力してください'); break;
+                case 1002: app.addSnack('電話番号を入力してください'); break;
+                case 1003: // same message
+                case 1004: app.addSnack('パスワードを6文字以上入力してください'); break;
+                default: app.addSnack('ユーザー作成に失敗しました'); break;
+                }
+
             },
         });
     }

@@ -1,4 +1,209 @@
+var Utils;
+(function (Utils) {
+    function toList(obj) {
+        var list = [];
+        for (var k in obj) {
+            list.push(obj[k]);
+        }
+        return list;
+    }
+    Utils.toList = toList;
+    function toNumber(source) {
+        var num = Number(String(source).replace(",", ""));
+        return isNaN(num) ? 0 : num;
+    }
+    Utils.toNumber = toNumber;
+    function toDateStr(time) {
+        var date = new Date(time);
+        var m = date.getMonth() + 1;
+        var d = date.getDate();
+        if (m < 10) {
+            m = "0" + m;
+        }
+        if (d < 10) {
+            d = "0" + d;
+        }
+        return date.getFullYear() + "-" + m + "-" + d;
+    }
+    Utils.toDateStr = toDateStr;
+    function clone(source) {
+        var dest = {};
+        for (var k in source) {
+            dest[k] = source[k];
+        }
+        return dest;
+    }
+    Utils.clone = clone;
+    function isEmpty(s) {
+        return s == null || s.length == 0;
+    }
+    Utils.isEmpty = isEmpty;
+})(Utils || (Utils = {}));
+/// <reference path="./Functions.ts"/>
+var ClientValidator;
+(function (ClientValidator) {
+    function isValidLogin(username, password, callback) {
+        if (Utils.isEmpty(username)) {
+            callback.error(1000, "Username must not be empty.");
+            return false;
+        }
+        if (Utils.isEmpty(password)) {
+            callback.error(1001, "Password must not be empty.");
+            return false;
+        }
+        return true;
+    }
+    ClientValidator.isValidLogin = isValidLogin;
+    function isValidCreateUser(loginName, displayName, tel, password, callback) {
+        if (Utils.isEmpty(loginName)) {
+            callback.error(1000, "LoginName must not be empty.");
+            return false;
+        }
+        if (Utils.isEmpty(displayName)) {
+            callback.error(1001, "DisplayName must not be empty.");
+            return false;
+        }
+        if (Utils.isEmpty(tel)) {
+            callback.error(1002, "Tel must not be empty.");
+            return false;
+        }
+        if (Utils.isEmpty(password)) {
+            callback.error(1003, "Password must not be empty.");
+            return false;
+        }
+        if (password.length < 6) {
+            callback.error(1004, "Password must be more than 6 characters.");
+            return false;
+        }
+        return true;
+    }
+    ClientValidator.isValidCreateUser = isValidCreateUser;
+    function isValidSaveCompany(item, callback) {
+        if (item == null) {
+            callback.error(1000, "Item must not be empty.");
+            return false;
+        }
+        if (Utils.isEmpty(item.name)) {
+            callback.error(1001, "Name must not be empty.");
+            return false;
+        }
+        if (item.zip == null) {
+            item.zip = '';
+        }
+        if (item.address == null) {
+            item.address = '';
+        }
+        if (item.phone == null) {
+            item.phone = '';
+        }
+        if (item.fax == null) {
+            item.fax = '';
+        }
+        if (item.unit == null) {
+            item.unit = '';
+        }
+        return true;
+    }
+    ClientValidator.isValidSaveCompany = isValidSaveCompany;
+    function isValidSaveTrading(item, callback) {
+        if (item == null) {
+            callback.error(1000, "Item must not be empty.");
+            return false;
+        }
+        if (Utils.isEmpty(item.subject)) {
+            callback.error(1001, "Subject must not be empty.");
+            return false;
+        }
+        if (item.work_to < item.work_from) {
+            callback.error(1002, "Invalid work_from and work_to.");
+            return false;
+        }
+        if (item.tax_rate < 0) {
+            callback.error(1003, "tax_rate must be positive(tax_rate > 0).");
+            return false;
+        }
+        if (item.product == null) {
+            item.product = '';
+        }
+        return true;
+    }
+    ClientValidator.isValidSaveTrading = isValidSaveTrading;
+    function isValidSaveTradingItem(tradingId, item, callback) {
+        if (Utils.isEmpty(tradingId)) {
+            callback.error(1000, "trading ID must not be empty.");
+            return false;
+        }
+        if (item == null) {
+            callback.error(1001, "item must not be empty.");
+            return false;
+        }
+        if (Utils.isEmpty(item.subject)) {
+            callback.error(1002, "subject must not be empty.");
+            return false;
+        }
+        if (item.tax_type < 0 || item.tax_type > 2) {
+            callback.error(1003, "tax_type must be 0, 1, 2.");
+            return false;
+        }
+        if (item.degree == null) {
+            item.degree = '';
+        }
+        if (item.memo == null) {
+            item.memo = '';
+        }
+        return true;
+    }
+    ClientValidator.isValidSaveTradingItem = isValidSaveTradingItem;
+    function isValidSaveEnvironment(env, callback) {
+        if (env == null) {
+            callback.error(1000, "item must not be empty.");
+            return false;
+        }
+        if (env.tax_rate == null) {
+            env.tax_rate = '';
+        }
+        if (env.quotation_limit == null) {
+            env.quotation_limit = '';
+        }
+        if (env.closing_month == null) {
+            env.closing_month = '';
+        }
+        if (env.pay_limit == null) {
+            env.pay_limit = '';
+        }
+        if (env.company_name == null) {
+            env.company_name = '';
+        }
+        if (env.company_zip == null) {
+            env.company_zip = '';
+        }
+        if (env.company_address == null) {
+            env.company_address = '';
+        }
+        if (env.company_tel == null) {
+            env.company_tel = '';
+        }
+        if (env.company_fax == null) {
+            env.company_fax = '';
+        }
+        if (env.company_bankname == null) {
+            env.company_bankname = '';
+        }
+        if (env.company_bank_type == null) {
+            env.company_bank_type = '';
+        }
+        if (env.company_bank_num == null) {
+            env.company_bank_num = '';
+        }
+        if (env.company_bank_name == null) {
+            env.company_bank_name = '';
+        }
+        return true;
+    }
+    ClientValidator.isValidSaveEnvironment = isValidSaveEnvironment;
+})(ClientValidator || (ClientValidator = {}));
 /// <reference path="./Client.ts"/>
+/// <reference path="./ClientValidator.ts"/>
 var $;
 var _;
 var baseURL = '';
@@ -19,6 +224,9 @@ var AppClientImpl = (function () {
     };
     AppClientImpl.prototype.login = function (username, password, callback) {
         var _this = this;
+        if (!ClientValidator.isValidLogin(username, password, callback)) {
+            return;
+        }
         var params = {
             username: username,
             password: password
@@ -62,6 +270,9 @@ var AppClientImpl = (function () {
         });
     };
     AppClientImpl.prototype.createUser = function (loginName, displayName, tel, password, callback) {
+        if (!ClientValidator.isValidCreateUser(loginName, displayName, tel, password, callback)) {
+            return;
+        }
         var url = this.url + '/api/v1/users';
         var params = {
             login_name: loginName,
@@ -101,6 +312,9 @@ var AppClientImpl = (function () {
         });
     };
     AppClientImpl.prototype.saveTrading = function (item, callback) {
+        if (!ClientValidator.isValidSaveTrading(item, callback)) {
+            return;
+        }
         if (item.id === null) {
             this.createTrading(item, callback);
         }
@@ -109,6 +323,9 @@ var AppClientImpl = (function () {
         }
     };
     AppClientImpl.prototype.saveTradingItem = function (tradingId, item, callback) {
+        if (!ClientValidator.isValidSaveTradingItem(tradingId, item, callback)) {
+            return;
+        }
         if (item.id === null) {
             this.createTradingItem(tradingId, item, callback);
         }
@@ -150,6 +367,9 @@ var AppClientImpl = (function () {
         });
     };
     AppClientImpl.prototype.saveCompany = function (item, callback) {
+        if (!ClientValidator.isValidSaveCompany(item, callback)) {
+            return;
+        }
         if (item.id === null || item.id.length == 0) {
             this.createCompany(item, callback);
         }
@@ -180,6 +400,9 @@ var AppClientImpl = (function () {
         });
     };
     AppClientImpl.prototype.saveEnvironment = function (env, callback) {
+        if (!ClientValidator.isValidSaveEnvironment(env, callback)) {
+            return;
+        }
         var url = this.url + '/api/v1/environments';
         this.exec(url, 'PUT', this.accessToken, env, {
             success: function (json) {
@@ -375,43 +598,6 @@ var Environment = (function () {
     }
     return Environment;
 })();
-var Utils;
-(function (Utils) {
-    function toList(obj) {
-        var list = [];
-        for (var k in obj) {
-            list.push(obj[k]);
-        }
-        return list;
-    }
-    Utils.toList = toList;
-    function toNumber(source) {
-        var num = Number(String(source).replace(",", ""));
-        return isNaN(num) ? 0 : num;
-    }
-    Utils.toNumber = toNumber;
-    function toDateStr(time) {
-        var date = new Date(time);
-        var m = date.getMonth() + 1;
-        var d = date.getDate();
-        if (m < 10) {
-            m = "0" + m;
-        }
-        if (d < 10) {
-            d = "0" + d;
-        }
-        return date.getFullYear() + "-" + m + "-" + d;
-    }
-    Utils.toDateStr = toDateStr;
-    function clone(source) {
-        var dest = {};
-        for (var k in source) {
-            dest[k] = source[k];
-        }
-        return dest;
-    }
-    Utils.clone = clone;
-})(Utils || (Utils = {}));
 ///<reference path="./Dialog.ts"/>
 ///<reference path="./Client.ts"/>
 ///<reference path="./Functions.ts"/>
@@ -646,7 +832,24 @@ var UserListDialog = (function () {
                 app.addSnack('ユーザーを作成しました！');
             },
             error: function (status, msg) {
-                app.addSnack('ユーザー作成に失敗しました');
+                switch (status) {
+                    case 1000:
+                        app.addSnack('ユーザー名を入力してください');
+                        break;
+                    case 1001:
+                        app.addSnack('担当者名を入力してください');
+                        break;
+                    case 1002:
+                        app.addSnack('電話番号を入力してください');
+                        break;
+                    case 1003: // same message
+                    case 1004:
+                        app.addSnack('パスワードを6文字以上入力してください');
+                        break;
+                    default:
+                        app.addSnack('ユーザー作成に失敗しました');
+                        break;
+                }
             }
         });
     };
@@ -750,9 +953,16 @@ var CompanyListDialog = (function () {
                 company.id = id;
                 app.companyMap[id] = company;
                 _this.ractive.unshift('companyList', company);
+                app.addSnack('保存しました。');
                 _this.clearForm(app);
             },
             error: function (status, msg) {
+                switch (status) {
+                    case 1001:
+                        app.addSnack('会社名を入力してください。');
+                        break;
+                    default: app.addSnack('保存に失敗しました。');
+                }
                 console.log('Failed to create company status=' + status);
             }
         });
@@ -897,6 +1107,14 @@ var SignInPage = (function () {
             error: function (status, msg) {
                 app.ractive.set('inProgress', false);
                 app.ractive.update();
+                switch (status) {
+                    case 1000:
+                        app.addSnack('ユーザー名を入力してください');
+                        break;
+                    case 1001:
+                        app.addSnack('パスワードを入力してください');
+                        break;
+                }
                 console.log('failed to login status=' + status);
             }
         });
@@ -1308,6 +1526,18 @@ var SheetPage = (function () {
                 _this.deleteItems(app, id, deleted, doneFunc);
             },
             error: function (status, msg) {
+                switch (status) {
+                    case 1001:
+                        app.addSnack('件名を入力してください。');
+                        break;
+                    case 1002:
+                        app.addSnack('作業終了日は作業開始日より後にしてください。');
+                        break;
+                    case 1003:
+                        app.addSnack('消費税率は0以上にしてください。');
+                        break;
+                    default: app.addSnack('保存に失敗しました。');
+                }
                 console.log('Failed to save trading status=' + status);
             }
         });
@@ -1352,6 +1582,15 @@ var SheetPage = (function () {
                 _this.saveItems(app, id, list, doneFunc);
             },
             error: function (status, msg) {
+                switch (status) {
+                    case 1002:
+                        app.addSnack('項目名を入力してください。');
+                        break;
+                    case 1003:
+                        app.addSnack('税区分が不正です。');
+                        break;
+                    default: app.addSnack('保存に失敗しました。');
+                }
                 console.log('Failed to save items status=' + status);
             }
         });

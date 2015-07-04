@@ -69,9 +69,14 @@ class CompanyListDialog implements Dialog {
                 company.id = id;
                 app.companyMap[id] = company;
                 this.ractive.unshift('companyList', company);
+                app.addSnack('保存しました。');
                 this.clearForm(app);
             },
             error : (status : number, msg : string) => {
+                switch (status) {
+                case 1001: app.addSnack('会社名を入力してください。'); break;
+                default: app.addSnack('保存に失敗しました。');
+                }
                 console.log('Failed to create company status=' + status);
             }
         });
