@@ -1,4 +1,5 @@
 /// <reference path="./Client.ts"/>
+/// <reference path="./ClientValidator.ts"/>
 
 var globalSeq = {
     'company' : 1,
@@ -81,6 +82,7 @@ class MockClient implements Client {
      * Logs in with username and password.
      */
     login(username : string, password : string, callback : ItemCallback<string>) {
+        if (!ClientValidator.isValidLogin(username, password, callback)) { return; }
         callback.success('token1122');
     }
 
@@ -89,6 +91,7 @@ class MockClient implements Client {
      */
     createUser(loginName : string, displayName : string, tel : string,
                password : string, callback : ItemCallback<User>) {
+        if (!ClientValidator.isValidCreateUser(loginName, displayName, tel, password, callback)) { return; }
         console.log('createUser');
         var user = new User();
         user.id = '';
@@ -121,6 +124,7 @@ class MockClient implements Client {
      * @return item is Company ID
      */
     saveCompany(item : Company, callback : ItemCallback<string>) {
+        if (!ClientValidator.isValidSaveCompany(item, callback)) { return; }
         if (item.id == null) {
             item.id = "compnay" + (++globalSeq['company']);
         }
@@ -164,6 +168,7 @@ class MockClient implements Client {
      * @return item is trading ID
      */
     saveTrading(item : Trading, callback : ItemCallback<string>) {
+        if (!ClientValidator.isValidSaveTrading(item, callback)) { return; }
         if (item.id == null) {
             item.id = "trading" + (++globalSeq['trading']);
         }
@@ -177,6 +182,7 @@ class MockClient implements Client {
      * @return item is item ID
      */
     saveTradingItem(tradingId : string, item : TradingItem, callback : ItemCallback<string>) {
+        if (!ClientValidator.isValidSaveTradingItem(tradingId, item, callback)) { return; }
         var items = tradingItemList[tradingId];
         if (items === undefined) { items = {}; }
 
@@ -213,6 +219,7 @@ class MockClient implements Client {
      * Saves Environment
      */
     saveEnvironment(env : Environment, callback : Callback) {
+        if (!ClientValidator.isValidSaveEnvironment(env, callback)) { return; }
         callback.success();
     };
 

@@ -1,4 +1,5 @@
 /// <reference path="./Client.ts"/>
+/// <reference path="./ClientValidator.ts"/>
 var $;
 var _;
 var baseURL = '';
@@ -24,6 +25,7 @@ class AppClientImpl implements Client {
     }
     
     login(username : string, password : string, callback : ItemCallback<string>) {
+        if (!ClientValidator.isValidLogin(username, password, callback)) { return; }
         var params : any = {
             username : username,
             password : password,
@@ -70,6 +72,7 @@ class AppClientImpl implements Client {
 
     createUser(loginName : string, displayName : string, tel : string,
                password : string, callback : ItemCallback<User>) {
+        if (!ClientValidator.isValidCreateUser(loginName, displayName, tel, password, callback)) { return; }
         var url = this.url + '/api/v1/users';
         var params = {
             login_name : loginName,
@@ -112,6 +115,7 @@ class AppClientImpl implements Client {
     }
     
     saveTrading(item : Trading, callback : ItemCallback<string>) {
+        if (!ClientValidator.isValidSaveTrading(item, callback)) { return; }
         if (item.id === null) {
             this.createTrading(item, callback);
         } else {
@@ -120,6 +124,7 @@ class AppClientImpl implements Client {
     }
     
     saveTradingItem(tradingId : string, item : TradingItem, callback : ItemCallback<string>) {
+        if (!ClientValidator.isValidSaveTradingItem(tradingId, item, callback)) { return; }
         if (item.id === null) {
             this.createTradingItem(tradingId, item, callback);
         } else {
@@ -161,6 +166,7 @@ class AppClientImpl implements Client {
     }
     
     saveCompany(item : Company, callback : ItemCallback<string>) {
+        if (!ClientValidator.isValidSaveCompany(item, callback)) { return; }
         if (item.id === null || item.id.length == 0 ) {
             this.createCompany(item, callback);
         } else {
@@ -193,6 +199,7 @@ class AppClientImpl implements Client {
     }
 
     saveEnvironment(env : Environment, callback : Callback) {
+        if (!ClientValidator.isValidSaveEnvironment(env, callback)) { return; }
         var url = this.url + '/api/v1/environments';
         this.exec(url, 'PUT', this.accessToken, env, {
             success : (json : any) => {

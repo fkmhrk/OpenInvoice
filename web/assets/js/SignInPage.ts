@@ -37,7 +37,11 @@ class SignInPage implements Page {
             },
             error : (status : number, msg : string) => {
                 app.ractive.set('inProgress', false);
-                app.ractive.update();                                
+                app.ractive.update();
+                switch (status) {
+                case 1000: app.addSnack('ユーザー名を入力してください'); break;
+                case 1001: app.addSnack('パスワードを入力してください'); break;
+                }
                 console.log('failed to login status=' + status);
             }
         });
