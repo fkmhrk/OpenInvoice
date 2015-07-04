@@ -26,8 +26,8 @@ func deleteUserByName(db *sql.DB, name string) {
 
 func insertUser(db *sql.DB, id, name, password string) {
 	s, err := db.Prepare("INSERT INTO user" +
-		"(id,login_name,display_name,role,tel,password,deleted)" +
-		"VALUES(?,?,'demo','Read','',?,0)")
+		"(id,login_name,display_name,role,tel,password,created_time,modified_time,deleted)" +
+		"VALUES(?,?,'demo','Read','',?,0,0,0)")
 	if err != nil {
 		fmt.Printf("error %s", err)
 		return
