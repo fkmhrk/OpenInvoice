@@ -283,9 +283,9 @@
       </header>
       <div class="inner">
         <section id="addUser">
-          <p><input type="text" placeholder="担当者名"><input type="text" placeholder="ユーザーID（半角英数字）"></p>
-          <p><input type="text" placeholder="TEL"><input type="password" placeholder="パスワード"></p>
-          <p class="addBtn"><i class="fa fa-plus"></i>追加</p>
+          <p><input type="text" placeholder="担当者名" value="{{displayName}}"><input type="text" placeholder="ユーザーID（半角英数字）" value="{{loginName}}"></p>
+          <p><input type="text" placeholder="TEL" value="{{tel}}"><input type="password" placeholder="パスワード" value="{{password}}"></p>
+          <p class="addBtn" on-click="create"><i class="fa fa-plus"></i>追加</p>
         </section>
         <section class="list">
           <table>

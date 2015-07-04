@@ -589,24 +589,37 @@ var UserListDialog = (function () {
     function UserListDialog() {
     }
     UserListDialog.prototype.attach = function (app, el) {
-        app.ractive = new Ractive({
+        var _this = this;
+        this.ractive = new Ractive({
             // どの箱に入れるかをIDで指定
             el: el,
             // 指定した箱に、どのHTMLを入れるかをIDで指定
             template: '#userListTemplate'
         });
-        app.ractive.on({
+        this.ractive.on({
             'windowClicked': function () {
                 return false;
             },
             'close': function () {
                 app.closeDialog();
                 return false;
+            },
+            'create': function () {
+                _this.createUser(app);
+                return false;
             }
         });
         //dialog内だけスクロールするように調整
         var listUserHeight = $('.listTemplate').height();
         $('.listTemplate .list').css('height', listUserHeight - 330);
+    };
+    UserListDialog.prototype.createUser = function (app) {
+        var loginName = this.ractive.get('loginName');
+        var displayName = this.ractive.get('displayName');
+        var tel = this.ractive.get('tel');
+        var password = this.ractive.get('password');
+        console.log('loginName=' + loginName + ' displayName=' + displayName +
+            ' tel=' + tel + ' password=' + password);
     };
     return UserListDialog;
 })();
