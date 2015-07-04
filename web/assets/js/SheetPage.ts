@@ -61,6 +61,7 @@ class SheetPage implements Page {
             decorators: { },
             data : {
                 myCompanyName : app.myCompanyName,
+                is_admin : app.client.isAdmin(),
                 'trading' : trading,
                 'workFrom' : Utils.toDateStr(trading.work_from),
                 'workTo' : Utils.toDateStr(trading.work_to),

@@ -1180,6 +1180,7 @@ var TopPage = (function () {
             // データを設定。テンプレートで使います。
             data: {
                 myCompanyName: app.myCompanyName,
+                is_admin: app.client.isAdmin(),
                 'company': app.companyMap,
                 'sheets': sheets,
                 'toDateStr': Utils.toDateStr,
@@ -1324,6 +1325,7 @@ var SheetPage = (function () {
             decorators: {},
             data: {
                 myCompanyName: app.myCompanyName,
+                is_admin: app.client.isAdmin(),
                 'trading': trading,
                 'workFrom': Utils.toDateStr(trading.work_from),
                 'workTo': Utils.toDateStr(trading.work_to),

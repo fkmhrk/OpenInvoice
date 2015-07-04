@@ -48,6 +48,7 @@ class TopPage implements Page {
             // データを設定。テンプレートで使います。
             data : {
                 myCompanyName : app.myCompanyName,
+                is_admin : app.client.isAdmin(),
                 'company' : app.companyMap,
                 'sheets' : sheets,
                 'toDateStr' : Utils.toDateStr,
