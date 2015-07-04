@@ -11,7 +11,10 @@ class UserListDialog implements Dialog {
             // どの箱に入れるかをIDで指定
             el : el,
             // 指定した箱に、どのHTMLを入れるかをIDで指定
-            template : '#userListTemplate'
+            template : '#userListTemplate',
+            data : {
+                userList : app.users,
+            }
         });
         this.ractive.on({
             'windowClicked' : () => {
@@ -37,7 +40,21 @@ class UserListDialog implements Dialog {
         var tel = this.ractive.get('tel');
         var password = this.ractive.get('password');
 
-        console.log('loginName=' + loginName + ' displayName=' + displayName +
-                    ' tel=' + tel + ' password=' + password);
+        app.client.createUser(loginName, displayName, tel, password, {
+            success : (user : User) => {
+                this.ractive.push('userList', user);
+                this.clear();
+                app.addSnack('ユーザーを作成しました！');
+            },
+            error : (status : number, msg : string) => {
+                app.addSnack('ユーザー作成に失敗しました');
+            },
+        });
+    }
+    private clear() {
+        this.ractive.set('loginName', '');
+        this.ractive.set('displayName', '');
+        this.ractive.set('tel', '');
+        this.ractive.set('password', '');
     }
 }

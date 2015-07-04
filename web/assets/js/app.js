@@ -61,6 +61,23 @@ var AppClientImpl = (function () {
             }
         });
     };
+    AppClientImpl.prototype.createUser = function (loginName, displayName, tel, password, callback) {
+        var url = this.url + '/api/v1/users';
+        var params = {
+            login_name: loginName,
+            display_name: displayName,
+            tel: tel,
+            password: password
+        };
+        this.exec(url, 'POST', this.accessToken, params, {
+            success: function (json) {
+                callback.success(json);
+            },
+            error: function (status, body) {
+                callback.error(status, body.msg);
+            }
+        });
+    };
     AppClientImpl.prototype.getUsers = function (callback) {
         var url = this.url + '/api/v1/users';
         this.exec(url, 'GET', this.accessToken, null, {
@@ -594,7 +611,10 @@ var UserListDialog = (function () {
             // どの箱に入れるかをIDで指定
             el: el,
             // 指定した箱に、どのHTMLを入れるかをIDで指定
-            template: '#userListTemplate'
+            template: '#userListTemplate',
+            data: {
+                userList: app.users
+            }
         });
         this.ractive.on({
             'windowClicked': function () {
@@ -614,12 +634,27 @@ var UserListDialog = (function () {
         $('.listTemplate .list').css('height', listUserHeight - 330);
     };
     UserListDialog.prototype.createUser = function (app) {
+        var _this = this;
         var loginName = this.ractive.get('loginName');
         var displayName = this.ractive.get('displayName');
         var tel = this.ractive.get('tel');
         var password = this.ractive.get('password');
-        console.log('loginName=' + loginName + ' displayName=' + displayName +
-            ' tel=' + tel + ' password=' + password);
+        app.client.createUser(loginName, displayName, tel, password, {
+            success: function (user) {
+                _this.ractive.push('userList', user);
+                _this.clear();
+                app.addSnack('ユーザーを作成しました！');
+            },
+            error: function (status, msg) {
+                app.addSnack('ユーザー作成に失敗しました');
+            }
+        });
+    };
+    UserListDialog.prototype.clear = function () {
+        this.ractive.set('loginName', '');
+        this.ractive.set('displayName', '');
+        this.ractive.set('tel', '');
+        this.ractive.set('password', '');
     };
     return UserListDialog;
 })();

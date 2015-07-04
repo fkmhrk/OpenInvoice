@@ -15,7 +15,13 @@ interface Client {
      */
     login(username : string, password : string, callback : ItemCallback<string>);
 
-   /**
+    /**
+     * Creates user. This API requires Admin token.
+     */
+    createUser(loginName : string, displayName : string, tel : string,
+               password : string, callback : ItemCallback<User>);
+    
+    /**
      * Gets all users
      */
     getUsers(callback : ItemListCallback<User>);
