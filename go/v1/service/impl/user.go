@@ -53,6 +53,7 @@ func (o *userService) GetToken(name, pass string) s.Result {
 		"id":            user.Id,
 		"access_token":  session.Token,
 		"refresh_token": sessionRefresh.Token,
+		"isAdmin":       user.Role.IsAdmin(),
 		"token_type":    "bearer",
 	}
 	return jsonResult(200, body)
@@ -69,7 +70,7 @@ func (o *userService) RefreshToken(token string) s.Result {
 		return errorResult(500, MSG_SERVER_ERROR)
 	}
 	// create access token
-	session, err := o.sessionDAO.Create(sessionRefresh.UserId, sessionRefresh.Role, TIME_30MIN)
+	session, err := o.sessionDAO.Create(sessionRefresh.UserId, string(sessionRefresh.Role), TIME_30MIN)
 	if err != nil {
 		return errorResult(500, MSG_SERVER_ERROR)
 	}
@@ -77,6 +78,7 @@ func (o *userService) RefreshToken(token string) s.Result {
 	body := map[string]interface{}{
 		"id":           sessionRefresh.UserId,
 		"access_token": session.Token,
+		"isAdmin":      sessionRefresh.Role.IsAdmin(),
 		"token_type":   "bearer",
 	}
 

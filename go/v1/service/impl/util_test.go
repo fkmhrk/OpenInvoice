@@ -34,3 +34,9 @@ func assertFloat(t *testing.T, item rj.RawJsonObject, key string, expected float
 		t.Errorf("%s must be %f but %f", key, expected, v)
 	}
 }
+
+func assertBool(t *testing.T, item rj.RawJsonObject, key string, expected bool) {
+	if v, _ := item.Bool(key); v != expected {
+		t.Errorf("%s must be %d but %d", key, expected, v)
+	}
+}
