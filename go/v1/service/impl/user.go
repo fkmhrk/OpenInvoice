@@ -53,7 +53,7 @@ func (o *userService) GetToken(name, pass string) s.Result {
 		"id":            user.Id,
 		"access_token":  session.Token,
 		"refresh_token": sessionRefresh.Token,
-		"isAdmin":       user.Role.IsAdmin(),
+		"is_admin":      user.Role.IsAdmin(),
 		"token_type":    "bearer",
 	}
 	return jsonResult(200, body)
@@ -78,7 +78,7 @@ func (o *userService) RefreshToken(token string) s.Result {
 	body := map[string]interface{}{
 		"id":           sessionRefresh.UserId,
 		"access_token": session.Token,
-		"isAdmin":      sessionRefresh.Role.IsAdmin(),
+		"is_admin":     sessionRefresh.Role.IsAdmin(),
 		"token_type":   "bearer",
 	}
 

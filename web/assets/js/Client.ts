@@ -6,6 +6,11 @@ interface Client {
     setRefreshToken(refreshToken : string);
 
     /**
+     * Determines whether this account is admin.
+     */
+    isAdmin() : boolean;
+
+    /**
      * Gets access token
      */
     getAccessToken() : string;
