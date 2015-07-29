@@ -192,6 +192,11 @@ class App {
             }            
         });
     }
+
+    addCompany(c : Company) {
+        this.companies.push(c);
+        this.companyMap[c.id] = c;
+    }
 }
 
 interface LoadCallback {

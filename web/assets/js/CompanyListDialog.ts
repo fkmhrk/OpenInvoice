@@ -42,7 +42,9 @@ class CompanyListDialog implements Dialog {
         $('.listTemplate .list').css('height', listUserHeight-370);     
     }
     private showEditDialog(app : App, item : Company) {
-        app.showDialog(new AddCompanyDialog());
+        app.showDialog(new AddCompanyDialog(item, (result : any) => {
+            // nop
+        }));
     }
     
     private save(app : App) {

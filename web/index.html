@@ -395,26 +395,31 @@
       <header>
         <h1>クライアントの追加・編集</h1>
         <ul class="actionBtn">
-	      <li on-click="close"><a title="閉じる"><i class="fa fa-remove"></i></a></li>
-	    </ul>
-	    <p class="save" on-click="save"><i class="fa fa-check"></i>保存</p>
+	  <li on-click="close"><a title="閉じる"><i class="fa fa-remove"></i></a></li>
+	</ul>
+        {{#if !isNew }}
+	<p class="save" on-click="save"><i class="fa fa-check"></i>保存</p>
+        {{/if}}
       </header>
       <div class="inner">
         <section id="addCompany">
           <div class="wrapper">
             <div class="names">
-              <p><span>会社名</span><input type="text" placeholder="例）株式会社ABC"></p>
-              <p><span>部署名</span><input type="text" placeholder="例）第2システム営業部"></p>
-              <p><span>担当者</span><input type="text" placeholder="例）山田 太郎"></p>
+              <p><span>会社名</span><input type="text" placeholder="例）株式会社ABC" value="{{company.name}}"></p>
+              <p><span>部署名</span><input type="text" placeholder="例）第2システム営業部" value="{{company.unit}}"></p>
+              <p><span>担当者</span><input type="text" placeholder="例）山田 太郎" value="{{company.assignee}}"></p>
             </div>
             <div class="infos">
-              <p class="zip"><span>郵便番号</span><input type="text" placeholder="例）160-0022"></p>
-              <p class="address"><span>住所</span><input type="text" placeholder="例）東京都新宿区新宿1-1-1 ◯◯ビル6F"></p>
-              <p><span>TEL</span><input type="text" placeholder="例）03-1234-5678"></p>
-              <p><span>FAX</span><input type="text" placeholder="FAX"></p>
+              <p class="zip"><span>郵便番号</span><input type="text" placeholder="例）160-0022" value="{{company.zip}}"></p>
+              <p class="address"><span>住所</span><input type="text" placeholder="例）東京都新宿区新宿1-1-1 ○○ビル 6F"
+                                                                                  value="{{company.address}}"></p>
+              <p><span>TEL</span><input type="text" placeholder="例）03-1234-5678" value="{{company.phone}}"></p>
+              <p><span>FAX</span><input type="text" placeholder="FAX" value="{{company.fax}}"></p>
             </div>
           </div>
-          <p class="addBtn"><i class="fa fa-plus"></i>追加</p>
+          {{#if isNew }}
+          <p class="addBtn" on-click="save"><i class="fa fa-plus"></i>追加</p>
+          {{/if}}
         </section>
       </div>
     </section>

@@ -790,6 +790,10 @@ var App = (function () {
             }
         });
     };
+    App.prototype.addCompany = function (c) {
+        this.companies.push(c);
+        this.companyMap[c.id] = c;
+    };
     return App;
 })();
 ///<reference path="./Application.ts"/>
@@ -869,23 +873,80 @@ var UserListDialog = (function () {
 })();
 ///<reference path="./Application.ts"/>
 ///<reference path="./Dialog.ts"/>
+///<reference path="./Functions.ts"/>
 var AddCompanyDialog = (function () {
-    function AddCompanyDialog() {
+    function AddCompanyDialog(company, callback) {
+        if (company == null) {
+            this.isNew = true;
+            this.company = new Company();
+            this.companyOrg = null;
+        }
+        else {
+            this.isNew = false;
+            this.company = Utils.clone(company);
+            this.companyOrg = company;
+        }
+        this.callback = callback;
     }
     AddCompanyDialog.prototype.attach = function (app, el) {
-        app.ractive = new Ractive({
+        var _this = this;
+        this.ractive = new Ractive({
             // どの箱に入れるかをIDで指定
             el: el,
             // 指定した箱に、どのHTMLを入れるかをIDで指定
-            template: '#addCompanyTemplate'
+            template: '#addCompanyTemplate',
+            data: {
+                isNew: this.isNew,
+                company: this.company
+            }
         });
-        app.ractive.on({
+        this.ractive.on({
             'windowClicked': function () {
                 return false;
             },
             'close': function () {
                 app.closeDialog();
                 return false;
+            },
+            'save': function () {
+                _this.save(app);
+                return false;
+            }
+        });
+    };
+    AddCompanyDialog.prototype.save = function (app) {
+        var _this = this;
+        var company = this.ractive.get('company');
+        console.log(company);
+        app.client.saveCompany(company, {
+            success: function (id) {
+                // clone?
+                company.id = id;
+                if (_this.companyOrg == null) {
+                    app.addCompany(company);
+                }
+                else {
+                    _this.companyOrg.name = company.name;
+                    _this.companyOrg.unit = company.unit;
+                    _this.companyOrg.assignee = company.assignee;
+                    _this.companyOrg.zip = company.zip;
+                    _this.companyOrg.address = company.address;
+                    _this.companyOrg.phone = company.phone;
+                    _this.companyOrg.fax = company.fax;
+                }
+                _this.callback(company);
+                app.addSnack('保存しました。');
+                app.closeDialog();
+            },
+            error: function (status, msg) {
+                switch (status) {
+                    case 1001:
+                        app.addSnack('会社名を入力してください');
+                        break;
+                    default:
+                        app.addSnack('保存に失敗しました。');
+                        break;
+                }
             }
         });
     };
@@ -934,7 +995,9 @@ var CompanyListDialog = (function () {
         $('.listTemplate .list').css('height', listUserHeight - 370);
     };
     CompanyListDialog.prototype.showEditDialog = function (app, item) {
-        app.showDialog(new AddCompanyDialog());
+        app.showDialog(new AddCompanyDialog(item, function (result) {
+            // nop
+        }));
     };
     CompanyListDialog.prototype.save = function (app) {
         var _this = this;
@@ -1434,7 +1497,9 @@ var SheetPage = (function () {
         tooltipster();
     };
     SheetPage.prototype.showAddCompanyDialog = function (app) {
-        app.showDialog(new AddCompanyDialog());
+        app.showDialog(new AddCompanyDialog(null, function (result) {
+            app.ractive.update();
+        }));
     };
     SheetPage.prototype.showAddUserDialog = function (app) {
         app.showDialog(new AddUserDialog());
