@@ -23,13 +23,13 @@
   </script>
 
   <script id="snackbarsTemplate" type="text/ractive">
-    {{#if snackbars.length > 0}}    
+    {{#if snackbars.length > 0}}
     <ul intro-outro="fade:300">
     {{#snackbars:i}}
       <li on-click="close:{{i}}">{{.}}</li>
     {{/}}
     </ul>
-    {{/if}}    
+    {{/if}}
   </script>
 
   <script id="signInTemplate" type="text/ractive">
@@ -140,11 +140,11 @@
 	    </p>
 	    <ul>
 	      <li><input type="text" placeholder="件名" value="{{trading.subject}}"></li>
-	      <li><span>作業期間</span><input type="date" value="{{workFrom}}">〜<input type="date" value="{{workTo}}"></li>
-	      <li><textarea placeholder="成果物" value="{{trading.product}}"></textarea></li>
-	      <li><textarea placeholder="備考" value="{{trading.memo}}"></textarea></li>
+	      <li><span class="label">作業期間</span><input type="date" value="{{workFrom}}">〜<input type="date" value="{{workTo}}"></li>
+	      <li><span class="label">成果物</span><textarea placeholder="成果物" value="{{trading.product}}"></textarea></li>
+	      <li><span class="label">備考</span><textarea placeholder="備考" value="{{trading.memo}}"></textarea></li>
 	      <li>
-		<span>担当者</span>
+		<span class="label">担当者</span>
 		<span class="selectbox">
 		  <select value="{{trading.assignee}}">
 		    {{#users}}
@@ -239,10 +239,12 @@
               <td><input type="text" value="{{closing_month}}">月</td>
               <th>お支払期限</th>
               <td>
-                <select id="pay_limit" value="{{pay_limit}}">
-                  <option value="1">翌月末</option>
-                  <option value="2">翌々月末</option>
-                </select>
+                <span class="selectbox">
+                  <select id="pay_limit" value="{{pay_limit}}">
+                    <option value="1">翌月末</option>
+                    <option value="2">翌々月末</option>
+                  </select>
+                </span>
               </td>
             </tr>
           </table>
@@ -251,22 +253,24 @@
           <div class="companySetting">
             <h2>会社の基本情報</h2>
             <ul>
-              <li><input type="text" placeholder="会社名" value="{{company_name}}"></li>
-              <li><input type="text" placeholder="郵便番号" value="{{company_zip}}"></li>
-              <li><input type="text" placeholder="住所" value="{{company_address}}"></li>
-              <li><input type="text" placeholder="TEL" value="{{company_tel}}"></li>
-              <li><input type="text" placeholder="FAX" value="{{company_fax}}"></li>
+              <li><span class="label">会社名</span><input type="text" placeholder="例）株式会社ABC" value="{{company_name}}"></li>
+              <li><span class="label">郵便番号</span><input type="text" placeholder="例）160-0022" value="{{company_zip}}"></li>
+              <li><span class="label">住所</span><input type="text" placeholder="例）東京都新宿区新宿1-1-1 ◯◯ビル6F" value="{{company_address}}"></li>
+              <li><span class="label">TEL</span><input type="text" placeholder="例）03-1234-5678" value="{{company_tel}}"></li>
+              <li><span class="label">FAX</span><input type="text" placeholder="FAX" value="{{company_fax}}"></li>
             </ul>
           </div>
           <div class="bankSetting">
             <h2>口座情報</h2>
             <p>
               <input type="text" placeholder="銀行名" value="{{company_bankname}}">
-              <select id="bank_type" value="company_bank_type">
-                <option value="1">普通</option>
-                <option value="2">当座</option>
-                <option value="3">定期</option>
-              </select>
+              <span class="selectbox">
+                <select id="bank_type" value="company_bank_type">
+                  <option value="1">普通</option>
+                  <option value="2">当座</option>
+                  <option value="3">定期</option>
+                </select>
+              </span>
               <input type="text" placeholder="口座番号" value="{{company_bank_num}}">
             </p>
             <p class="name"><input type="text" placeholder="名義" value="{{company_bank_name}}"></p>
@@ -279,7 +283,7 @@
   <script id="userListTemplate" type="text/ractive">
     <section id="setting" class="listTemplate" on-click="windowClicked">
       <header>
-        <h1>担当者情報</h1>
+        <h1>担当者の編集</h1>
         <ul class="actionBtn">
 	        <li on-click="close"><a title="閉じる"><i class="fa fa-remove"></i></a></li>
 	      </ul>
@@ -287,8 +291,10 @@
       </header>
       <div class="inner">
         <section id="addUser">
-          <p><input type="text" placeholder="担当者名" value="{{displayName}}"><input type="text" placeholder="ユーザーID（半角英数字）" value="{{loginName}}"></p>
-          <p><input type="text" placeholder="TEL" value="{{tel}}"><input type="password" placeholder="パスワード" value="{{password}}"></p>
+          <p><span class="label">担当者名</span><input type="text" placeholder="例）山田 花子" value="{{displayName}}">
+            <span class="label">ユーザーID</span><input type="text" placeholder="例）hanako_y（半角英数字）" value="{{loginName}}"></p>
+          <p><span class="label">TEL</span><input type="text" placeholder="例）080-1234-5678" value="{{tel}}">
+            <span class="label">パスワード</span><input type="password" placeholder="＃ログイン時に必要です" value="{{password}}"></p>
           <p class="addBtn" on-click="create"><i class="fa fa-plus"></i>追加</p>
         </section>
         <section class="list">
@@ -324,8 +330,10 @@
       </header>
       <div class="inner">
         <section id="addUser">
-          <p><input type="text" placeholder="担当者名"></p>
-          <p><input type="text" placeholder="TEL"></p>
+          <p><span class="label">担当者名</span><input type="text">
+            <span class="label">ユーザーID</span><input type="text" placeholder="例）hanako_y（半角英数字）"></p>
+          <p><span class="label">TEL</span><input type="text" placeholder="例）080-1234-5678">
+            <span class="label">パスワード</span><input type="password" placeholder="＃ログイン時に必要です"></p>
           <p class="addBtn"><i class="fa fa-plus"></i>追加</p>
         </section>
       </div>
@@ -345,14 +353,15 @@
         <section id="addCompany">
           <div class="wrapper">
             <div class="names">
-              <p><input type="text" placeholder="クライアント会社名" value="{{name}}"></p>
-              <p><input type="text" placeholder="部署名" value="{{unit}}"></p>
-              <p><input type="text" placeholder="担当者" value="{{assignee}}"></p>
+              <p><span>会社名</span><input type="text" placeholder="例）株式会社ABC" value="{{name}}"></p>
+              <p><span>部署名</span><input type="text" placeholder="例）第2システム営業部" value="{{unit}}"></p>
+              <p><span>担当者</span><input type="text" placeholder="例）山田 太郎" value="{{assignee}}"></p>
             </div>
             <div class="infos">
-              <p><input type="text" placeholder="郵便番号" value="{{zip}}"><input type="text" placeholder="住所" value="{{address}}"></p>
-              <p><input type="text" placeholder="TEL" value="{{tel}}"></p>
-              <p><input type="text" placeholder="FAX" value="{{fax}}"></p>
+              <p class="zip"><span>郵便番号</span><input type="text" placeholder="例）160-0022" value="{{zip}}"></p>
+              <p class="address"><span>住所</span><input type="text" placeholder="例）東京都新宿区新宿1-1-1 ◯◯ビル6F" value="{{address}}"></p>
+              <p><span>TEL</span><input type="text" placeholder="例）03-1234-5678" value="{{tel}}"></p>
+              <p><span>FAX</span><input type="text" placeholder="FAX" value="{{fax}}"></p>
             </div>
           </div>
           <p class="addBtn" on-click="submit"><i class="fa fa-plus"></i>追加</p>
@@ -394,14 +403,15 @@
         <section id="addCompany">
           <div class="wrapper">
             <div class="names">
-              <p><input type="text" placeholder="クライアント会社名"></p>
-              <p><input type="text" placeholder="部署名"></p>
-              <p><input type="text" placeholder="担当者"></p>
+              <p><span>会社名</span><input type="text" placeholder="例）株式会社ABC"></p>
+              <p><span>部署名</span><input type="text" placeholder="例）第2システム営業部"></p>
+              <p><span>担当者</span><input type="text" placeholder="例）山田 太郎"></p>
             </div>
             <div class="infos">
-              <p><input type="text" placeholder="郵便番号"><input type="text" placeholder="住所"></p>
-              <p><input type="text" placeholder="TEL"></p>
-              <p><input type="text" placeholder="FAX"></p>
+              <p class="zip"><span>郵便番号</span><input type="text" placeholder="例）160-0022"></p>
+              <p class="address"><span>住所</span><input type="text" placeholder="例）東京都新宿区新宿1-1-1 ◯◯ビル6F"></p>
+              <p><span>TEL</span><input type="text" placeholder="例）03-1234-5678"></p>
+              <p><span>FAX</span><input type="text" placeholder="FAX"></p>
             </div>
           </div>
           <p class="addBtn"><i class="fa fa-plus"></i>追加</p>
