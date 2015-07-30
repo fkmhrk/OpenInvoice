@@ -74,10 +74,10 @@ class TQPDFViewImpl implements PDFView {
         $this->pdf->SetXY(140.5, 60.5);
         $this->pdf->write(4.3, s('〒'. $info['company_zip']. ' '. $info['company_address']));
         $this->pdf->SetXY(140.5, 64.8);
-        $this->pdf->write(4.3, s('担当：'. $user['display_name']. ' / '. $info['company_tel']));        
+        $this->pdf->write(4.3, s('担当：'. $user['display_name']. ' / '. $user['tel']));        
     }
     
-    public function writeItemTable($x, $y, $items, $taxRate) {
+    public function writeItemTable($x, $y, $items, $taxRate, $totalLabel) {
         $h1 = 8;    // 1行目
         $h2 = 3;      // 2行目
         $h3 = 2;      // 余白行
@@ -161,7 +161,7 @@ class TQPDFViewImpl implements PDFView {
                 //空白行
                 $this->pdf->SetDrawColor(153, 153, 153);
                 $this->pdf->Cell($w0, $h3, s(''), 0, 0, 'C', 0);
-                $this->pdf->Cell($w1+$w2+$w3+$w4+$w5, $h3, s(''), B, 1, 'L', 0);                
+                $this->pdf->Cell($w1+$w2+$w3+$w4+$w5, $h3, s(''), 'B', 1, 'L', 0);                
             }
             ++$no;
         }
@@ -178,7 +178,7 @@ class TQPDFViewImpl implements PDFView {
 
         $this->pdf->SetTextColor(77, 77, 77);
         $this->pdf->Cell($w0, $h2+$h3, s(''), 0, 0, 'C', 0);
-        $this->pdf->Cell($w1+$w2+$w3+$w4, $h2+$h3, s('消費税（'. $taxRate. '％）'), 0, 0, 'R', 0);
+        $this->pdf->Cell($w1+$w2+$w3+$w4, $h2+$h3, s('消費税（'. (int)$taxRate. '％）'), 0, 0, 'R', 0);
         $this->pdf->SetTextColor(0, 0, 0);
         $this->pdf->Cell($w5, $h2+$h3, s('¥'. number_format($tax)), 0, 1, 'R', 0);
 
@@ -190,12 +190,30 @@ class TQPDFViewImpl implements PDFView {
         $this->pdf->SetTextColor($this->accColorR, $this->accColorG, $this->accColorB);
         $this->pdf->SetDrawColor($this->accColorR, $this->accColorG, $this->accColorB);
         $this->pdf->Cell($w0, $h1+$h2, s(''), 0, 0, 'C', 0);
-        $this->pdf->Cell($w1+$w2+$w3+$w4, $h1+$h2, s('ご請求金額'), TB, 0, 'R', 0);
-        $this->pdf->Cell($w5, $h1+$h2, s('¥'. number_format($total)), TB, 1, 'R', 0);
+        $this->pdf->Cell($w1+$w2+$w3+$w4, $h1+$h2, s($totalLabel), 'TB', 0, 'R', 0);
+        $this->pdf->Cell($w5, $h1+$h2, s('¥'. number_format($total)), 'TB', 1, 'R', 0);
 
         return array('sum' => $sum, 'tax' => $tax, 'total' => $total);
     }
 
+    public function writeTheTimeForQuotation($days) {
+        $w0 = $this->startX; // $w0は開始位置をあわせるために空白として生成
+        $w1 = 70.5;
+        $w2 = 29;
+        $w3 = 20.9;
+        $w4 = 20.9;
+        $w5 = 28.5;
+        $h1 = 8;
+        $h2 = 3;
+
+        $this->pdf->SetFont(GOTHIC,'', 7);
+        $this->pdf->SetTextColor(77, 77, 77);
+        $this->pdf->Cell($w0, $h1, s(''), 0, 0, 'C', 0);
+        $this->pdf->Cell($w1+$w2+$w3+$w4+$w5, $h1, s('＃お見積期限：発行日より'. $days. '日間'), 0, 1, 'R', 0);
+
+        $this->pdf->Cell($w0, $h1, s(''), 0, 1, 'L', 0);  // 行の余白用
+    }
+        
     public function writeTheTimeForPayment($time, $limitType) {
         $w0 = $this->startX; // $w0は開始位置をあわせるために空白として生成
         $w1 = 70.5;
@@ -224,7 +242,7 @@ class TQPDFViewImpl implements PDFView {
         $this->pdf->Cell($w0, $h1, s(''), 0, 1, 'L', 0);  // 行の余白用
     }
 
-    public function writeProduct($workFrom, $workTo, $product) {
+    public function writeProduct($workFrom, $workTo, $product, $memo) {
         $w0 = $this->startX; // $w0は開始位置をあわせるために空白として生成
         $w1 = 70.5;
         $w2 = 29;
@@ -242,7 +260,7 @@ class TQPDFViewImpl implements PDFView {
         $this->pdf->SetTextColor($this->accColorR, $this->accColorG, $this->accColorB);
         $this->pdf->SetLineWidth(0.5);
         $this->pdf->Cell($w0, $h1, s(''), 0, 0, 'C', 0);
-        $this->pdf->Cell($w3, $h1, s('作業期間'), B, 1, 'L', 0);
+        $this->pdf->Cell($w3, $h1, s('作業期間'), 'B', 1, 'L', 0);
 
         $this->pdf->Cell($w0, $h2, s(''), 0, 0, 'C', 0);
         $this->pdf->Cell($w1+$w2+$w3+$w4+$w5, $h2, s(''), 0, 1, 'L', 0);
@@ -254,7 +272,7 @@ class TQPDFViewImpl implements PDFView {
         $this->pdf->SetTextColor($this->accColorR, $this->accColorG, $this->accColorB);
         $this->pdf->SetLineWidth(0.5);
         $this->pdf->Cell($w0, $h1, s(''), 0, 0, 'C', 0);
-        $this->pdf->Cell($w3, $h1, s('成果物'), B, 1, 'L', 0);
+        $this->pdf->Cell($w3, $h1, s('成果物'), 'B', 1, 'L', 0);
         //空白行
         $this->pdf->Cell($w0, $h2, s(''), 0, 0, 'C', 0);
         $this->pdf->Cell($w1+$w2+$w3+$w4+$w5, $h2, s(''), 0, 1, 'L', 0);
@@ -263,7 +281,41 @@ class TQPDFViewImpl implements PDFView {
         $this->pdf->Cell($w0, $h2, s(''), 0, 0, 'C', 0);
         $this->pdf->MultiCell($w1+$w2+$w3+$w4+$w5, $h2, s($product), 0, 'L', 0);
     
-        $this->pdf->Cell($w0, $mS+$mM, s(''), 0, 1, 'L', 0);  // 行の余白用
+        $this->pdf->Cell($w0, $mS, s(''), 0, 1, 'L', 0);  // 行の余白用
+    }
+
+    public function writeMemo($memo) {
+        $w0 = $this->startX; // $w0は開始位置をあわせるために空白として生成
+        $w1 = 70.5;
+        $w2 = 29;
+        $w3 = 20.9;
+        $w4 = 20.9;
+        $w5 = 28.5;
+        $h1 = 8;
+        $h2 = 3;
+        $mS = 2;
+        $mM = 5;
+                
+        // 備考 ----------------------------------------------------
+        $this->pdf->SetTextColor($this->accColorR, $this->accColorG, $this->accColorB);
+        $this->pdf->SetLineWidth(0.5);
+        $this->pdf->Cell($w0, $h1, s(''), 0, 0, 'C', 0);
+        $this->pdf->Cell($w3, $h1, s('備考'), 'B', 1, 'L', 0);
+        //空白行
+        $this->pdf->Cell($w0, $h2, s(''), 0, 0, 'C', 0);
+        $this->pdf->Cell($w1+$w2+$w3+$w4+$w5, $h2, s(''), 0, 1, 'L', 0);
+        //内容
+        $this->pdf->SetTextColor(0, 0, 0);
+        $this->pdf->Cell($w0, $h2, s(''), 0, 0, 'C', 0);
+        $this->pdf->MultiCell($w1+$w2+$w3+$w4+$w5, $h2, s($memo), 0, 'L', 0);
+
+        $this->pdf->Cell($w0, $mS, s(''), 0, 1, 'L', 0);  // 行の余白用
+
+        // ひとこと ----------------------------------------------------
+        $this->pdf->Cell($w0, $mM, s(''), 0, 1, 'L', 0);  // 行の余白用
+
+        $this->pdf->Cell($w0, $h1, s(''), 0, 0, 'C', 0);
+        $this->pdf->Cell($w1+$w2+$w4+$w5, $h1, s('上記のとおり、お見積り申し上げます。'), 0, 1, 'L', 0);        
     }
 
     public function writeBankInfo($info) {
