@@ -214,3 +214,95 @@ func TestUser0201_Create_Not_Admin(t *testing.T) {
 		t.Errorf("Wrong msg : %s", v)
 	}
 }
+
+func TestUser0300_Update(t *testing.T) {
+	models := mock.NewMock()
+	sessionDAO, _ := models.Session.(*mock.SessionDAO)
+	sessionDAO.GetByTokenResult = &m.Session{
+		Token: "testToken",
+		Role:  m.Role("Admin,Read,Write"),
+	}
+	userDAO, _ := models.User.(*mock.UserDAO)
+	userDAO.UpdateResult = &m.User{
+		Id: "id1234",
+	}
+
+	s := NewUserSerivce(userDAO, sessionDAO, models)
+
+	token := "token1122"
+	r := s.Update(token, "user1111", "loginName", "disp", "08011112222", "pass1122")
+	if r == nil {
+		t.Errorf("Result must not be nil")
+		return
+	}
+	if r.Status() != 200 {
+		t.Errorf("Wrong status : %d", r.Status())
+		return
+	}
+	json := json(r)
+	assertString(t, json, "id", "user1111")
+	assertString(t, json, "login_name", "loginName")
+	assertString(t, json, "display_name", "disp")
+	assertString(t, json, "tel", "08011112222")
+}
+
+func TestUser0301_Update_Not_Admin(t *testing.T) {
+	models := mock.NewMock()
+	sessionDAO, _ := models.Session.(*mock.SessionDAO)
+	sessionDAO.GetByTokenResult = &m.Session{
+		Token:  "testToken",
+		UserId: "user1111",
+		Role:   m.Role("Read,Write"),
+	}
+	userDAO, _ := models.User.(*mock.UserDAO)
+	userDAO.UpdateResult = &m.User{
+		Id: "id1234",
+	}
+
+	s := NewUserSerivce(userDAO, sessionDAO, models)
+
+	token := "token1122"
+	r := s.Update(token, "user1111", "loginName", "disp", "08011112222", "pass1122")
+	if r == nil {
+		t.Errorf("Result must not be nil")
+		return
+	}
+	if r.Status() != 200 {
+		t.Errorf("Wrong status : %d", r.Status())
+		return
+	}
+	json := json(r)
+	assertString(t, json, "id", "user1111")
+	assertString(t, json, "login_name", "loginName")
+	assertString(t, json, "display_name", "disp")
+	assertString(t, json, "tel", "08011112222")
+}
+
+func TestUser0302_Update_Not_Admin_Other(t *testing.T) {
+	models := mock.NewMock()
+	sessionDAO, _ := models.Session.(*mock.SessionDAO)
+	sessionDAO.GetByTokenResult = &m.Session{
+		Token:  "testToken",
+		UserId: "user2222",
+		Role:   m.Role("Read,Write"),
+	}
+	userDAO, _ := models.User.(*mock.UserDAO)
+	userDAO.UpdateResult = &m.User{
+		Id: "id1234",
+	}
+
+	service := NewUserSerivce(userDAO, sessionDAO, models)
+
+	token := "token1122"
+	r := service.Update(token, "user1111", "loginName", "disp", "08011112222", "pass1122")
+	if r == nil {
+		t.Errorf("Result must not be nil")
+		return
+	}
+	if r.Status() != 403 {
+		t.Errorf("Wrong status : %d", r.Status())
+		return
+	}
+	json := json(r)
+	assertString(t, json, "msg", MSG_NOT_AUTHORIZED)
+}
