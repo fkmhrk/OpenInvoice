@@ -156,7 +156,7 @@ func (s *userService) Update(token, id, loginName, displayName, tel, password st
 		}
 	}
 	// update
-	_, err = s.userDAO.Update(id, loginName, displayName, tel, "", password)
+	_, err = s.userDAO.Update(id, loginName, displayName, "", tel, password)
 	if err != nil {
 		return errorResult(500, MSG_SERVER_ERROR)
 	}
