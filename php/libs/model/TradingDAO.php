@@ -1,6 +1,6 @@
 <?php
 
 interface TradingDAO {
-    public function getById($userId, $id);
+    public function getById($id);
 }
 ?>
