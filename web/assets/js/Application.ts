@@ -197,6 +197,15 @@ class App {
         this.users.push(u);
     }
 
+    deleteUser(u : User) {
+        var list = [];
+        _.each(this.users, (item : User) => {
+            if (item.id == u.id) { return; }
+            list.push(item);
+        });
+        this.users = list;
+    }
+
     addCompany(c : Company) {
         this.companies.push(c);
         this.companyMap[c.id] = c;

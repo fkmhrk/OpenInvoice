@@ -26,6 +26,8 @@ func SetHandlers(r *mux.Router, services s.Services, u s.UserService, t s.Tradin
 		Methods(method_POST)
 	r.HandleFunc("/users/{id}", updateUser(services)).
 		Methods(method_PUT)
+	r.HandleFunc("/users/{id}", deleteUser(services)).
+		Methods(method_DELETE)
 	r.HandleFunc("/tradings", getTradings(t)).
 		Methods(method_GET)
 	r.HandleFunc("/tradings", createTrading(t)).

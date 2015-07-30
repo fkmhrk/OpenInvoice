@@ -134,6 +134,19 @@ class MockClient implements Client {
     }
 
     /**
+     * Deletes user
+     */
+    deleteUser(id : string, callback : Callback) {
+        var list = [];
+        _.each(userList, (item : User) => {
+            if (item.id == id) { return; }
+            list.push(item);
+        });
+        userList = list;
+        callback.success();
+    }
+
+    /**
      * Gets all companies
      */
     getCompanies(callback : ItemListCallback<Company>) {

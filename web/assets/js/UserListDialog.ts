@@ -28,6 +28,10 @@ class UserListDialog implements Dialog {
                 this.showEditDialog(app, item);
                 return false;
             },
+            'delete' : (e : any, item : User) => {
+                this.deleteUser(app, item);
+                return false;
+            },            
             'create' : () => {
                 this.createUser(app);
                 return false;
@@ -69,6 +73,25 @@ class UserListDialog implements Dialog {
             },
         });
     }
+
+    private deleteUser(app : App, user : User) {
+        if (!window.confirm('この担当者を削除しますか？')) {
+            return;
+        }
+        app.client.deleteUser(user.id, {
+            success : () => {
+                app.deleteUser(user);
+                this.ractive.set('userList', app.users);
+                app.addSnack('担当者を削除しました');
+            },
+            error : (status : number, msg : string) => {
+                switch (status) {
+                default : app.addSnack('削除に失敗しました');
+                }
+            }
+        });
+    }
+    
     private clear() {
         this.ractive.set('loginName', '');
         this.ractive.set('displayName', '');

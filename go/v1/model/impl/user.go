@@ -74,6 +74,28 @@ func (d *userDAO) GetList() ([]*m.User, error) {
 	return list, nil
 }
 
+func (d *userDAO) GetById(id string) (*m.User, error) {
+	db := d.connection.Connect()
+	st, err := db.Prepare(select_user + "WHERE id=? AND deleted <> 1")
+	if err != nil {
+		return nil, err
+	}
+	defer st.Close()
+
+	rows, err := st.Query(id)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	if !rows.Next() {
+		return nil, nil
+	}
+
+	user, _, err := d.scan(rows)
+	return user, err
+}
+
 func (d *userDAO) Create(loginName, displayName, role, tel, password string) (*m.User, error) {
 	tr, err := d.connection.Begin()
 	if err != nil {
@@ -118,6 +140,27 @@ func (o *userDAO) Update(id, loginName, displayName, role, tel, password string)
 	} else {
 		return o.updateWithPassword(id, loginName, displayName, role, tel, password)
 	}
+}
+
+func (o *userDAO) Delete(id string) error {
+	tr, err := o.connection.Begin()
+	if err != nil {
+		return err
+	}
+	defer tr.Rollback()
+
+	err = o.updateTradingAssignee(tr, id)
+	if err != nil {
+		return err
+	}
+
+	err = o.deleteUser(tr, id)
+	if err != nil {
+		return err
+	}
+
+	tr.Commit()
+	return nil
 }
 
 func (o *userDAO) updateWithoutPassword(id, loginName, displayName, role, tel string) (*m.User, error) {
@@ -183,6 +226,32 @@ func (o *userDAO) updateWithPassword(id, loginName, displayName, role, tel, pass
 		Role:        m.Role(role),
 		Tel:         tel,
 	}, nil
+}
+
+func (o *userDAO) updateTradingAssignee(tr *sql.Tx, id string) error {
+	st, err := tr.Prepare("UPDATE trading SET " +
+		"assignee='empty',modified_time=unix_timestamp(now()) " +
+		"WHERE assignee=?")
+	if err != nil {
+		return err
+	}
+	defer st.Close()
+
+	_, err = st.Exec(id)
+	return err
+}
+
+func (o *userDAO) deleteUser(tr *sql.Tx, id string) error {
+	st, err := tr.Prepare("UPDATE user SET " +
+		"deleted=1,modified_time=unix_timestamp(now()) " +
+		"WHERE id=?")
+	if err != nil {
+		return err
+	}
+	defer st.Close()
+
+	_, err = st.Exec(id)
+	return err
 }
 
 func (o *userDAO) scan(rows *sql.Rows) (*m.User, string, error) {

@@ -352,6 +352,17 @@ var AppClientImpl = (function () {
             }
         });
     };
+    AppClientImpl.prototype.deleteUser = function (id, callback) {
+        var url = this.url + '/api/v1/users/' + id;
+        this.exec(url, 'DELETE', this.accessToken, null, {
+            success: function (json) {
+                callback.success();
+            },
+            error: function (status, body) {
+                callback.error(status, body.msg);
+            }
+        });
+    };
     AppClientImpl.prototype.getCompanies = function (callback) {
         var url = this.url + '/api/v1/companies';
         this.exec(url, 'GET', this.accessToken, null, {
@@ -840,6 +851,16 @@ var App = (function () {
     App.prototype.addUser = function (u) {
         this.users.push(u);
     };
+    App.prototype.deleteUser = function (u) {
+        var list = [];
+        _.each(this.users, function (item) {
+            if (item.id == u.id) {
+                return;
+            }
+            list.push(item);
+        });
+        this.users = list;
+    };
     App.prototype.addCompany = function (c) {
         this.companies.push(c);
         this.companyMap[c.id] = c;
@@ -872,6 +893,10 @@ var UserListDialog = (function () {
             },
             'showEdit': function (e, item) {
                 _this.showEditDialog(app, item);
+                return false;
+            },
+            'delete': function (e, item) {
+                _this.deleteUser(app, item);
                 return false;
             },
             'create': function () {
@@ -919,6 +944,24 @@ var UserListDialog = (function () {
                     default:
                         app.addSnack('ユーザー作成に失敗しました');
                         break;
+                }
+            }
+        });
+    };
+    UserListDialog.prototype.deleteUser = function (app, user) {
+        var _this = this;
+        if (!window.confirm('この担当者を削除しますか？')) {
+            return;
+        }
+        app.client.deleteUser(user.id, {
+            success: function () {
+                app.deleteUser(user);
+                _this.ractive.set('userList', app.users);
+                app.addSnack('担当者を削除しました');
+            },
+            error: function (status, msg) {
+                switch (status) {
+                    default: app.addSnack('削除に失敗しました');
                 }
             }
         });

@@ -6,4 +6,5 @@ type UserService interface {
 	GetUsers(token string) Result
 	Create(token, loginName, displayName, tel, password string) Result
 	Update(token, id, loginName, displayName, tel, password string) Result
+	Delete(token, id string) Result
 }

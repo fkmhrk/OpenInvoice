@@ -235,3 +235,52 @@ func TestUserDAO_0300_Update(t *testing.T) {
 	assertUser(t, user5, user.Id, loginName, "NewName2", "Read", "09033334444")
 
 }
+
+func TestUserDAO_0400_Delete(t *testing.T) {
+	db, err := connect()
+	if err != nil {
+		t.Errorf("Failed to connect")
+		return
+	}
+	defer db.Close()
+	// prepare
+	loginName := "test0100"
+	displayName := "Demo user"
+	tel := "08011112222"
+	password := "pass1234"
+	deleteUserByName(db, loginName)
+
+	dao := createUserDAO(db)
+	user, err := dao.Create(loginName, displayName, "Read", tel, password)
+	if err != nil {
+		t.Errorf("Failed to create user : %s", err)
+		return
+	}
+	assertUser(t, user, user.Id, loginName, displayName, "Read", tel)
+
+	// get by id
+	user2, err := dao.GetById(user.Id)
+	if err != nil {
+		t.Errorf("Failed to get user : %s", err)
+		return
+	}
+	assertUser(t, user2, user.Id, loginName, displayName, "Read", tel)
+
+	// delete
+	err = dao.Delete(user.Id)
+	if err != nil {
+		t.Errorf("Failed to delete user : %s", err)
+		return
+	}
+
+	// login
+	user3, err := dao.GetByNamePassword(loginName, password)
+	if err != nil {
+		t.Errorf("Failed to get user : %s", err)
+		return
+	}
+	if user3 != nil {
+		t.Errorf("User must be empty but id=%s", user3.Id)
+		return
+	}
+}
