@@ -54,8 +54,8 @@ class AddUserDialog implements Dialog {
         if (this.isNew) {
             app.client.createUser(user.login_name, user.display_name, user.tel, password, {
                 success : (item : User) => {
-                    this.callback(item);
                     app.addUser(item);
+                    this.callback(item);
                     app.addSnack('作成しました');
                     app.closeDialog();
                 },
