@@ -87,9 +87,6 @@ func (s *tradingService) Update(token string, trading s.Trading) s.Result {
 	if len(trading.Subject) == 0 {
 		return errorResult(400, MSG_ERR_SUBJECT_EMPTY)
 	}
-	if len(trading.Product) == 0 {
-		return errorResult(400, MSG_ERR_PRODUCT_EMPTY)
-	}
 
 	// get session
 	session, err := s.sessionDAO.GetByToken(token)
