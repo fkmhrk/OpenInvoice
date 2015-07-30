@@ -74,6 +74,28 @@ func (d *userDAO) GetList() ([]*m.User, error) {
 	return list, nil
 }
 
+func (d *userDAO) GetById(id string) (*m.User, error) {
+	db := d.connection.Connect()
+	st, err := db.Prepare(select_user + "WHERE id=? AND deleted <> 1")
+	if err != nil {
+		return nil, err
+	}
+	defer st.Close()
+
+	rows, err := st.Query(id)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	if !rows.Next() {
+		return nil, nil
+	}
+
+	user, _, err := d.scan(rows)
+	return user, err
+}
+
 func (d *userDAO) Create(loginName, displayName, role, tel, password string) (*m.User, error) {
 	tr, err := d.connection.Begin()
 	if err != nil {

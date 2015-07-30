@@ -258,6 +258,14 @@ func TestUserDAO_0400_Delete(t *testing.T) {
 	}
 	assertUser(t, user, user.Id, loginName, displayName, "Read", tel)
 
+	// get by id
+	user2, err := dao.GetById(user.Id)
+	if err != nil {
+		t.Errorf("Failed to get user : %s", err)
+		return
+	}
+	assertUser(t, user2, user.Id, loginName, displayName, "Read", tel)
+
 	// delete
 	err = dao.Delete(user.Id)
 	if err != nil {
@@ -266,13 +274,13 @@ func TestUserDAO_0400_Delete(t *testing.T) {
 	}
 
 	// login
-	user2, err := dao.GetByNamePassword(loginName, password)
+	user3, err := dao.GetByNamePassword(loginName, password)
 	if err != nil {
 		t.Errorf("Failed to get user : %s", err)
 		return
 	}
-	if user2 != nil {
-		t.Errorf("User must be empty but id=%s", user2.Id)
+	if user3 != nil {
+		t.Errorf("User must be empty but id=%s", user3.Id)
 		return
 	}
 }
