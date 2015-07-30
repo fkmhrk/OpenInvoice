@@ -169,3 +169,34 @@ func (s *userService) Update(token, id, loginName, displayName, tel, password st
 	}
 	return jsonResult(200, body)
 }
+
+func (o *userService) Delete(token, id string) s.Result {
+	// get session
+	session, err := o.sessionDAO.GetByToken(token)
+	if err != nil {
+		return errorResult(500, MSG_SERVER_ERROR)
+	}
+	if session == nil {
+		return errorResult(401, MSG_WRONG_TOKEN)
+	}
+	if !session.Role.IsAdmin() {
+		return errorResult(403, MSG_NOT_AUTHORIZED)
+	}
+	// get user
+	user, err := o.userDAO.GetById(id)
+	if err != nil {
+		return errorResult(500, MSG_SERVER_ERROR)
+	}
+	if user.Role.IsAdmin() {
+		return errorResult(403, MSG_NOT_AUTHORIZED)
+	}
+	// delete
+	err = o.userDAO.Delete(id)
+	if err != nil {
+		return errorResult(500, MSG_SERVER_ERROR)
+	}
+	return &result{
+		status: 204,
+		body:   "",
+	}
+}

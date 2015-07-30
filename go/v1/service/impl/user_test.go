@@ -306,3 +306,95 @@ func TestUser0302_Update_Not_Admin_Other(t *testing.T) {
 	json := json(r)
 	assertString(t, json, "msg", MSG_NOT_AUTHORIZED)
 }
+
+func TestUser0400_Delete(t *testing.T) {
+	models := mock.NewMock()
+	sessionDAO, _ := models.Session.(*mock.SessionDAO)
+	sessionDAO.GetByTokenResult = &m.Session{
+		Token: "testToken",
+		Role:  m.Role("Admin,Read,Write"),
+	}
+	userDAO, _ := models.User.(*mock.UserDAO)
+	userDAO.GetByIdResult = &m.User{
+		Id:   "id1234",
+		Role: m.Role("Read"),
+	}
+	userDAO.DeleteResult = nil
+
+	service := NewUserSerivce(userDAO, sessionDAO, models)
+
+	token := "token1122"
+	r := service.Delete(token, "user1111")
+	if r == nil {
+		t.Errorf("Result must not be nil")
+		return
+	}
+	if r.Status() != 204 {
+		t.Errorf("Wrong status : %d", r.Status())
+		return
+	}
+	if len(r.Body()) != 0 {
+		t.Errorf("Body must be empty but %s", r.Body())
+		return
+	}
+}
+
+func TestUser0401_Delete_Not_Admin(t *testing.T) {
+	models := mock.NewMock()
+	sessionDAO, _ := models.Session.(*mock.SessionDAO)
+	sessionDAO.GetByTokenResult = &m.Session{
+		Token: "testToken",
+		Role:  m.Role("Read,Write"),
+	}
+	userDAO, _ := models.User.(*mock.UserDAO)
+	userDAO.GetByIdResult = &m.User{
+		Id:   "id1234",
+		Role: m.Role("Read"),
+	}
+	userDAO.DeleteResult = nil
+
+	service := NewUserSerivce(userDAO, sessionDAO, models)
+
+	token := "token1122"
+	r := service.Delete(token, "user1111")
+	if r == nil {
+		t.Errorf("Result must not be nil")
+		return
+	}
+	if r.Status() != 403 {
+		t.Errorf("Wrong status : %d", r.Status())
+		return
+	}
+	json := json(r)
+	assertString(t, json, "msg", MSG_NOT_AUTHORIZED)
+}
+
+func TestUser0402_Delete_Target_Admin(t *testing.T) {
+	models := mock.NewMock()
+	sessionDAO, _ := models.Session.(*mock.SessionDAO)
+	sessionDAO.GetByTokenResult = &m.Session{
+		Token: "testToken",
+		Role:  m.Role("Admin,Read,Write"),
+	}
+	userDAO, _ := models.User.(*mock.UserDAO)
+	userDAO.GetByIdResult = &m.User{
+		Id:   "id1234",
+		Role: m.Role("Admin,Read"),
+	}
+	userDAO.DeleteResult = nil
+
+	service := NewUserSerivce(userDAO, sessionDAO, models)
+
+	token := "token1122"
+	r := service.Delete(token, "user1111")
+	if r == nil {
+		t.Errorf("Result must not be nil")
+		return
+	}
+	if r.Status() != 403 {
+		t.Errorf("Wrong status : %d", r.Status())
+		return
+	}
+	json := json(r)
+	assertString(t, json, "msg", MSG_NOT_AUTHORIZED)
+}
