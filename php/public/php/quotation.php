@@ -71,7 +71,8 @@ $view->writeMyCompany($env, $user);
 
 $summary = $view->writeItemTable(16, 120, $items, $trading['tax_rate'], 'お見積金額');
 $view->writeTheTimeForQuotation($env['quotation_limit']);
-$view->writeProduct($trading['work_from'] / 1000, $trading['work_to'] / 1000, $trading['product'], $trading['memo']);
+$view->writeProduct($trading['work_from'] / 1000, $trading['work_to'] / 1000, $trading['product']);
+$view->writeMemo($trading['memo']);
 $view->writeTotal("御見積金額計 ￥" . number_format($summary['total']));
 $view->output('見積書_'. $company['name']);
 ?>
