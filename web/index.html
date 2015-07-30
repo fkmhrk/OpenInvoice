@@ -287,7 +287,7 @@
         <ul class="actionBtn">
 	        <li on-click="close"><a title="閉じる"><i class="fa fa-remove"></i></a></li>
 	      </ul>
-	      <p class="save" on-click="save"><i class="fa fa-check"></i>保存</p>
+	      <!-- <p class="save" on-click="save"><i class="fa fa-check"></i>保存</p> -->
       </header>
       <div class="inner">
         <section id="addUser">
@@ -306,7 +306,7 @@
               <th></th>
             </tr>
             {{#userList}}
-            <tr>
+            <tr on-click="showEdit:{{.}}">
               <td>{{display_name}}</td>
               <td>{{tel}}</td>
               <td>{{login_name}}</td>
@@ -324,17 +324,21 @@
       <header>
         <h1>担当者の追加・編集</h1>
         <ul class="actionBtn">
-	      <li on-click="close"><a title="閉じる"><i class="fa fa-remove"></i></a></li>
-	    </ul>
-	    <p class="save" on-click="save"><i class="fa fa-check"></i>保存</p>
+	  <li on-click="close"><a title="閉じる"><i class="fa fa-remove"></i></a></li>
+	</ul>
+        {{#if !isNew}}
+	<p class="save" on-click="save"><i class="fa fa-check"></i>保存</p>
+        {{/if}}
       </header>
       <div class="inner">
         <section id="addUser">
-          <p><span class="label">担当者名</span><input type="text">
-            <span class="label">ユーザーID</span><input type="text" placeholder="例）hanako_y（半角英数字）"></p>
-          <p><span class="label">TEL</span><input type="text" placeholder="例）080-1234-5678">
-            <span class="label">パスワード</span><input type="password" placeholder="＃ログイン時に必要です"></p>
-          <p class="addBtn"><i class="fa fa-plus"></i>追加</p>
+          <p><span class="label">担当者名</span><input type="text" value="{{user.display_name}}">
+            <span class="label">ユーザーID</span><input type="text" placeholder="例）hanako_y（半角英数字）" value="{{user.login_name}}"></p>
+          <p><span class="label">TEL</span><input type="text" placeholder="例）080-1234-5678" value="{{user.tel}}">
+            <span class="label">パスワード</span><input type="password" placeholder="＃ログイン時に必要です" value="{{password}}"></p>
+          {{#if isNew}}
+          <p class="addBtn" on-click="save"><i class="fa fa-plus"></i>追加</p>
+          {{/if}}
         </section>
       </div>
     </section>

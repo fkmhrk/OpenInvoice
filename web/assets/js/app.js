@@ -78,6 +78,32 @@ var ClientValidator;
         return true;
     }
     ClientValidator.isValidCreateUser = isValidCreateUser;
+    function isValidSaveUser(user, password, callback) {
+        if (user == null) {
+            callback.error(1000, "User must not be empty.");
+            return false;
+        }
+        if (Utils.isEmpty(user.login_name)) {
+            callback.error(1001, "LoginName must not be empty.");
+            return false;
+        }
+        if (Utils.isEmpty(user.display_name)) {
+            callback.error(1002, "DisplayName must not be empty.");
+            return false;
+        }
+        if (Utils.isEmpty(user.tel)) {
+            callback.error(1003, "Tel must not be empty.");
+            return false;
+        }
+        if (!Utils.isEmpty(password)) {
+            if (password.length < 6) {
+                callback.error(1004, "Password must be more than 6 characters.");
+                return false;
+            }
+        }
+        return true;
+    }
+    ClientValidator.isValidSaveUser = isValidSaveUser;
     function isValidSaveCompany(item, callback) {
         if (item == null) {
             callback.error(1000, "Item must not be empty.");
@@ -299,6 +325,27 @@ var AppClientImpl = (function () {
         this.exec(url, 'GET', this.accessToken, null, {
             success: function (json) {
                 callback.success(json.users);
+            },
+            error: function (status, body) {
+                callback.error(status, body.msg);
+            }
+        });
+    };
+    AppClientImpl.prototype.saveUser = function (user, password, callback) {
+        if (!ClientValidator.isValidSaveUser(user, password, callback)) {
+            return;
+        }
+        var url = this.url + '/api/v1/users/' + user.id;
+        var params = {
+            id: user.id,
+            login_name: user.login_name,
+            display_name: user.display_name,
+            tel: user.tel,
+            password: password
+        };
+        this.exec(url, 'PUT', this.accessToken, params, {
+            success: function (json) {
+                callback.success(params);
             },
             error: function (status, body) {
                 callback.error(status, body.msg);
@@ -790,6 +837,9 @@ var App = (function () {
             }
         });
     };
+    App.prototype.addUser = function (u) {
+        this.users.push(u);
+    };
     App.prototype.addCompany = function (c) {
         this.companies.push(c);
         this.companyMap[c.id] = c;
@@ -820,6 +870,10 @@ var UserListDialog = (function () {
                 app.closeDialog();
                 return false;
             },
+            'showEdit': function (e, item) {
+                _this.showEditDialog(app, item);
+                return false;
+            },
             'create': function () {
                 _this.createUser(app);
                 return false;
@@ -829,6 +883,12 @@ var UserListDialog = (function () {
         var listUserHeight = $('.listTemplate').height();
         $('.listTemplate .list').css('height', listUserHeight - 330);
     };
+    UserListDialog.prototype.showEditDialog = function (app, item) {
+        var _this = this;
+        app.showDialog(new AddUserDialog(item, function (result) {
+            _this.ractive.update();
+        }));
+    };
     UserListDialog.prototype.createUser = function (app) {
         var _this = this;
         var loginName = this.ractive.get('loginName');
@@ -837,7 +897,7 @@ var UserListDialog = (function () {
         var password = this.ractive.get('password');
         app.client.createUser(loginName, displayName, tel, password, {
             success: function (user) {
-                _this.ractive.push('userList', user);
+                app.addUser(user);
                 _this.clear();
                 app.addSnack('ユーザーを作成しました！');
             },
@@ -1307,25 +1367,108 @@ var TopPage = (function () {
 })();
 ///<reference path="./Application.ts"/>
 ///<reference path="./Dialog.ts"/>
+///<reference path="./Functions.ts"/>
 var AddUserDialog = (function () {
-    function AddUserDialog() {
+    function AddUserDialog(user, callback) {
+        if (user == null) {
+            this.isNew = true;
+            this.user = new User();
+            this.userOrg = null;
+        }
+        else {
+            this.isNew = false;
+            this.user = Utils.clone(user);
+            this.userOrg = user;
+        }
+        this.callback = callback;
     }
     AddUserDialog.prototype.attach = function (app, el) {
-        app.ractive = new Ractive({
+        var _this = this;
+        this.ractive = new Ractive({
             // どの箱に入れるかをIDで指定
             el: el,
             // 指定した箱に、どのHTMLを入れるかをIDで指定
-            template: '#addUserTemplate'
+            template: '#addUserTemplate',
+            data: {
+                isNew: this.isNew,
+                user: this.user
+            }
         });
-        app.ractive.on({
+        this.ractive.on({
             'windowClicked': function () {
                 return false;
             },
             'close': function () {
                 app.closeDialog();
                 return false;
+            },
+            'save': function () {
+                _this.save(app);
+                return false;
             }
         });
+    };
+    AddUserDialog.prototype.save = function (app) {
+        var _this = this;
+        var user = this.ractive.get('user');
+        var password = this.ractive.get('password');
+        if (this.isNew) {
+            app.client.createUser(user.login_name, user.display_name, user.tel, password, {
+                success: function (item) {
+                    _this.callback(item);
+                    app.addUser(item);
+                    app.addSnack('作成しました');
+                    app.closeDialog();
+                },
+                error: function (status, msg) {
+                    switch (status) {
+                        case 1000:
+                            app.addSnack('ユーザーIDを入力してください');
+                            break;
+                        case 1001:
+                            app.addSnack('担当者名を入力してください');
+                            break;
+                        case 1002:
+                            app.addSnack('TELを入力してください');
+                            break;
+                        case 1003:
+                        case 1004:
+                            app.addSnack('パスワードを6文字以上入力してください');
+                            break;
+                        default: app.addSnack('保存に失敗しました。');
+                    }
+                }
+            });
+        }
+        else {
+            app.client.saveUser(user, password, {
+                success: function (item) {
+                    _this.userOrg.login_name = user.login_name;
+                    _this.userOrg.display_name = user.display_name;
+                    _this.userOrg.tel = user.tel;
+                    _this.callback(item);
+                    app.addSnack('保存しました');
+                    app.closeDialog();
+                },
+                error: function (status, msg) {
+                    switch (status) {
+                        case 1001:
+                            app.addSnack('ユーザーIDを入力してください');
+                            break;
+                        case 1002:
+                            app.addSnack('担当者名を入力してください');
+                            break;
+                        case 1003:
+                            app.addSnack('TELを入力してください');
+                            break;
+                        case 1004:
+                            app.addSnack('パスワードを6文字以上入力してください');
+                            break;
+                        default: app.addSnack('保存に失敗しました。');
+                    }
+                }
+            });
+        }
     };
     return AddUserDialog;
 })();
@@ -1502,7 +1645,9 @@ var SheetPage = (function () {
         }));
     };
     SheetPage.prototype.showAddUserDialog = function (app) {
-        app.showDialog(new AddUserDialog());
+        app.showDialog(new AddUserDialog(null, function (result) {
+            app.ractive.update();
+        }));
     };
     SheetPage.prototype.printQuotation = function (app) {
         var _this = this;

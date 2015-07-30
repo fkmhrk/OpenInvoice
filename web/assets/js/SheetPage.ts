@@ -175,7 +175,9 @@ class SheetPage implements Page {
         }));
     }
     private showAddUserDialog(app : App) {
-        app.showDialog(new AddUserDialog());
+        app.showDialog(new AddUserDialog(null, (result : User) => {
+            app.ractive.update();
+        }));
     }
     private printQuotation(app : App) {
         var trading = app.ractive.get('trading');

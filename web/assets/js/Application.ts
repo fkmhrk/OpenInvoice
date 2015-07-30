@@ -193,6 +193,10 @@ class App {
         });
     }
 
+    addUser(u : User) {
+        this.users.push(u);
+    }
+
     addCompany(c : Company) {
         this.companies.push(c);
         this.companyMap[c.id] = c;

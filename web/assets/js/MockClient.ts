@@ -2,6 +2,7 @@
 /// <reference path="./ClientValidator.ts"/>
 
 var globalSeq = {
+    'user' : 1,
     'company' : 1,
     'trading' : 1,
     'tradingItem' : 1,
@@ -110,7 +111,7 @@ class MockClient implements Client {
         if (!ClientValidator.isValidCreateUser(loginName, displayName, tel, password, callback)) { return; }
         console.log('createUser');
         var user = new User();
-        user.id = '';
+        user.id = 'user' + (++globalSeq['user']);
         user.login_name = loginName;        
         user.display_name = displayName;
         user.tel = tel;
@@ -122,6 +123,14 @@ class MockClient implements Client {
      */
     getUsers(callback : ItemListCallback<User>) {
         callback.success(userList);
+    }
+
+    /**
+     * Saves user
+     */
+    saveUser(user : User, password : string, callback : ItemCallback<User>) {
+        if (!ClientValidator.isValidSaveUser(user, password, callback)) { return; }
+        callback.success(user);
     }
 
     /**
