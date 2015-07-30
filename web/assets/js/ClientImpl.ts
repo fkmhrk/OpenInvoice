@@ -108,6 +108,26 @@ class AppClientImpl implements Client {
             }
         });            
     }
+
+    saveUser(user : User, password : string, callback : ItemCallback<User>) {
+        if (!ClientValidator.isValidSaveUser(user, password, callback)) { return; }
+        var url = this.url + '/api/v1/users/' + user.id;
+        var params = {
+            id : user.id,
+            login_name : user.login_name,
+            display_name : user.display_name,
+            tel : user.tel,
+            password : password,
+        };
+        this.exec(url, 'PUT', this.accessToken, params, {
+            success : (json : any) => {
+                callback.success(params);
+            },
+            error : (status : any, body : any) => {
+                callback.error(status, body.msg);
+            }
+        });
+    }
     
     getCompanies(callback : ItemListCallback<Company>) {
         var url = this.url + '/api/v1/companies';

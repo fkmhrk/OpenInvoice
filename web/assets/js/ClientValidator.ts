@@ -37,6 +37,32 @@ module ClientValidator {
         return true;
     }
 
+    export function isValidSaveUser(user : User, password : string, callback : ItemCallback<User>) : boolean {
+        if (user == null) {
+            callback.error(1000, "User must not be empty.");
+            return false;
+        } 
+        if (Utils.isEmpty(user.login_name)) {
+            callback.error(1001, "LoginName must not be empty.");
+            return false;
+        }
+        if (Utils.isEmpty(user.display_name)) {
+            callback.error(1002, "DisplayName must not be empty.");
+            return false;
+        }
+        if (Utils.isEmpty(user.tel)) {
+            callback.error(1003, "Tel must not be empty.");
+            return false;
+        }
+        if (!Utils.isEmpty(password)) {
+            if (password.length < 6) {
+                callback.error(1004, "Password must be more than 6 characters.");
+                return false;            
+            }
+        }
+        return true;
+    }
+
     export function isValidSaveCompany(item : Company, callback : ItemCallback<string>) : boolean {
         if (item == null) {
             callback.error(1000, "Item must not be empty.");

@@ -179,3 +179,59 @@ func TestUserDAO_0200_Create(t *testing.T) {
 		return
 	}
 }
+
+func TestUserDAO_0300_Update(t *testing.T) {
+	db, err := connect()
+	if err != nil {
+		t.Errorf("Failed to connect")
+		return
+	}
+	defer db.Close()
+	// prepare
+	loginName := "test0100"
+	displayName := "Demo user"
+	tel := "08011112222"
+	password := "pass1234"
+	deleteUserByName(db, loginName)
+
+	dao := createUserDAO(db)
+	user, err := dao.Create(loginName, displayName, "Read", tel, password)
+	if err != nil {
+		t.Errorf("Failed to create user : %s", err)
+		return
+	}
+	assertUser(t, user, user.Id, loginName, displayName, "Read", tel)
+
+	// update
+	user2, err := dao.Update(user.Id, loginName, "NewName", "Read", "09022223333", "")
+	if err != nil {
+		t.Errorf("Failed to update user : %s", err)
+		return
+	}
+	assertUser(t, user2, user.Id, loginName, "NewName", "Read", "09022223333")
+
+	// login
+	user3, err := dao.GetByNamePassword(loginName, password)
+	if err != nil {
+		t.Errorf("Failed to get user : %s", err)
+		return
+	}
+	assertUser(t, user3, user.Id, loginName, "NewName", "Read", "09022223333")
+
+	// update with new password
+	user4, err := dao.Update(user.Id, loginName, "NewName2", "Read", "09033334444", "NewPassword")
+	if err != nil {
+		t.Errorf("Failed to update user : %s", err)
+		return
+	}
+	assertUser(t, user4, user.Id, loginName, "NewName2", "Read", "09033334444")
+
+	// login
+	user5, err := dao.GetByNamePassword(loginName, "NewPassword")
+	if err != nil {
+		t.Errorf("Failed to get user : %s", err)
+		return
+	}
+	assertUser(t, user5, user.Id, loginName, "NewName2", "Read", "09033334444")
+
+}

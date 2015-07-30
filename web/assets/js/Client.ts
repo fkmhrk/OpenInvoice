@@ -32,6 +32,11 @@ interface Client {
     getUsers(callback : ItemListCallback<User>);
 
     /**
+     * Saves user
+     */
+    saveUser(user : User, password : string, callback : ItemCallback<User>);
+
+    /**
      * Gets all companies
      */
     getCompanies(callback : ItemListCallback<Company>);

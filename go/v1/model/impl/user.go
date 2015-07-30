@@ -112,6 +112,79 @@ func (d *userDAO) Create(loginName, displayName, role, tel, password string) (*m
 
 }
 
+func (o *userDAO) Update(id, loginName, displayName, role, tel, password string) (*m.User, error) {
+	if len(password) == 0 {
+		return o.updateWithoutPassword(id, loginName, displayName, role, tel)
+	} else {
+		return o.updateWithPassword(id, loginName, displayName, role, tel, password)
+	}
+}
+
+func (o *userDAO) updateWithoutPassword(id, loginName, displayName, role, tel string) (*m.User, error) {
+	tr, err := o.connection.Begin()
+	if err != nil {
+		return nil, err
+	}
+	defer tr.Rollback()
+
+	st, err := tr.Prepare("UPDATE user SET " +
+		"login_name=?,display_name=?,tel=?," +
+		"modified_time=unix_timestamp(now()) " +
+		"WHERE id=? AND deleted<>1")
+	if err != nil {
+		return nil, err
+	}
+	defer st.Close()
+
+	_, err = st.Exec(loginName, displayName, tel, id)
+	if err != nil {
+		return nil, err
+	}
+
+	tr.Commit()
+
+	return &m.User{
+		Id:          id,
+		LoginName:   loginName,
+		DisplayName: displayName,
+		Role:        m.Role(role),
+		Tel:         tel,
+	}, nil
+}
+
+func (o *userDAO) updateWithPassword(id, loginName, displayName, role, tel, password string) (*m.User, error) {
+	tr, err := o.connection.Begin()
+	if err != nil {
+		return nil, err
+	}
+	defer tr.Rollback()
+
+	st, err := tr.Prepare("UPDATE user SET " +
+		"login_name=?,display_name=?,tel=?,password=?," +
+		"modified_time=unix_timestamp(now()) " +
+		"WHERE id=? AND deleted<>1")
+	if err != nil {
+		return nil, err
+	}
+	defer st.Close()
+
+	hashedPassword := hashPassword(password)
+	_, err = st.Exec(loginName, displayName, tel, hashedPassword, id)
+	if err != nil {
+		return nil, err
+	}
+
+	tr.Commit()
+
+	return &m.User{
+		Id:          id,
+		LoginName:   loginName,
+		DisplayName: displayName,
+		Role:        m.Role(role),
+		Tel:         tel,
+	}, nil
+}
+
 func (o *userDAO) scan(rows *sql.Rows) (*m.User, string, error) {
 	var id, loginName, displayName, role, tel, password string
 	var createTime, modifiedTime int64

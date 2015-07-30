@@ -140,3 +140,32 @@ func (s *userService) Create(token, loginName, displayName, tel, password string
 	}
 	return jsonResult(201, body)
 }
+
+func (s *userService) Update(token, id, loginName, displayName, tel, password string) s.Result {
+	// get session
+	session, err := s.sessionDAO.GetByToken(token)
+	if err != nil {
+		return errorResult(500, MSG_SERVER_ERROR)
+	}
+	if session == nil {
+		return errorResult(401, MSG_WRONG_TOKEN)
+	}
+	if !session.Role.IsAdmin() {
+		if session.UserId != id {
+			return errorResult(403, MSG_NOT_AUTHORIZED)
+		}
+	}
+	// update
+	_, err = s.userDAO.Update(id, loginName, displayName, tel, "", password)
+	if err != nil {
+		return errorResult(500, MSG_SERVER_ERROR)
+	}
+
+	body := map[string]interface{}{
+		"id":           id,
+		"login_name":   loginName,
+		"display_name": displayName,
+		"tel":          tel,
+	}
+	return jsonResult(200, body)
+}

@@ -24,6 +24,10 @@ class UserListDialog implements Dialog {
                 app.closeDialog();
                 return false;
             },
+            'showEdit' : (e : any, item : User) => {
+                this.showEditDialog(app, item);
+                return false;
+            },
             'create' : () => {
                 this.createUser(app);
                 return false;
@@ -34,6 +38,12 @@ class UserListDialog implements Dialog {
         $('.listTemplate .list').css('height', listUserHeight-330);
     }
 
+    private showEditDialog(app : App, item : User) {
+        app.showDialog(new AddUserDialog(item, (result : User) => {
+            this.ractive.update();
+        }));
+    }
+
     private createUser(app : App) {
         var loginName = this.ractive.get('loginName');
         var displayName = this.ractive.get('displayName');
@@ -42,7 +52,7 @@ class UserListDialog implements Dialog {
 
         app.client.createUser(loginName, displayName, tel, password, {
             success : (user : User) => {
-                this.ractive.push('userList', user);
+                app.addUser(user);
                 this.clear();
                 app.addSnack('ユーザーを作成しました！');
             },
