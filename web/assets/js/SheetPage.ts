@@ -170,7 +170,9 @@ class SheetPage implements Page {
         tooltipster();
     }
     private showAddCompanyDialog(app : App) {
-        app.showDialog(new AddCompanyDialog());
+        app.showDialog(new AddCompanyDialog(null, (result : Company) => {
+            app.ractive.update();
+        }));
     }
     private showAddUserDialog(app : App) {
         app.showDialog(new AddUserDialog());
