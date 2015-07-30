@@ -4,6 +4,7 @@ type UserDAO interface {
 	GetByNamePassword(name, password string) (*User, error)
 	GetList() ([]*User, error)
 	Create(loginName, displayName, role, tel, password string) (*User, error)
+	Update(id, loginName, displayName, role, tel, password string) (*User, error)
 }
 
 type User struct {

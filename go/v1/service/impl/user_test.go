@@ -78,7 +78,7 @@ func TestUser0001_GetToken_Admin(t *testing.T) {
 	assertString(t, json, "token_type", "bearer")
 	assertString(t, json, "access_token", "testToken")
 	assertString(t, json, "refresh_token", "tokenRefresh")
-	assertBool(t, json, "isAdmin", true)
+	assertBool(t, json, "is_admin", true)
 }
 
 func TestUser0100_RefreshToken(t *testing.T) {
@@ -110,7 +110,7 @@ func TestUser0100_RefreshToken(t *testing.T) {
 	assertString(t, json, "id", "user1122")
 	assertString(t, json, "token_type", "bearer")
 	assertString(t, json, "access_token", "testToken")
-	assertBool(t, json, "isAdmin", true)
+	assertBool(t, json, "is_admin", true)
 }
 
 func TestUser0100_GetList(t *testing.T) {
