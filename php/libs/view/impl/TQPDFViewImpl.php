@@ -224,7 +224,7 @@ class TQPDFViewImpl implements PDFView {
         $this->pdf->Cell($w0, $h1, s(''), 0, 1, 'L', 0);  // 行の余白用
     }
 
-    public function writeProduct($workFrom, $workTo, $product) {
+    public function writeProduct($workFrom, $workTo, $product, $memo) {
         $w0 = $this->startX; // $w0は開始位置をあわせるために空白として生成
         $w1 = 70.5;
         $w2 = 29;
@@ -242,7 +242,7 @@ class TQPDFViewImpl implements PDFView {
         $this->pdf->SetTextColor($this->accColorR, $this->accColorG, $this->accColorB);
         $this->pdf->SetLineWidth(0.5);
         $this->pdf->Cell($w0, $h1, s(''), 0, 0, 'C', 0);
-        $this->pdf->Cell($w3, $h1, s('作業期間'), B, 1, 'L', 0);
+        $this->pdf->Cell($w3, $h1, s('作業期間'), 'B', 1, 'L', 0);
 
         $this->pdf->Cell($w0, $h2, s(''), 0, 0, 'C', 0);
         $this->pdf->Cell($w1+$w2+$w3+$w4+$w5, $h2, s(''), 0, 1, 'L', 0);
@@ -254,7 +254,7 @@ class TQPDFViewImpl implements PDFView {
         $this->pdf->SetTextColor($this->accColorR, $this->accColorG, $this->accColorB);
         $this->pdf->SetLineWidth(0.5);
         $this->pdf->Cell($w0, $h1, s(''), 0, 0, 'C', 0);
-        $this->pdf->Cell($w3, $h1, s('成果物'), B, 1, 'L', 0);
+        $this->pdf->Cell($w3, $h1, s('成果物'), 'B', 1, 'L', 0);
         //空白行
         $this->pdf->Cell($w0, $h2, s(''), 0, 0, 'C', 0);
         $this->pdf->Cell($w1+$w2+$w3+$w4+$w5, $h2, s(''), 0, 1, 'L', 0);
@@ -264,6 +264,26 @@ class TQPDFViewImpl implements PDFView {
         $this->pdf->MultiCell($w1+$w2+$w3+$w4+$w5, $h2, s($product), 0, 'L', 0);
     
         $this->pdf->Cell($w0, $mS+$mM, s(''), 0, 1, 'L', 0);  // 行の余白用
+        // 備考 ----------------------------------------------------
+        $this->pdf->SetTextColor($accColorR, $accColorG, $accColorB);
+        $this->pdf->SetLineWidth(0.5);
+        $this->pdf->Cell($w0, $h1, s(''), 0, 0, 'C', 0);
+        $this->pdf->Cell($w3, $h1, s('備考'), 'B', 1, 'L', 0);
+        //空白行
+        $this->pdf->Cell($w0, $h2, s(''), 0, 0, 'C', 0);
+        $this->pdf->Cell($w1+$w2+$w3+$w4+$w5, $h2, s(''), 0, 1, 'L', 0);
+        //内容
+        $this->pdf->SetTextColor(0, 0, 0);
+        $this->pdf->Cell($w0, $h2, s(''), 0, 0, 'C', 0);
+        $this->pdf->MultiCell($w1+$w2+$w3+$w4+$w5, $h2, s($memo), 0, 'L', 0);
+
+        $this->pdf->Cell($w0, $mS, s(''), 0, 1, 'L', 0);  // 行の余白用
+
+        // ひとこと ----------------------------------------------------
+        $this->pdf->Cell($w0, $mM, s(''), 0, 1, 'L', 0);  // 行の余白用
+
+        $this->pdf->Cell($w0, $h1, s(''), 0, 0, 'C', 0);
+        $this->pdf->Cell($w1+$w2+$w4+$w5, $h1, s('上記のとおり、お見積り申し上げます。'), 0, 1, 'L', 0);
     }
 
     public function writeBankInfo($info) {

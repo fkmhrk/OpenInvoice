@@ -64,7 +64,7 @@ if ($user === null) {
 
 // render
 
-$view->writeTitle("御見積書");
+$view->writeTitle("お見積書");
 $view->writeDate($trading['quotation_number'], $trading['quotation_date'] / 1000);
 $view->writeCompany($company['name'], $title);
 $view->writeMyCompany($env, $user);
