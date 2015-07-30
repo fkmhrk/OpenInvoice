@@ -42,3 +42,13 @@ func updateUser(services s.Services) handler {
 		return services.User.Update(token, id, loginName, displayName, tel, password)
 	})
 }
+
+func deleteUser(services s.Services) handler {
+	return makeHandler(func(token, tType string, req *http.Request) s.Result {
+		// read path param
+		vars := mux.Vars(req)
+		id := vars["id"]
+
+		return services.User.Delete(token, id)
+	})
+}
