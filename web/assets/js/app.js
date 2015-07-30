@@ -1415,8 +1415,8 @@ var AddUserDialog = (function () {
         if (this.isNew) {
             app.client.createUser(user.login_name, user.display_name, user.tel, password, {
                 success: function (item) {
-                    _this.callback(item);
                     app.addUser(item);
+                    _this.callback(item);
                     app.addSnack('作成しました');
                     app.closeDialog();
                 },
@@ -1539,7 +1539,7 @@ var SheetPage = (function () {
                 'billDate': Utils.toDateStr(trading.bill_date),
                 'deliveryDate': Utils.toDateStr(trading.delivery_date),
                 'companies': app.companies,
-                'users': app.users,
+                'users': this.createUserList(app),
                 'tradingItems': itemList,
                 'deletedItems': []
             }
@@ -1645,7 +1645,9 @@ var SheetPage = (function () {
         }));
     };
     SheetPage.prototype.showAddUserDialog = function (app) {
+        var _this = this;
         app.showDialog(new AddUserDialog(null, function (result) {
+            app.ractive.set('users', _this.createUserList(app));
             app.ractive.update();
         }));
     };
@@ -1717,6 +1719,17 @@ var SheetPage = (function () {
         else {
             this.save(app, doneFunc);
         }
+    };
+    SheetPage.prototype.createUserList = function (app) {
+        var list = [];
+        var emptyUser = new User();
+        emptyUser.id = "empty";
+        emptyUser.display_name = "担当者なし";
+        list.push(emptyUser);
+        _.each(app.users, function (item) {
+            list.push(item);
+        });
+        return list;
     };
     SheetPage.prototype.save = function (app, doneFunc) {
         var _this = this;

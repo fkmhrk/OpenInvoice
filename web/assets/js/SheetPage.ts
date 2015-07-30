@@ -69,7 +69,7 @@ class SheetPage implements Page {
                 'billDate' : Utils.toDateStr(trading.bill_date),
                 'deliveryDate' : Utils.toDateStr(trading.delivery_date),
                 'companies' : app.companies,
-                'users' : app.users,
+                'users' : this.createUserList(app),
                 'tradingItems' : itemList,
                 'deletedItems' : [],
             }
@@ -176,6 +176,7 @@ class SheetPage implements Page {
     }
     private showAddUserDialog(app : App) {
         app.showDialog(new AddUserDialog(null, (result : User) => {
+            app.ractive.set('users', this.createUserList(app));
             app.ractive.update();
         }));
     }
@@ -245,6 +246,18 @@ class SheetPage implements Page {
         } else {
             this.save(app, doneFunc);
         }
+    }
+
+    private createUserList(app : App) {
+        var list = [];
+        var emptyUser = new User();
+        emptyUser.id = "empty";
+        emptyUser.display_name = "担当者なし";
+        list.push(emptyUser);
+        _.each(app.users, (item : User) => {
+            list.push(item);
+        });
+        return list;
     }
     
     private save(app : App, doneFunc : (id : string) => void) {
