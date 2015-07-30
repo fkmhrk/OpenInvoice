@@ -5,6 +5,7 @@ type UserDAO interface {
 	GetList() ([]*User, error)
 	Create(loginName, displayName, role, tel, password string) (*User, error)
 	Update(id, loginName, displayName, role, tel, password string) (*User, error)
+	Delete(id string) error
 }
 
 type User struct {
