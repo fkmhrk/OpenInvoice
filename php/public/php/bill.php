@@ -67,7 +67,7 @@ $view->writeDate($trading['bill_number'], $trading['bill_date'] / 1000);
 $view->writeCompany($company['name'], $title);
 $view->writeMyCompany($env, $user);
 
-$summary = $view->writeItemTable(16, 120, $items, $trading['tax_rate']);
+$summary = $view->writeItemTable(16, 120, $items, $trading['tax_rate'], 'ご請求金額');
 $view->writeTheTimeForPayment($trading['bill_date'] / 1000, $env['pay_limit']);
 $view->writeProduct($trading['work_from'] / 1000, $trading['work_to'] / 1000, $trading['product']);
 $view->writeTotal("御請求金額計 ￥" . number_format($summary['total']));

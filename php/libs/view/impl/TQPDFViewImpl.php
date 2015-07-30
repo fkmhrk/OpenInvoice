@@ -77,7 +77,7 @@ class TQPDFViewImpl implements PDFView {
         $this->pdf->write(4.3, s('担当：'. $user['display_name']. ' / '. $info['company_tel']));        
     }
     
-    public function writeItemTable($x, $y, $items, $taxRate) {
+    public function writeItemTable($x, $y, $items, $taxRate, $totalLabel) {
         $h1 = 8;    // 1行目
         $h2 = 3;      // 2行目
         $h3 = 2;      // 余白行
@@ -161,7 +161,7 @@ class TQPDFViewImpl implements PDFView {
                 //空白行
                 $this->pdf->SetDrawColor(153, 153, 153);
                 $this->pdf->Cell($w0, $h3, s(''), 0, 0, 'C', 0);
-                $this->pdf->Cell($w1+$w2+$w3+$w4+$w5, $h3, s(''), B, 1, 'L', 0);                
+                $this->pdf->Cell($w1+$w2+$w3+$w4+$w5, $h3, s(''), 'B', 1, 'L', 0);                
             }
             ++$no;
         }
@@ -190,8 +190,8 @@ class TQPDFViewImpl implements PDFView {
         $this->pdf->SetTextColor($this->accColorR, $this->accColorG, $this->accColorB);
         $this->pdf->SetDrawColor($this->accColorR, $this->accColorG, $this->accColorB);
         $this->pdf->Cell($w0, $h1+$h2, s(''), 0, 0, 'C', 0);
-        $this->pdf->Cell($w1+$w2+$w3+$w4, $h1+$h2, s('ご請求金額'), TB, 0, 'R', 0);
-        $this->pdf->Cell($w5, $h1+$h2, s('¥'. number_format($total)), TB, 1, 'R', 0);
+        $this->pdf->Cell($w1+$w2+$w3+$w4, $h1+$h2, s($totalLabel), 'TB', 0, 'R', 0);
+        $this->pdf->Cell($w5, $h1+$h2, s('¥'. number_format($total)), 'TB', 1, 'R', 0);
 
         return array('sum' => $sum, 'tax' => $tax, 'total' => $total);
     }
@@ -281,7 +281,7 @@ class TQPDFViewImpl implements PDFView {
         $this->pdf->Cell($w0, $h2, s(''), 0, 0, 'C', 0);
         $this->pdf->MultiCell($w1+$w2+$w3+$w4+$w5, $h2, s($product), 0, 'L', 0);
     
-        $this->pdf->Cell($w0, $mS+$mM, s(''), 0, 1, 'L', 0);  // 行の余白用
+        $this->pdf->Cell($w0, $mS, s(''), 0, 1, 'L', 0);  // 行の余白用
         // 備考 ----------------------------------------------------
         $this->pdf->SetTextColor($this->accColorR, $this->accColorG, $this->accColorB);
         $this->pdf->SetLineWidth(0.5);
