@@ -128,6 +128,18 @@ class AppClientImpl implements Client {
             }
         });
     }
+
+    deleteUser(id : string, callback : Callback) {
+        var url = this.url + '/api/v1/users/' + id;
+        this.exec(url, 'DELETE', this.accessToken, null, {
+            success : (json : any) => {
+                callback.success();
+            },
+            error : (status : any, body : any) => {
+                callback.error(status, body.msg);
+            }
+        });        
+    }
     
     getCompanies(callback : ItemListCallback<Company>) {
         var url = this.url + '/api/v1/companies';

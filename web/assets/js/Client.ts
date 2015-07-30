@@ -37,6 +37,11 @@ interface Client {
     saveUser(user : User, password : string, callback : ItemCallback<User>);
 
     /**
+     * Deletes user
+     */
+    deleteUser(id : string, callback : Callback);
+    
+    /**
      * Gets all companies
      */
     getCompanies(callback : ItemListCallback<Company>);
