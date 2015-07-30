@@ -982,6 +982,7 @@ var AddCompanyDialog = (function () {
         if (company == null) {
             this.isNew = true;
             this.company = new Company();
+            this.company.id = null;
             this.companyOrg = null;
         }
         else {
