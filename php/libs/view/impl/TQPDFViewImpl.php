@@ -178,7 +178,7 @@ class TQPDFViewImpl implements PDFView {
 
         $this->pdf->SetTextColor(77, 77, 77);
         $this->pdf->Cell($w0, $h2+$h3, s(''), 0, 0, 'C', 0);
-        $this->pdf->Cell($w1+$w2+$w3+$w4, $h2+$h3, s('消費税（'. int($taxRate). '％）'), 0, 0, 'R', 0);
+        $this->pdf->Cell($w1+$w2+$w3+$w4, $h2+$h3, s('消費税（'. (int)$taxRate. '％）'), 0, 0, 'R', 0);
         $this->pdf->SetTextColor(0, 0, 0);
         $this->pdf->Cell($w5, $h2+$h3, s('¥'. number_format($tax)), 0, 1, 'R', 0);
 
