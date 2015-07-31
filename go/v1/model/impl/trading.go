@@ -30,6 +30,29 @@ func NewTradingDAO(connection *Connection, logger m.Logger) *tradingDAO {
 	}
 }
 
+func (o *tradingDAO) GetList() ([]*m.Trading, error) {
+	db := o.connection.Connect()
+	st, err := db.Prepare(select_trading +
+		" WHERE deleted <> 1 ORDER BY modified_time DESC")
+	if err != nil {
+		return nil, err
+	}
+	defer st.Close()
+
+	rows, err := st.Query()
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var list []*m.Trading
+	for rows.Next() {
+		item := o.scanTrading(rows)
+		list = append(list, &item)
+	}
+	return list, nil
+}
+
 func (d *tradingDAO) GetListByUser(userId string) ([]*m.Trading, error) {
 	db := d.connection.Connect()
 	st, err := db.Prepare(select_trading +
