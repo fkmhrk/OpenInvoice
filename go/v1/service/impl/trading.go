@@ -98,7 +98,7 @@ func (s *tradingService) Update(token string, trading s.Trading) s.Result {
 	}
 
 	// get item
-	item, err := s.tradingDAO.GetById(trading.Id, session.UserId)
+	item, err := s.tradingDAO.GetById(trading.Id)
 	if err != nil {
 		return errorResult(500, MSG_SERVER_ERROR)
 	}
