@@ -32,8 +32,8 @@ func (s *tradingService) GetListByUser(token string) s.Result {
 	if session == nil {
 		return errorResult(401, MSG_WRONG_TOKEN)
 	}
-	// get
-	tradings, err := s.tradingDAO.GetListByUser(session.UserId)
+	// get : fixed we use GetList
+	tradings, err := s.tradingDAO.GetList()
 	if err != nil {
 		return errorResult(500, MSG_SERVER_ERROR)
 	}

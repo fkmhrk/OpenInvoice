@@ -39,7 +39,7 @@ func TestTrading0000_GetListByUser(t *testing.T) {
 		Id: "trade2222",
 	})
 	tradingDAO, _ := models.Trading.(*mock.TradingDAO)
-	tradingDAO.GetListByUserResult = list
+	tradingDAO.GetListResult = list
 
 	service := NewTradingSerivce(sessionDAO, tradingDAO, models)
 
