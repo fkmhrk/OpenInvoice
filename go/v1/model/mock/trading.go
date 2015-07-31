@@ -20,7 +20,7 @@ func (d *TradingDAO) GetListByUser(userId string) ([]*m.Trading, error) {
 	return d.GetListByUserResult, nil
 }
 
-func (d *TradingDAO) GetById(id, userId string) (*m.Trading, error) {
+func (d *TradingDAO) GetById(id string) (*m.Trading, error) {
 	return d.GetByIdResult, nil
 }
 
