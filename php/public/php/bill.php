@@ -39,7 +39,7 @@ if ($session === null) {
 }
 $userId = $session['user_id'];
 
-$trading = $tradingDAO->getById($userId, $tradingId);
+$trading = $tradingDAO->getById($tradingId);
 if ($trading === null) {
     echo 'Wrogn trading ID';
     return;

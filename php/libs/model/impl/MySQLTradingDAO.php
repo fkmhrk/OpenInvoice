@@ -10,11 +10,11 @@ class MySQLTradingDAO implements TradingDAO {
         $this->db = $db;
     }
 
-    public function getById($userId, $id) {
+    public function getById($id) {
         $stmt = $this->db->prepare("SELECT * ".
                                    "FROM trading ".
-                                   "WHERE id=? AND assignee=? AND deleted <> 1 LIMIT 1");
-        $stmt->execute(array($id, $userId));
+                                   "WHERE id=? AND deleted <> 1 LIMIT 1");
+        $stmt->execute(array($id));
         $list = $stmt->fetchAll();
         if (count($list) == 0) {
             return null;
