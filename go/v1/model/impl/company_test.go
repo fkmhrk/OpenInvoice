@@ -196,7 +196,7 @@ func TestCompany0400_Delete(t *testing.T) {
 	}
 
 	// trading
-	trading2, err := tradingDAO.GetById(trading.Id, userId)
+	trading2, err := tradingDAO.GetById(trading.Id)
 	if err != nil {
 		t.Errorf("Failed to get trading by Id : %s", err)
 		return

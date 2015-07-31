@@ -54,16 +54,16 @@ func (d *tradingDAO) GetListByUser(userId string) ([]*m.Trading, error) {
 
 }
 
-func (d *tradingDAO) GetById(id, userId string) (*m.Trading, error) {
+func (d *tradingDAO) GetById(id string) (*m.Trading, error) {
 	db := d.connection.Connect()
 	st, err := db.Prepare(select_trading +
-		" WHERE id=? AND assignee=? AND deleted <> 1 LIMIT 1")
+		" WHERE id=? AND deleted <> 1 LIMIT 1")
 	if err != nil {
 		return nil, err
 	}
 	defer st.Close()
 
-	rows, err := st.Query(id, userId)
+	rows, err := st.Query(id)
 	if err != nil {
 		return nil, err
 	}

@@ -2,7 +2,7 @@ package model
 
 type TradingDAO interface {
 	GetListByUser(userId string) ([]*Trading, error)
-	GetById(id, userId string) (*Trading, error)
+	GetById(id string) (*Trading, error)
 	Create(companyId, subject string, titleType int, workFrom, workTo, total, quotationDate, billDate, deliveryDate int64, taxRate float32, assignee, product, memo string) (*Trading, error)
 	Update(trading Trading) (*Trading, error)
 

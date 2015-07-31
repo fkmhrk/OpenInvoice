@@ -110,7 +110,7 @@ func TestTrading0100_GetById(t *testing.T) {
 	insertTrading(db, "trade2", userId, "subject2", product)
 
 	dao := createTradingDAO(db)
-	item, err := dao.GetById("trade1", userId)
+	item, err := dao.GetById("trade1")
 	if err != nil {
 		t.Errorf("Failed to get tradings by Id : %s", err)
 		return
@@ -134,7 +134,7 @@ func TestTrading0101_GetById_noId(t *testing.T) {
 	insertTrading(db, "trade2", userId, "subject2", product)
 
 	dao := createTradingDAO(db)
-	item, err := dao.GetById("trade3", userId)
+	item, err := dao.GetById("trade3")
 	if err != nil {
 		t.Errorf("Failed to get tradings by Id : %s", err)
 		return
@@ -268,7 +268,7 @@ func TestTrading0300_Update(t *testing.T) {
 	}
 
 	// get by id
-	item3, err := dao.GetById(item.Id, userId)
+	item3, err := dao.GetById(item.Id)
 	if err != nil {
 		t.Errorf("Failed to get trading : %s", err)
 		return
@@ -343,7 +343,7 @@ func TestTrading0400_Delete(t *testing.T) {
 		t.Errorf("ItemList must be 0 but %d", len(itemList2))
 		return
 	}
-	trading2, err := dao.GetById(trading.Id, userId)
+	trading2, err := dao.GetById(trading.Id)
 	if err != nil {
 		t.Errorf("Failed to get trading : %s", err)
 		return
