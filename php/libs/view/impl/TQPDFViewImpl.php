@@ -352,7 +352,7 @@ class TQPDFViewImpl implements PDFView {
     }
 
     public function writeStamp() {
-        $this->pdf->Image('stamp.png', 162, 25);
+        $this->pdf->Image('stamp.png', 171, 34);
     }
 
     public function output($name) {
