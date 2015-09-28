@@ -303,17 +303,19 @@ class TQPDFViewImpl implements PDFView {
         // 備考 ----------------------------------------------------
         $this->pdf->SetTextColor($this->accColorR, $this->accColorG, $this->accColorB);
         $this->pdf->SetLineWidth(0.5);
-        $this->pdf->Cell($w0, $h1, s(''), 0, 0, 'C', 0);
-        $this->pdf->Cell($w3, $h1, s('備考'), 'B', 1, 'L', 0);
-        //空白行
-        $this->pdf->Cell($w0, $h2, s(''), 0, 0, 'C', 0);
-        $this->pdf->Cell($w1+$w2+$w3+$w4+$w5, $h2, s(''), 0, 1, 'L', 0);
-        //内容
-        $this->pdf->SetTextColor(0, 0, 0);
-        $this->pdf->Cell($w0, $h2, s(''), 0, 0, 'C', 0);
-        $this->pdf->MultiCell($w1+$w2+$w3+$w4+$w5, $h2, s($memo), 0, 'L', 0);
-
-        $this->pdf->Cell($w0, $mS, s(''), 0, 1, 'L', 0);  // 行の余白用
+        if ($memo != null && strlen($memo) > 0) {
+            $this->pdf->Cell($w0, $h1, s(''), 0, 0, 'C', 0);
+            $this->pdf->Cell($w3, $h1, s('備考'), 'B', 1, 'L', 0);
+            //空白行
+            $this->pdf->Cell($w0, $h2, s(''), 0, 0, 'C', 0);
+            $this->pdf->Cell($w1+$w2+$w3+$w4+$w5, $h2, s(''), 0, 1, 'L', 0);
+            //内容
+            $this->pdf->SetTextColor(0, 0, 0);
+            $this->pdf->Cell($w0, $h2, s(''), 0, 0, 'C', 0);
+            $this->pdf->MultiCell($w1+$w2+$w3+$w4+$w5, $h2, s($memo), 0, 'L', 0);
+            
+            $this->pdf->Cell($w0, $mS, s(''), 0, 1, 'L', 0);  // 行の余白用
+        }
 
         // ひとこと ----------------------------------------------------
         $this->pdf->Cell($w0, $mM, s(''), 0, 1, 'L', 0);  // 行の余白用
