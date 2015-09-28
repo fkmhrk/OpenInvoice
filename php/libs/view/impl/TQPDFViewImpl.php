@@ -347,7 +347,8 @@ class TQPDFViewImpl implements PDFView {
 
         $bankType = ($info['company_bank_type'] == '1') ? '普通' :
             (($info['company_bank_type'] == '2') ? '当座' : '定期');
-        
+
+        $this->pdf->Cell($w0, $mM, s(''), 0, 1, 'L', 0);  // 行の余白用        
         $this->pdf->Cell($w0, $h1, s(''), 0, 0, 'C', 0);
         $this->pdf->Cell($w1+$w2+$w4+$w5, $h1, s('いつもお引き立ていただきありがとうございます。今後ともどうぞよろしくお願いいたします。'), 0, 1, 'L', 0);
         
