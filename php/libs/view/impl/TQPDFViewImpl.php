@@ -343,6 +343,7 @@ class TQPDFViewImpl implements PDFView {
         $w4 = 20.9;
         $w5 = 28.5;
         $h1 = 8;
+        $mM = 5;
         $hBank = 12;  // 振込先用
 
         $bankType = ($info['company_bank_type'] == '1') ? '普通' :
