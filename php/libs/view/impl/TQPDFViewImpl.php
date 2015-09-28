@@ -317,11 +317,22 @@ class TQPDFViewImpl implements PDFView {
             $this->pdf->Cell($w0, $mS, s(''), 0, 1, 'L', 0);  // 行の余白用
         }
 
+    }
+
+    public function writeQuotationComment() {
+        $w0 = $this->startX; // $w0は開始位置をあわせるために空白として生成
+        $w1 = 70.5;
+        $w2 = 29;
+        $w3 = 20.9;
+        $w4 = 20.9;
+        $w5 = 28.5;
+        $h1 = 8;
+        $mM = 5;
         // ひとこと ----------------------------------------------------
         $this->pdf->Cell($w0, $mM, s(''), 0, 1, 'L', 0);  // 行の余白用
 
         $this->pdf->Cell($w0, $h1, s(''), 0, 0, 'C', 0);
-        $this->pdf->Cell($w1+$w2+$w4+$w5, $h1, s('上記のとおり、お見積り申し上げます。'), 0, 1, 'L', 0);        
+        $this->pdf->Cell($w1+$w2+$w4+$w5, $h1, s('上記のとおり、お見積り申し上げます。'), 0, 1, 'L', 0);                
     }
 
     public function writeBankInfo($info) {
