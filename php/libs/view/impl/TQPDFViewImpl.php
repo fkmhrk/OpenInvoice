@@ -350,6 +350,7 @@ class TQPDFViewImpl implements PDFView {
 
         $this->pdf->Cell($w0, $mM, s(''), 0, 1, 'L', 0);  // 行の余白用        
         $this->pdf->Cell($w0, $h1, s(''), 0, 0, 'C', 0);
+        $this->pdf->SetTextColor(0, 0, 0);
         $this->pdf->Cell($w1+$w2+$w4+$w5, $h1, s('いつもお引き立ていただきありがとうございます。今後ともどうぞよろしくお願いいたします。'), 0, 1, 'L', 0);
         
         $this->pdf->SetTextColor($this->accColorR, $this->accColorG, $this->accColorB);
