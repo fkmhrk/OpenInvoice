@@ -257,31 +257,35 @@ class TQPDFViewImpl implements PDFView {
         $this->pdf->SetFont(HIRAKAKU_W3,'', 8);
         $this->pdf->SetDrawColor($this->accColorR, $this->accColorG, $this->accColorB);
 
-        $this->pdf->SetTextColor($this->accColorR, $this->accColorG, $this->accColorB);
-        $this->pdf->SetLineWidth(0.5);
-        $this->pdf->Cell($w0, $h1, s(''), 0, 0, 'C', 0);
-        $this->pdf->Cell($w3, $h1, s('作業期間'), 'B', 1, 'L', 0);
+        if ($workFrom > 0 && $workTo > 0) {
+            $this->pdf->SetTextColor($this->accColorR, $this->accColorG, $this->accColorB);
+            $this->pdf->SetLineWidth(0.5);
+            $this->pdf->Cell($w0, $h1, s(''), 0, 0, 'C', 0);
+            $this->pdf->Cell($w3, $h1, s('作業期間'), 'B', 1, 'L', 0);
+            
+            $this->pdf->Cell($w0, $h2, s(''), 0, 0, 'C', 0);
+            $this->pdf->Cell($w1+$w2+$w3+$w4+$w5, $h2, s(''), 0, 1, 'L', 0);
+            $this->pdf->SetTextColor(0, 0, 0);
+            $this->pdf->Cell($w0, $h2, s(''), 0, 0, 'C', 0);
+            $this->pdf->MultiCell($w1+$w2+$w3+$w4+$w5, $h2, s(date('Y年n月j日', $workFrom). '〜'. date('Y年n月j日', $workTo)), 0, 'L', 0);
+            $this->pdf->Cell($w0, $mS, s(''), 0, 1, 'L', 0);  // 行の余白用
+        }
 
-        $this->pdf->Cell($w0, $h2, s(''), 0, 0, 'C', 0);
-        $this->pdf->Cell($w1+$w2+$w3+$w4+$w5, $h2, s(''), 0, 1, 'L', 0);
-        $this->pdf->SetTextColor(0, 0, 0);
-        $this->pdf->Cell($w0, $h2, s(''), 0, 0, 'C', 0);
-        $this->pdf->MultiCell($w1+$w2+$w3+$w4+$w5, $h2, s(date('Y年n月j日', $workFrom). '〜'. date('Y年n月j日', $workTo)), 0, 'L', 0);
-        $this->pdf->Cell($w0, $mS, s(''), 0, 1, 'L', 0);  // 行の余白用
-
-        $this->pdf->SetTextColor($this->accColorR, $this->accColorG, $this->accColorB);
-        $this->pdf->SetLineWidth(0.5);
-        $this->pdf->Cell($w0, $h1, s(''), 0, 0, 'C', 0);
-        $this->pdf->Cell($w3, $h1, s('成果物'), 'B', 1, 'L', 0);
-        //空白行
-        $this->pdf->Cell($w0, $h2, s(''), 0, 0, 'C', 0);
-        $this->pdf->Cell($w1+$w2+$w3+$w4+$w5, $h2, s(''), 0, 1, 'L', 0);
-        //内容
-        $this->pdf->SetTextColor(0, 0, 0);
-        $this->pdf->Cell($w0, $h2, s(''), 0, 0, 'C', 0);
-        $this->pdf->MultiCell($w1+$w2+$w3+$w4+$w5, $h2, s($product), 0, 'L', 0);
-    
-        $this->pdf->Cell($w0, $mS, s(''), 0, 1, 'L', 0);  // 行の余白用
+        if ($product != null && strlen($product) > 0) {
+            $this->pdf->SetTextColor($this->accColorR, $this->accColorG, $this->accColorB);
+            $this->pdf->SetLineWidth(0.5);
+            $this->pdf->Cell($w0, $h1, s(''), 0, 0, 'C', 0);
+            $this->pdf->Cell($w3, $h1, s('成果物'), 'B', 1, 'L', 0);
+            //空白行
+            $this->pdf->Cell($w0, $h2, s(''), 0, 0, 'C', 0);
+            $this->pdf->Cell($w1+$w2+$w3+$w4+$w5, $h2, s(''), 0, 1, 'L', 0);
+            //内容
+            $this->pdf->SetTextColor(0, 0, 0);
+            $this->pdf->Cell($w0, $h2, s(''), 0, 0, 'C', 0);
+            $this->pdf->MultiCell($w1+$w2+$w3+$w4+$w5, $h2, s($product), 0, 'L', 0);
+            
+            $this->pdf->Cell($w0, $mS, s(''), 0, 1, 'L', 0);  // 行の余白用
+        }
     }
 
     public function writeMemo($memo) {
@@ -299,23 +303,36 @@ class TQPDFViewImpl implements PDFView {
         // 備考 ----------------------------------------------------
         $this->pdf->SetTextColor($this->accColorR, $this->accColorG, $this->accColorB);
         $this->pdf->SetLineWidth(0.5);
-        $this->pdf->Cell($w0, $h1, s(''), 0, 0, 'C', 0);
-        $this->pdf->Cell($w3, $h1, s('備考'), 'B', 1, 'L', 0);
-        //空白行
-        $this->pdf->Cell($w0, $h2, s(''), 0, 0, 'C', 0);
-        $this->pdf->Cell($w1+$w2+$w3+$w4+$w5, $h2, s(''), 0, 1, 'L', 0);
-        //内容
-        $this->pdf->SetTextColor(0, 0, 0);
-        $this->pdf->Cell($w0, $h2, s(''), 0, 0, 'C', 0);
-        $this->pdf->MultiCell($w1+$w2+$w3+$w4+$w5, $h2, s($memo), 0, 'L', 0);
+        if ($memo != null && strlen($memo) > 0) {
+            $this->pdf->Cell($w0, $h1, s(''), 0, 0, 'C', 0);
+            $this->pdf->Cell($w3, $h1, s('備考'), 'B', 1, 'L', 0);
+            //空白行
+            $this->pdf->Cell($w0, $h2, s(''), 0, 0, 'C', 0);
+            $this->pdf->Cell($w1+$w2+$w3+$w4+$w5, $h2, s(''), 0, 1, 'L', 0);
+            //内容
+            $this->pdf->SetTextColor(0, 0, 0);
+            $this->pdf->Cell($w0, $h2, s(''), 0, 0, 'C', 0);
+            $this->pdf->MultiCell($w1+$w2+$w3+$w4+$w5, $h2, s($memo), 0, 'L', 0);
+            
+            $this->pdf->Cell($w0, $mS, s(''), 0, 1, 'L', 0);  // 行の余白用
+        }
 
-        $this->pdf->Cell($w0, $mS, s(''), 0, 1, 'L', 0);  // 行の余白用
+    }
 
+    public function writeQuotationComment() {
+        $w0 = $this->startX; // $w0は開始位置をあわせるために空白として生成
+        $w1 = 70.5;
+        $w2 = 29;
+        $w3 = 20.9;
+        $w4 = 20.9;
+        $w5 = 28.5;
+        $h1 = 8;
+        $mM = 5;
         // ひとこと ----------------------------------------------------
         $this->pdf->Cell($w0, $mM, s(''), 0, 1, 'L', 0);  // 行の余白用
 
         $this->pdf->Cell($w0, $h1, s(''), 0, 0, 'C', 0);
-        $this->pdf->Cell($w1+$w2+$w4+$w5, $h1, s('上記のとおり、お見積り申し上げます。'), 0, 1, 'L', 0);        
+        $this->pdf->Cell($w1+$w2+$w4+$w5, $h1, s('上記のとおり、お見積り申し上げます。'), 0, 1, 'L', 0);                
     }
 
     public function writeBankInfo($info) {
