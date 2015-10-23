@@ -60,7 +60,7 @@ if ($session === null) {
 $view = new TQInvoicePDFViewImpl();
 
 $view->writeToAddr($customer['address'], $customer['name']);
-$view->writeItemTitle($json['item_titme']);
+$view->writeItemTitle($json['item_title']);
 $view->writeDate($json['date'] / 1000);
 $view->writeMyCompany($myCompany['name'], $myCompany['address']);
 $view->writeTitleMessage();
