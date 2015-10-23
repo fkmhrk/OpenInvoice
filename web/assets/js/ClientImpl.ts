@@ -295,7 +295,7 @@ class AppClientImpl implements Client {
         var data : any = {
             url : this.url + '/php/invoice.php',
             type : 'POST',
-            dataType : 'json',
+            dataType : 'text',
             scriptCharset : 'utf-8',
             processData : false,
             data : JSON.stringify(params)
