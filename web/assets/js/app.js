@@ -501,6 +501,35 @@ var AppClientImpl = (function () {
             }
         });
     };
+    AppClientImpl.prototype.createInvoice = function (items, callback) {
+        var params = {
+            access_token: this.accessToken,
+            company: {
+                name: "サンプル会社",
+                address: "サンプル住所"
+            },
+            myCompany: {
+                name: "サンプル会社",
+                address: "住所\n\n担当"
+            },
+            item_title: 'ご請求書在中',
+            date: new Date().getTime(),
+            items: items
+        };
+        var data = {
+            url: this.url + '/php/invoice.php',
+            type: 'POST',
+            dataType: 'json',
+            scriptCharset: 'utf-8',
+            processData: false,
+            data: JSON.stringify(params)
+        };
+        $.ajax(data).done(function (data_, status, data) {
+            callback.success(data.responseText);
+        }).fail(function (data) {
+            callback.error(data.status, data.responseText);
+        });
+    };
     AppClientImpl.prototype.createTrading = function (item, callback) {
         var url = this.url + '/api/v1/tradings';
         this.exec(url, 'POST', this.accessToken, item, {
@@ -1517,10 +1546,72 @@ var AddUserDialog = (function () {
     return AddUserDialog;
 })();
 ///<reference path="./Application.ts"/>
+///<reference path="./Dialog.ts"/>
+///<reference path="./Functions.ts"/>
+var CreateInvoiceDialog = (function () {
+    function CreateInvoiceDialog() {
+    }
+    CreateInvoiceDialog.prototype.attach = function (app, el) {
+        var _this = this;
+        this.ractive = new Ractive({
+            // どの箱に入れるかをIDで指定
+            el: el,
+            // 指定した箱に、どのHTMLを入れるかをIDで指定
+            template: '#createInvoiceTemplate',
+            data: {
+                items: [{ "name": "", "num": "" }]
+            }
+        });
+        this.ractive.on({
+            'windowClicked': function () {
+                return false;
+            },
+            'close': function () {
+                app.closeDialog();
+                return false;
+            },
+            'addItem': function () {
+                _this.ractive.push('items', { "name": "", "num": "" });
+                return false;
+            },
+            'save': function () {
+                _this.save(app);
+                return false;
+            }
+        });
+        var listUserHeight = $('.listTemplate').height();
+        $('.listTemplate .list').css('height', listUserHeight - 370);
+    };
+    CreateInvoiceDialog.prototype.save = function (app) {
+        var _this = this;
+        var items = this.ractive.get('items');
+        app.client.createInvoice(items, {
+            success: function (body) {
+                _this.downloadBody(body);
+            },
+            error: function (status, msg) {
+                switch (status) {
+                    default:
+                        app.addSnack('PDF作成に失敗しました');
+                        break;
+                }
+            }
+        });
+    };
+    CreateInvoiceDialog.prototype.downloadBody = function (body) {
+        var blob = new Blob([body], { "type": "application/x-download" });
+        var url = window.URL || window.webkitURL;
+        window.URL = window.URL || window.webkitURL;
+        window.location.href = url.createObjectURL(blob);
+    };
+    return CreateInvoiceDialog;
+})();
+///<reference path="./Application.ts"/>
 ///<reference path="./Page.ts"/>
 ///<reference path="./Functions.ts"/>
 ///<reference path="./AddCompanyDialog.ts"/>
 ///<reference path="./AddUserDialog.ts"/>
+///<reference path="./CreateInvoiceDialog.ts"/>
 var SheetPage = (function () {
     function SheetPage(id, copyMode) {
         this.id = id;
@@ -1661,6 +1752,9 @@ var SheetPage = (function () {
             },
             'printDelivery': function () {
                 _this.printDelivery(app);
+            },
+            'printInvoide': function () {
+                _this.showInvoiceDialog(app);
             }
         });
         r.on('deleteItem', function (e, index) {
@@ -1763,6 +1857,9 @@ var SheetPage = (function () {
         else {
             this.save(app, doneFunc);
         }
+    };
+    SheetPage.prototype.showInvoiceDialog = function (app) {
+        app.showDialog(new CreateInvoiceDialog());
     };
     SheetPage.prototype.createUserList = function (app) {
         var list = [];
