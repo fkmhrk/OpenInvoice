@@ -504,7 +504,7 @@ var AppClientImpl = (function () {
     AppClientImpl.prototype.createInvoice = function (items, callback) {
         var params = {
             access_token: this.accessToken,
-            company: {
+            customer: {
                 name: "サンプル会社",
                 address: "サンプル住所"
             },

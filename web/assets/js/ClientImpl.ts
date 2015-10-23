@@ -280,7 +280,7 @@ class AppClientImpl implements Client {
     createInvoice(items : Array<any>, callback : ItemCallback<string>) {
         var params = {
             access_token : this.accessToken,
-            company : {
+            customer : {
                 name : "サンプル会社",
                 address : "サンプル住所",
             },
