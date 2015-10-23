@@ -516,19 +516,18 @@ var AppClientImpl = (function () {
             date: new Date().getTime(),
             items: items
         };
-        var data = {
-            url: this.url + '/php/invoice.php',
-            type: 'POST',
-            dataType: 'text',
-            scriptCharset: 'utf-8',
-            processData: false,
-            data: JSON.stringify(params)
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', this.url + '/php/invoice.php', true);
+        xhr.responseType = 'arraybuffer';
+        xhr.onload = function (e) {
+            if (this.status == 200) {
+                callback.success(this.response);
+            }
+            else {
+                callback.error(this.status, this.response);
+            }
         };
-        $.ajax(data).done(function (data_, status, data) {
-            callback.success(data.responseText);
-        }).fail(function (data) {
-            callback.error(data.status, data.responseText);
-        });
+        xhr.send(JSON.stringify(params));
     };
     AppClientImpl.prototype.createTrading = function (item, callback) {
         var url = this.url + '/api/v1/tradings';

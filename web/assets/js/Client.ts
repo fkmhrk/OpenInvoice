@@ -112,7 +112,7 @@ interface Client {
     /**
      * Creates invoice
      */
-    createInvoice(items : Array<any>, callback : ItemCallback<string>);
+    createInvoice(items : Array<any>, callback : ItemCallback<ArrayBuffer>);
 }
 
 interface Callback {

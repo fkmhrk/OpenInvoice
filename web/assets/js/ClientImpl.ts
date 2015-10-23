@@ -277,7 +277,7 @@ class AppClientImpl implements Client {
         });                
     }
 
-    createInvoice(items : Array<any>, callback : ItemCallback<string>) {
+    createInvoice(items : Array<any>, callback : ItemCallback<ArrayBuffer>) {
         var params = {
             access_token : this.accessToken,
             customer : {
@@ -292,19 +292,17 @@ class AppClientImpl implements Client {
             date : new Date().getTime(),
             items : items,
         };
-        var data : any = {
-            url : this.url + '/php/invoice.php',
-            type : 'POST',
-            dataType : 'text',
-            scriptCharset : 'utf-8',
-            processData : false,
-            data : JSON.stringify(params)
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', this.url + '/php/invoice.php', true);
+        xhr.responseType = 'arraybuffer';
+        xhr.onload = function(e : any){
+            if (this.status == 200) {
+                callback.success(this.response);
+            } else {
+                callback.error(this.status, this.response);
+            }
         };
-        $.ajax(data).done((data_ : any, status : any, data : any) => {
-	    callback.success(data.responseText);
-	}).fail((data : any) => {
-            callback.error(data.status, data.responseText);
-	});
+        xhr.send(JSON.stringify(params));
     }
     
     private createTrading(item : Trading, callback : ItemCallback<string>) {

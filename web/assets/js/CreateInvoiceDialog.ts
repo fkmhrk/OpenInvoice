@@ -42,7 +42,7 @@ class CreateInvoiceDialog implements Dialog {
     private save(app : App) {
         var items = this.ractive.get('items');
         app.client.createInvoice(items, {
-            success : (body : string) => {
+            success : (body : ArrayBuffer) => {
                 this.downloadBody(body);
             },
             error : (status : number, msg : string) => {
@@ -53,7 +53,7 @@ class CreateInvoiceDialog implements Dialog {
         });
     }
 
-    private downloadBody(body : string) {
+    private downloadBody(body : ArrayBuffer) {
         var blob = new Blob([body], { "type" : "application/x-download" });
         var url = (<any>window).URL || (<any>window).webkitURL;
         (<any>window).URL = (<any>window).URL || (<any>window).webkitURL;
