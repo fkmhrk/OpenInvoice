@@ -206,7 +206,7 @@ class TQPDFViewImpl implements PDFView {
         $h1 = 8;
         $h2 = 3;
 
-        $this->pdf->SetFont(GOTHIC,'', 7);
+        $this->pdf->SetFont(HIRAKAKU_W3, '', 7);
         $this->pdf->SetTextColor(77, 77, 77);
         $this->pdf->Cell($w0, $h1, s(''), 0, 0, 'C', 0);
         $this->pdf->Cell($w1+$w2+$w3+$w4+$w5, $h1, s('＃お見積期限：発行日より'. $days. '日間'), 0, 1, 'R', 0);
