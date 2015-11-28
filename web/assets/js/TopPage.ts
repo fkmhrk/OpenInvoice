@@ -18,6 +18,7 @@ class TopPage implements Page {
     }
     private show(app : App) {
         var sheets = app.getTradings();
+        sheets.sort(this.modifiedSorter);
         var total = 0;
         _.each(sheets, (item : Trading) => {
             total += item.total;
@@ -111,4 +112,9 @@ class TopPage implements Page {
             }
         });
     }
+
+    // sort
+    modifiedSorter = (l : Trading, r : Trading) => {
+            return r.modified_time - l.modified_time;
+    };
 }

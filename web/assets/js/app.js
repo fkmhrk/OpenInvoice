@@ -1330,6 +1330,10 @@ var SignInPage = (function () {
 ///<reference path="./Functions.ts"/>
 var TopPage = (function () {
     function TopPage() {
+        // sort
+        this.modifiedSorter = function (l, r) {
+            return r.modified_time - l.modified_time;
+        };
     }
     TopPage.prototype.onCreate = function (app) {
         var _this = this;
@@ -1345,6 +1349,7 @@ var TopPage = (function () {
     TopPage.prototype.show = function (app) {
         var _this = this;
         var sheets = app.getTradings();
+        sheets.sort(this.modifiedSorter);
         var total = 0;
         _.each(sheets, function (item) {
             total += item.total;
