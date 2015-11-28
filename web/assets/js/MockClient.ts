@@ -278,8 +278,8 @@ class MockClient implements Client {
     /**
      * Creates invoice
      */    
-    createInvoice(items : Array<any>, callback : ItemCallback<string>) {
-        callback.success('OK');
+    createInvoice(items : Array<any>, callback : ItemCallback<ArrayBuffer>) {
+        callback.success(null);
     }
 }
 
