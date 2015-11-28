@@ -276,6 +276,34 @@ class AppClientImpl implements Client {
             }
         });                
     }
+
+    createInvoice(items : Array<any>, callback : ItemCallback<ArrayBuffer>) {
+        var params = {
+            access_token : this.accessToken,
+            customer : {
+                name : "サンプル会社",
+                address : "サンプル住所",
+            },
+            myCompany : {
+                name : "サンプル会社",
+                address : "住所\n\n担当",
+            },
+            item_title : 'ご請求書在中',
+            date : new Date().getTime(),
+            items : items,
+        };
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', this.url + '/php/invoice.php', true);
+        xhr.responseType = 'arraybuffer';
+        xhr.onload = function(e : any){
+            if (this.status == 200) {
+                callback.success(this.response);
+            } else {
+                callback.error(this.status, this.response);
+            }
+        };
+        xhr.send(JSON.stringify(params));
+    }
     
     private createTrading(item : Trading, callback : ItemCallback<string>) {
         var url = this.url + '/api/v1/tradings';

@@ -3,6 +3,7 @@
 ///<reference path="./Functions.ts"/>
 ///<reference path="./AddCompanyDialog.ts"/>
 ///<reference path="./AddUserDialog.ts"/>
+///<reference path="./CreateInvoiceDialog.ts"/>
 
 class SheetPage implements Page {
     id : string;
@@ -148,6 +149,9 @@ class SheetPage implements Page {
             'printDelivery' : () => {
                 this.printDelivery(app);
             },
+            'printInvoide' : () => {
+                this.showInvoiceDialog(app);
+            },
         });
         r.on('deleteItem', function(e, index) {
             itemObserver.cancel();
@@ -246,6 +250,10 @@ class SheetPage implements Page {
         } else {
             this.save(app, doneFunc);
         }
+    }
+
+    private showInvoiceDialog(app : App) {
+        app.showDialog(new CreateInvoiceDialog());
     }
 
     private createUserList(app : App) {

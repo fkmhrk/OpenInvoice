@@ -274,6 +274,13 @@ class MockClient implements Client {
     getNextNumber(type : string, date : number, callback : ItemCallback<number>) {
         callback.success(20150000 + (++globalSeq[type + 'Number']));
     }
+
+    /**
+     * Creates invoice
+     */    
+    createInvoice(items : Array<any>, callback : ItemCallback<ArrayBuffer>) {
+        callback.success(null);
+    }
 }
 
 function createClient() {

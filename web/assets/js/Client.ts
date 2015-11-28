@@ -108,6 +108,11 @@ interface Client {
      * Gets next number
      */
     getNextNumber(type : string, date : number, callback : ItemCallback<number>);
+
+    /**
+     * Creates invoice
+     */
+    createInvoice(items : Array<any>, callback : ItemCallback<ArrayBuffer>);
 }
 
 interface Callback {

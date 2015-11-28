@@ -167,7 +167,7 @@
 				<dt><input type="text" value="{{trading.delivery_number}}"><input type="date" value="{{deliveryDate}}"></dt>
 				<dd class="pdf_order" on-click="printDelivery"><i class="fa fa-list-alt"></i>納品書 pdf</dd>
 				<dt><input type="date" value=""></dt>
-				<dd class="pdf_attach"><i class="fa fa-list-alt"></i>添え状</dd>
+				<dd class="pdf_attach" on-click="printInvoide"><i class="fa fa-list-alt"></i>添え状</dd>
 			</dl>
 		</section>
 	  <section id="sum">
@@ -287,7 +287,6 @@
         <ul class="actionBtn">
 	        <li on-click="close"><a title="閉じる"><i class="fa fa-remove"></i></a></li>
 	      </ul>
-	      <!-- <p class="save" on-click="save"><i class="fa fa-check"></i>保存</p> -->
       </header>
       <div class="inner">
         <section id="addUser">
@@ -427,6 +426,31 @@
         </section>
       </div>
     </section>
+  </script>
+
+  <script id="createInvoiceTemplate" type="text/ractive">
+    <section id="setting" class="listTemplate addDialog" on-click="windowClicked">
+      <header>
+        <h1>添え状の作成</h1>
+        <ul class="actionBtn">
+	  <li on-click="close"><a title="閉じる"><i class="fa fa-remove"></i></a></li>
+	</ul>
+      </header>
+      <div class="inner">
+        <section id="addTempSheet">
+          <div class="wrapper list">
+	    <dl>
+              {{#items}}
+	      <dt><span>項目</span><input type="text" value="{{name}}" placeholder="例）ご請求書"></dt>
+	      <dd><span>数量</span><input type="text" value="{{num}}" placeholder="例）1通"></dd>
+              {{/}}
+	    </dl>
+          </div>
+	  <p class="addInput" on-click="addItem"><span><i class="fa fa-plus"></i></span></p>
+          <p class="addBtn" on-click="save"><i class="fa fa-print"></i>pdf をダウンロードする</p>
+        </section>
+      </div>
+    </section>    
   </script>
 
   <script src="https://code.jquery.com/jquery-1.9.0.min.js"></script>
