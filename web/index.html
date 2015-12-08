@@ -183,9 +183,9 @@
       	</div>
 
       	<section id="inputArea">
-      	  <div class="inner">
+      	  <ul class="reorderable inner">
             {{#tradingItems:i}}
-	    <div class="inputBox">
+	    <li class="inputBox" decorator="sortable">
 	      <article>
 		<ul class="table">
                   <li><input type="text" placeholder="項目名" value="{{tradingItems[i].subject}}"></li>
@@ -206,9 +206,9 @@
 		</p>
 		<p class="delete" title="項目削除" on-click="deleteItem:{{i}}"><i class="fa fa-trash"></i></p>
 	      </article>
-            </div>
+            </li>
             {{/}}
-	  </div>
+	  </ul>
           <p class="addInput" on-click="addItem"><span><i class="fa fa-plus"></i></span></p>
 	</section>
       </section>
@@ -471,7 +471,8 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/ractive/0.7.1/ractive.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.7.0/underscore-min.js" type="text/javascript"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.1.2/backbone-min.js" type="text/javascript"></script>
-  <script src="./assets/js/ractive-fade.js"></script>    
+  <script src="./assets/js/ractive-fade.js"></script>
+  <script src="./assets/js/ractive-sortable.js"></script>
   <script src="./assets/js/app.js"></script>
 
 </body>
