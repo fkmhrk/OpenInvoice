@@ -75,11 +75,11 @@
 	<div class="list">
 	  <table>
 	    <tr>
-	      <th>更新日</th>
-	      <th>会社名</th>
-	      <th>合計金額</th>
-	      <th>見積書 No.</th>
-	      <th>請求書 No.</th>
+	      <th on-click="sortBy:1">更新日 {{showSortMark(1, sortIndex, sortDesc)}}</th>
+	      <th on-click="sortBy:2">会社名 {{showSortMark(2, sortIndex, sortDesc)}}</th>
+	      <th on-click="sortBy:3">合計金額 {{showSortMark(3, sortIndex, sortDesc)}}</th>
+	      <th on-click="sortBy:4">見積書 No. {{showSortMark(4, sortIndex, sortDesc)}}</th>
+	      <th on-click="sortBy:5">請求書 No. {{showSortMark(5, sortIndex, sortDesc)}}</th>
 	      <th></th>
 	    </tr>
             <!-- 繰り返しで表示 -->

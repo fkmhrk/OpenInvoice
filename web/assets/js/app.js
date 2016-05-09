@@ -661,7 +661,7 @@ var AppClientImpl = (function () {
         });
     };
     return AppClientImpl;
-})();
+}());
 function createClient() {
     return new AppClientImpl(baseURL);
 }
@@ -669,27 +669,27 @@ var User = (function () {
     function User() {
     }
     return User;
-})();
+}());
 var Company = (function () {
     function Company() {
     }
     return Company;
-})();
+}());
 var Trading = (function () {
     function Trading() {
     }
     return Trading;
-})();
+}());
 var TradingItem = (function () {
     function TradingItem() {
     }
     return TradingItem;
-})();
+}());
 var Environment = (function () {
     function Environment() {
     }
     return Environment;
-})();
+}());
 ///<reference path="./Dialog.ts"/>
 ///<reference path="./Client.ts"/>
 ///<reference path="./Functions.ts"/>
@@ -894,7 +894,7 @@ var App = (function () {
         this.companyMap[c.id] = c;
     };
     return App;
-})();
+}());
 ///<reference path="./Application.ts"/>
 ///<reference path="./Dialog.ts"/>
 var UserListDialog = (function () {
@@ -1001,7 +1001,7 @@ var UserListDialog = (function () {
         this.ractive.set('password', '');
     };
     return UserListDialog;
-})();
+}());
 ///<reference path="./Application.ts"/>
 ///<reference path="./Dialog.ts"/>
 ///<reference path="./Functions.ts"/>
@@ -1083,7 +1083,7 @@ var AddCompanyDialog = (function () {
         });
     };
     return AddCompanyDialog;
-})();
+}());
 ///<reference path="./Application.ts"/>
 ///<reference path="./Dialog.ts"/>
 ///<reference path="./AddCompanyDialog.ts"/>
@@ -1195,7 +1195,7 @@ var CompanyListDialog = (function () {
         });
     };
     return CompanyListDialog;
-})();
+}());
 ///<reference path="./Application.ts"/>
 ///<reference path="./Dialog.ts"/>
 var SettingsDialog = (function () {
@@ -1266,7 +1266,7 @@ var SettingsDialog = (function () {
         });
     };
     return SettingsDialog;
-})();
+}());
 ///<reference path="./app.ts"/>
 ///<reference path="./Page.ts"/>
 ///<reference path="./UserListDialog.ts"/>
@@ -1321,7 +1321,7 @@ var SignInPage = (function () {
         });
     };
     return SignInPage;
-})();
+}());
 ///<reference path="./app.ts"/>
 ///<reference path="./Page.ts"/>
 ///<reference path="./UserListDialog.ts"/>
@@ -1337,6 +1337,7 @@ var TopPage = (function () {
     }
     TopPage.prototype.onCreate = function (app) {
         var _this = this;
+        this.app = app;
         app.loadData({
             done: function () {
                 _this.show(app);
@@ -1369,7 +1370,7 @@ var TopPage = (function () {
             };
         };
         // Racriveオブジェクトを作る
-        app.ractive = new Ractive({
+        app.ractive = this.ractive = new Ractive({
             // どの箱に入れるかをIDで指定
             el: '#container',
             // 指定した箱に、どのHTMLを入れるかをIDで指定
@@ -1384,7 +1385,20 @@ var TopPage = (function () {
                 'company': app.companyMap,
                 'sheets': sheets,
                 'toDateStr': Utils.toDateStr,
-                total: total
+                total: total,
+                sortIndex: 1,
+                sortDesc: true,
+                showSortMark: function (index, sortIndex, desc) {
+                    if (index != sortIndex) {
+                        return '';
+                    }
+                    if (desc) {
+                        return '▽';
+                    }
+                    else {
+                        return '△';
+                    }
+                }
             }
         });
         tooltipster();
@@ -1422,6 +1436,46 @@ var TopPage = (function () {
             },
             'showSetting': function (e) {
                 app.showDialog(new SettingsDialog());
+            },
+            sortBy: function (e, index) {
+                var list = app.ractive.get('sheets');
+                var currentIndex = app.ractive.get('sortIndex');
+                var desc = app.ractive.get('sortDesc');
+                if (currentIndex == index) {
+                    desc = !desc;
+                }
+                else {
+                    currentIndex = index;
+                    app.ractive.set('sortIndex', index);
+                    desc = true;
+                }
+                app.ractive.set('sortDesc', desc);
+                var sortFunc;
+                switch (index) {
+                    case 1:
+                        sortFunc = _this.numberSorter('modified_time');
+                        break;
+                    case 2:
+                        sortFunc = _this.companySorter();
+                        break;
+                    case 3:
+                        sortFunc = _this.numberSorter('total');
+                        break;
+                    case 4:
+                        sortFunc = _this.stringSorter('quotation_number');
+                        break;
+                    case 5:
+                        sortFunc = _this.stringSorter('bill_number');
+                        break;
+                }
+                if (desc) {
+                    list.sort(function (l, r) {
+                        return -1 * sortFunc(l, r);
+                    });
+                }
+                else {
+                    list.sort(sortFunc);
+                }
             }
         });
     };
@@ -1440,8 +1494,24 @@ var TopPage = (function () {
             }
         });
     };
+    TopPage.prototype.numberSorter = function (key) {
+        return function (l, r) {
+            return l[key] - r[key];
+        };
+    };
+    TopPage.prototype.stringSorter = function (key) {
+        return function (l, r) {
+            return l[key].localeCompare(r[key]);
+        };
+    };
+    TopPage.prototype.companySorter = function () {
+        var company = this.app.companyMap;
+        return function (l, r) {
+            return company[l.company_id].name.localeCompare(company[r.company_id].name);
+        };
+    };
     return TopPage;
-})();
+}());
 ///<reference path="./Application.ts"/>
 ///<reference path="./Dialog.ts"/>
 ///<reference path="./Functions.ts"/>
@@ -1548,7 +1618,7 @@ var AddUserDialog = (function () {
         }
     };
     return AddUserDialog;
-})();
+}());
 ///<reference path="./Application.ts"/>
 ///<reference path="./Dialog.ts"/>
 ///<reference path="./Functions.ts"/>
@@ -1609,7 +1679,7 @@ var CreateInvoiceDialog = (function () {
         window.location.href = url.createObjectURL(blob);
     };
     return CreateInvoiceDialog;
-})();
+}());
 ///<reference path="./Application.ts"/>
 ///<reference path="./Page.ts"/>
 ///<reference path="./Functions.ts"/>
@@ -1973,7 +2043,7 @@ var SheetPage = (function () {
         });
     };
     return SheetPage;
-})();
+}());
 ///<reference path="./ractive.d.ts"/>
 ///<reference path="./data.ts"/>
 ///<reference path="./Application.ts"/>

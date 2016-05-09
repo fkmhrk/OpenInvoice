@@ -6,7 +6,11 @@
 ///<reference path="./Functions.ts"/>
 
 class TopPage implements Page {
+    app : App;
+    ractive : Ractive;
+    
     onCreate(app : App) {
+        this.app = app;
         app.loadData({
             done : () => {
                 this.show(app);
@@ -38,7 +42,7 @@ class TopPage implements Page {
             };
         };
         // Racriveオブジェクトを作る
-        app.ractive = new Ractive({
+        app.ractive = this.ractive = new Ractive({
             // どの箱に入れるかをIDで指定
             el : '#container',
             // 指定した箱に、どのHTMLを入れるかをIDで指定
@@ -54,6 +58,16 @@ class TopPage implements Page {
                 'sheets' : sheets,
                 'toDateStr' : Utils.toDateStr,
                 total : total,
+                sortIndex : 1,
+                sortDesc : true,
+                showSortMark : (index : number, sortIndex : number, desc : boolean) => {
+                    if (index != sortIndex) { return ''; }
+                    if (desc) {
+                       return '▽';
+                    } else {
+                       return '△';
+                    }
+                },
             }
         });
 
@@ -94,6 +108,44 @@ class TopPage implements Page {
             'showSetting' : (e : any) => {
                 app.showDialog(new SettingsDialog());
             },            
+            sortBy : (e : any, index : number) => {
+                var list = app.ractive.get('sheets');                
+                var currentIndex = app.ractive.get('sortIndex');
+                var desc = app.ractive.get('sortDesc');                
+                if (currentIndex == index) {                   
+                    desc = !desc;
+                } else {
+                    currentIndex = index;
+                    app.ractive.set('sortIndex', index);
+                    desc = true;
+                }
+                app.ractive.set('sortDesc', desc);
+                var sortFunc;
+                switch (index) {         
+                case 1:
+                     sortFunc = this.numberSorter('modified_time');
+                     break;
+                case 2:
+                     sortFunc = this.companySorter();
+                     break;
+                case 3:
+                     sortFunc = this.numberSorter('total');
+                     break;
+                case 4:
+                     sortFunc = this.stringSorter('quotation_number');
+                     break;
+                case 5:
+                     sortFunc = this.stringSorter('bill_number');
+                     break;                     
+                }
+                if (desc) {
+                    list.sort((l : Trading, r : Trading) => {
+                            return -1 * sortFunc(l, r);
+                    });
+                } else {
+                    list.sort(sortFunc);
+                }
+            },
         });        
     }
 
@@ -117,4 +169,24 @@ class TopPage implements Page {
     modifiedSorter = (l : Trading, r : Trading) => {
             return r.modified_time - l.modified_time;
     };
+
+    private numberSorter(key : string) : (l : Trading, r : Trading) => number {
+        return (l : Trading, r : Trading) => {
+            return l[key] - r[key];
+        };
+    }
+
+    private stringSorter(key : string) : (l : Trading, r : Trading) => number {
+        return (l : Trading, r : Trading) => {
+            return l[key].localeCompare(r[key]);
+        };
+    }
+
+    private companySorter() : (l : Trading, r : Trading) => number {
+        var company = this.app.companyMap;
+        return (l : Trading, r : Trading) => {
+            return company[l.company_id].name.localeCompare(
+                company[r.company_id].name);
+        };
+    }
 }
