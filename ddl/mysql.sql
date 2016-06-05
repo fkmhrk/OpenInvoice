@@ -59,7 +59,7 @@ create table if not exists trading_item(
   sort_order tinyint,
   subject text,
   unit_price integer,
-  amount integer,
+  amount float,
   degree varchar(8),
   tax_type tinyint,
   memo text,
