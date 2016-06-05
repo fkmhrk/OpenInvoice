@@ -311,7 +311,7 @@ func TestTrading0400_Delete(t *testing.T) {
 	}
 	// add item
 	for i := 0; i < 2; i++ {
-		_, err = dao.CreateItem(trading.Id, "item", "m/m", "memo", i, 100, i, 1)
+		_, err = dao.CreateItem(trading.Id, "item", "m/m", "memo", i, 100, float64(i), 1)
 		if err != nil {
 			t.Errorf("Failed to create trading item : %s", err)
 			return

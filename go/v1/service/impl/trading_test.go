@@ -205,7 +205,7 @@ func TestTrading0200_GetItemsByTradingId(t *testing.T) {
 			Id:        fmt.Sprintf("trade%d", i),
 			Subject:   fmt.Sprintf("subject%d", i),
 			UnitPrice: i*100 + 100,
-			Amount:    i*3 + 3,
+			Amount:    float64(i*3 + 3),
 			Degree:    fmt.Sprintf("D%d", i),
 			TaxType:   1,
 			Memo:      fmt.Sprintf("memo%d", i),

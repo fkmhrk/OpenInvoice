@@ -232,7 +232,8 @@ func (d *tradingDAO) GetItemsById(tradingId string) ([]*m.TradingItem, error) {
 
 	var list []*m.TradingItem
 	var id, subject, degree, memo string
-	var sortOrder, unitPrice, amount, taxType int
+	var sortOrder, unitPrice, taxType int
+    var amount float64
 	for rows.Next() {
 		rows.Scan(&id, &sortOrder, &subject, &unitPrice, &amount,
 			&degree, &taxType, &memo)
@@ -253,7 +254,7 @@ func (d *tradingDAO) GetItemsById(tradingId string) ([]*m.TradingItem, error) {
 
 }
 
-func (d *tradingDAO) CreateItem(tradingId, subject, degree, memo string, sortOrder, unitPrice, amount, taxType int) (*m.TradingItem, error) {
+func (d *tradingDAO) CreateItem(tradingId, subject, degree, memo string, sortOrder, unitPrice int, amount float64, taxType int) (*m.TradingItem, error) {
 	tr, err := d.connection.Begin()
 	if err != nil {
 		return nil, err
@@ -311,7 +312,7 @@ func (d *tradingDAO) CreateItem(tradingId, subject, degree, memo string, sortOrd
 	}, nil
 }
 
-func (d *tradingDAO) UpdateItem(id, tradingId, subject, degree, memo string, sortOrder, unitPrice, amount, taxType int) (*m.TradingItem, error) {
+func (d *tradingDAO) UpdateItem(id, tradingId, subject, degree, memo string, sortOrder, unitPrice int, amount float64, taxType int) (*m.TradingItem, error) {
 	tr, err := d.connection.Begin()
 	if err != nil {
 		return nil, err

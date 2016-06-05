@@ -177,7 +177,7 @@ func (s *tradingService) GetItemListByTradingId(token, tradingId string) s.Resul
 	return jsonResult(200, body)
 }
 
-func (s *tradingService) CreateItem(token, tradingId, subject, degree, memo string, sortOrder, unitPrice, amount, taxType int) s.Result {
+func (s *tradingService) CreateItem(token, tradingId, subject, degree, memo string, sortOrder, unitPrice int, amount float64, taxType int) s.Result {
 	// input check
 	// get session
 	session, err := s.sessionDAO.GetByToken(token)
@@ -199,7 +199,7 @@ func (s *tradingService) CreateItem(token, tradingId, subject, degree, memo stri
 	return jsonResult(201, body)
 }
 
-func (s *tradingService) UpdateItem(token, id, tradingId, subject, degree, memo string, sortOrder, unitPrice, amount, taxType int) s.Result {
+func (s *tradingService) UpdateItem(token, id, tradingId, subject, degree, memo string, sortOrder, unitPrice int, amount float64, taxType int) s.Result {
 	// input check
 	// get session
 	session, err := s.sessionDAO.GetByToken(token)
