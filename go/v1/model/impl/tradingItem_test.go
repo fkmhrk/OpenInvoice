@@ -144,7 +144,7 @@ func TestTradingItem0101_CreateItem_2(t *testing.T) {
 	dao := createTradingDAO(db)
 	for i := 0; i < 2; i++ {
 		_, err := dao.CreateItem(tradingId, "Subject1", "M/D", "Memo1",
-			i, 100*i, 5*i, 1)
+			i, 100*i, float64(5*i), 1)
 		if err != nil {
 			t.Errorf("Unexpected error : %s", err)
 			return

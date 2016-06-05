@@ -95,7 +95,7 @@ func assertTrading(t *testing.T, item *m.Trading,
 }
 
 func assertTradingItem(t *testing.T, item *m.TradingItem,
-	id, tradingId, subject string, sortOrder, unitPrice, amount int,
+	id, tradingId, subject string, sortOrder, unitPrice int, amount float64,
 	degree string, taxType int, memo string) {
 	caller := getCaller()
 	if item.Id != id {
@@ -114,7 +114,7 @@ func assertTradingItem(t *testing.T, item *m.TradingItem,
 		t.Errorf("%s UnitPrice must be %d but %d", caller, unitPrice, item.UnitPrice)
 	}
 	if item.Amount != amount {
-		t.Errorf("%s Amount must be %d but %d", caller, amount, item.Amount)
+		t.Errorf("%s Amount must be %f but %f", caller, amount, item.Amount)
 	}
 	if item.Degree != degree {
 		t.Errorf("%s Degree must be %s but %s", caller, degree, item.Degree)

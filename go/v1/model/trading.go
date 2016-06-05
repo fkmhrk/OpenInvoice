@@ -12,9 +12,9 @@ type TradingDAO interface {
 
 	// Gets all trading items by trading ID
 	GetItemsById(tradingId string) ([]*TradingItem, error)
-	CreateItem(tradingId, subject, degree, memo string, sortOrder, unitPrice, Amount, taxType int) (*TradingItem, error)
+	CreateItem(tradingId, subject, degree, memo string, sortOrder, unitPrice int, Amount float64, taxType int) (*TradingItem, error)
 	// Updates specified trading Item
-	UpdateItem(id, tradingId, subject, degree, memo string, sortOrder, unitPrice, Amount, taxType int) (*TradingItem, error)
+	UpdateItem(id, tradingId, subject, degree, memo string, sortOrder, unitPrice int, Amount float64, taxType int) (*TradingItem, error)
 
 	// Deletes specified trading Item
 	SoftDeleteItem(id, tradingId string) error
@@ -48,7 +48,7 @@ type TradingItem struct {
 	SortOrder int
 	Subject   string
 	UnitPrice int
-	Amount    int
+	Amount    float64
 	Degree    string
 	TaxType   int
 	Memo      string

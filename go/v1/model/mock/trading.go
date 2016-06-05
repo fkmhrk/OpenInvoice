@@ -45,11 +45,11 @@ func (d *TradingDAO) GetItemsById(tradingId string) ([]*m.TradingItem, error) {
 	return d.GetItemsByIdResult, nil
 }
 
-func (d *TradingDAO) CreateItem(tradingId, subject, degree, memo string, sortOrder, unitPrice, Amount, taxType int) (*m.TradingItem, error) {
+func (d *TradingDAO) CreateItem(tradingId, subject, degree, memo string, sortOrder, unitPrice int, Amount float64, taxType int) (*m.TradingItem, error) {
 	return d.CreateItemResult, nil
 }
 
-func (d *TradingDAO) UpdateItem(id, tradingId, subject, degree, memo string, sortOrder, unitPrice, Amount, taxType int) (*m.TradingItem, error) {
+func (d *TradingDAO) UpdateItem(id, tradingId, subject, degree, memo string, sortOrder, unitPrice int, Amount float64, taxType int) (*m.TradingItem, error) {
 	return d.UpdateItemResult, nil
 }
 
