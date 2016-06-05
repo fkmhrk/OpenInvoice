@@ -233,7 +233,7 @@ func (d *tradingDAO) GetItemsById(tradingId string) ([]*m.TradingItem, error) {
 	var list []*m.TradingItem
 	var id, subject, degree, memo string
 	var sortOrder, unitPrice, taxType int
-    var amount float64
+	var amount float64
 	for rows.Next() {
 		rows.Scan(&id, &sortOrder, &subject, &unitPrice, &amount,
 			&degree, &taxType, &memo)
