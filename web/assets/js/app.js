@@ -1277,6 +1277,14 @@ var SignInPage = (function () {
     }
     SignInPage.prototype.onCreate = function (app) {
         var _this = this;
+        if (navigator.credentials !== undefined) {
+            navigator.credentials.get({
+                password: true
+            }).then(function (c) {
+                _this.signIn(app, c.id, c.password);
+            }).catch(function (e) {
+            });
+        }
         // Racriveオブジェクトを作る
         var r = app.ractive = new Ractive({
             // どの箱に入れるかをIDで指定
@@ -1303,7 +1311,16 @@ var SignInPage = (function () {
         app.client.login(username, password, {
             success: function (token) {
                 localStorage.setItem('refreshToken', token);
-                app.router.navigate('top', { trigger: true });
+                if (navigator.credentials === undefined) {
+                    app.router.navigate('top', { trigger: true });
+                    return;
+                }
+                navigator.credentials.store(new PasswordCredential({
+                    id: username,
+                    password: password
+                })).then(function (c) {
+                    app.router.navigate('top', { trigger: true });
+                });
             },
             error: function (status, msg) {
                 app.ractive.set('inProgress', false);

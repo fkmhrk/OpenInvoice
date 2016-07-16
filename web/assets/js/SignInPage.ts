@@ -3,9 +3,20 @@
 ///<reference path="./UserListDialog.ts"/>
 ///<reference path="./CompanyListDialog.ts"/>
 ///<reference path="./SettingsDialog.ts"/>
+declare class PasswordCredential{
+    constructor(data : any);
+}
 
 class SignInPage implements Page {
     onCreate(app : App) {
+        if ((<any>navigator).credentials !== undefined) { 
+            (<any>navigator).credentials.get({
+                password: true,
+            }).then((c : any) => {
+                this.signIn(app, c.id, c.password);
+            }).catch((e : any) => {
+            });
+        }        
         // Racriveオブジェクトを作る
         var r = app.ractive = new Ractive({
             // どの箱に入れるかをIDで指定
@@ -33,7 +44,17 @@ class SignInPage implements Page {
         app.client.login(username, password, {
             success : (token : string) => {
                 localStorage.setItem('refreshToken', token);
-                app.router.navigate('top', {trigger:true});
+                if ((<any>navigator).credentials === undefined) {
+                    app.router.navigate('top', {trigger:true});
+                    return; 
+                }
+                (<any>navigator).credentials.store(new PasswordCredential({
+                    id : username,
+                    password : password,
+                })).then((c : any) => {
+                    app.router.navigate('top', {trigger:true});
+                });
+                
             },
             error : (status : number, msg : string) => {
                 app.ractive.set('inProgress', false);
