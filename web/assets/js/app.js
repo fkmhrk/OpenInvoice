@@ -233,74 +233,73 @@ var ClientValidator;
 var $;
 var _;
 var baseURL = '';
-var AppClientImpl = (function () {
-    function AppClientImpl(url) {
+class AppClientImpl {
+    constructor(url) {
         this.url = url;
         this.is_admin = false;
         this.isRetry = false;
     }
-    AppClientImpl.prototype.setRefreshToken = function (refreshToken) {
+    setRefreshToken(refreshToken) {
         if (refreshToken == null) {
             return;
         }
         this.accessToken = '';
         this.refreshToken = refreshToken;
-    };
-    AppClientImpl.prototype.isAdmin = function () {
+    }
+    isAdmin() {
         return this.is_admin;
-    };
-    AppClientImpl.prototype.getAccessToken = function () {
+    }
+    getAccessToken() {
         return this.accessToken;
-    };
-    AppClientImpl.prototype.login = function (username, password, callback) {
-        var _this = this;
+    }
+    login(username, password, callback) {
         if (!ClientValidator.isValidLogin(username, password, callback)) {
             return;
         }
         var params = {
             username: username,
-            password: password
+            password: password,
         };
         this.exec(this.url + '/api/v1/token', 'POST', null, params, {
-            success: function (json) {
-                _this.accessToken = json.access_token;
-                _this.refreshToken = json.refresh_token;
-                _this.is_admin = json.is_admin;
+            success: (json) => {
+                this.accessToken = json.access_token;
+                this.refreshToken = json.refresh_token;
+                this.is_admin = json.is_admin;
                 callback.success(json.refresh_token);
             },
-            error: function (status, body) {
+            error: (status, body) => {
                 callback.error(status, body.msg);
             }
         });
-    };
-    AppClientImpl.prototype.getTradings = function (callback) {
+    }
+    getTradings(callback) {
         this.exec(this.url + '/api/v1/tradings', 'GET', this.accessToken, null, {
-            success: function (json) {
-                callback.success(_.map(json.tradings, function (item) {
+            success: (json) => {
+                callback.success(_.map(json.tradings, (item) => {
                     item.date = item.id;
                     return item;
                 }));
             },
-            error: function (status, body) {
+            error: (status, body) => {
                 callback.error(status, body.msg);
             }
         });
-    };
-    AppClientImpl.prototype.getTradingItems = function (tradingId, callback) {
+    }
+    getTradingItems(tradingId, callback) {
         var url = this.url + '/api/v1/tradings/' + tradingId + '/items';
         this.exec(url, 'GET', this.accessToken, null, {
-            success: function (json) {
-                callback.success(_.map(json.items, function (item) {
+            success: (json) => {
+                callback.success(_.map(json.items, (item) => {
                     item.sum = item.unit_price * item.amount;
                     return item;
                 }));
             },
-            error: function (status, body) {
+            error: (status, body) => {
                 callback.error(status, body.msg);
             }
         });
-    };
-    AppClientImpl.prototype.createUser = function (loginName, displayName, tel, password, callback) {
+    }
+    createUser(loginName, displayName, tel, password, callback) {
         if (!ClientValidator.isValidCreateUser(loginName, displayName, tel, password, callback)) {
             return;
         }
@@ -309,29 +308,29 @@ var AppClientImpl = (function () {
             login_name: loginName,
             display_name: displayName,
             tel: tel,
-            password: password
+            password: password,
         };
         this.exec(url, 'POST', this.accessToken, params, {
-            success: function (json) {
+            success: (json) => {
                 callback.success(json);
             },
-            error: function (status, body) {
+            error: (status, body) => {
                 callback.error(status, body.msg);
             }
         });
-    };
-    AppClientImpl.prototype.getUsers = function (callback) {
+    }
+    getUsers(callback) {
         var url = this.url + '/api/v1/users';
         this.exec(url, 'GET', this.accessToken, null, {
-            success: function (json) {
+            success: (json) => {
                 callback.success(json.users);
             },
-            error: function (status, body) {
+            error: (status, body) => {
                 callback.error(status, body.msg);
             }
         });
-    };
-    AppClientImpl.prototype.saveUser = function (user, password, callback) {
+    }
+    saveUser(user, password, callback) {
         if (!ClientValidator.isValidSaveUser(user, password, callback)) {
             return;
         }
@@ -341,40 +340,40 @@ var AppClientImpl = (function () {
             login_name: user.login_name,
             display_name: user.display_name,
             tel: user.tel,
-            password: password
+            password: password,
         };
         this.exec(url, 'PUT', this.accessToken, params, {
-            success: function (json) {
+            success: (json) => {
                 callback.success(params);
             },
-            error: function (status, body) {
+            error: (status, body) => {
                 callback.error(status, body.msg);
             }
         });
-    };
-    AppClientImpl.prototype.deleteUser = function (id, callback) {
+    }
+    deleteUser(id, callback) {
         var url = this.url + '/api/v1/users/' + id;
         this.exec(url, 'DELETE', this.accessToken, null, {
-            success: function (json) {
+            success: (json) => {
                 callback.success();
             },
-            error: function (status, body) {
+            error: (status, body) => {
                 callback.error(status, body.msg);
             }
         });
-    };
-    AppClientImpl.prototype.getCompanies = function (callback) {
+    }
+    getCompanies(callback) {
         var url = this.url + '/api/v1/companies';
         this.exec(url, 'GET', this.accessToken, null, {
-            success: function (json) {
+            success: (json) => {
                 callback.success(json.companies);
             },
-            error: function (status, body) {
+            error: (status, body) => {
                 callback.error(status, body.msg);
             }
         });
-    };
-    AppClientImpl.prototype.saveTrading = function (item, callback) {
+    }
+    saveTrading(item, callback) {
         if (!ClientValidator.isValidSaveTrading(item, callback)) {
             return;
         }
@@ -384,8 +383,8 @@ var AppClientImpl = (function () {
         else {
             this.updateTrading(item, callback);
         }
-    };
-    AppClientImpl.prototype.saveTradingItem = function (tradingId, item, callback) {
+    }
+    saveTradingItem(tradingId, item, callback) {
         if (!ClientValidator.isValidSaveTradingItem(tradingId, item, callback)) {
             return;
         }
@@ -395,14 +394,14 @@ var AppClientImpl = (function () {
         else {
             this.updateTradingItem(tradingId, item, callback);
         }
-    };
-    AppClientImpl.prototype.deleteTrading = function (tradingId, callback) {
+    }
+    deleteTrading(tradingId, callback) {
         var url = this.url + '/api/v1/tradings/' + tradingId;
         this.exec(url, 'DELETE', this.accessToken, null, {
-            success: function (json) {
+            success: (json) => {
                 callback.success();
             },
-            error: function (status, body) {
+            error: (status, body) => {
                 if (status == 404) {
                     callback.success();
                 }
@@ -411,15 +410,15 @@ var AppClientImpl = (function () {
                 }
             }
         });
-    };
-    AppClientImpl.prototype.deleteTradingItem = function (tradingId, itemId, callback) {
+    }
+    deleteTradingItem(tradingId, itemId, callback) {
         var url = this.url + '/api/v1/tradings/' + tradingId +
             '/items/' + itemId;
         this.exec(url, 'DELETE', this.accessToken, null, {
-            success: function (json) {
+            success: (json) => {
                 callback.success(itemId);
             },
-            error: function (status, body) {
+            error: (status, body) => {
                 if (status == 404) {
                     callback.success(itemId);
                 }
@@ -428,8 +427,8 @@ var AppClientImpl = (function () {
                 }
             }
         });
-    };
-    AppClientImpl.prototype.saveCompany = function (item, callback) {
+    }
+    saveCompany(item, callback) {
         if (!ClientValidator.isValidSaveCompany(item, callback)) {
             return;
         }
@@ -439,82 +438,82 @@ var AppClientImpl = (function () {
         else {
             this.updateCompany(item, callback);
         }
-    };
-    AppClientImpl.prototype.deleteCompany = function (id, callback) {
+    }
+    deleteCompany(id, callback) {
         var url = this.url + '/api/v1/companies/' + id;
         this.exec(url, 'DELETE', this.accessToken, null, {
-            success: function (json) {
+            success: (json) => {
                 callback.success();
             },
-            error: function (status, body) {
+            error: (status, body) => {
                 callback.error(status, body.msg);
             }
         });
-    };
-    AppClientImpl.prototype.getEnvironment = function (callback) {
+    }
+    getEnvironment(callback) {
         var url = this.url + '/api/v1/environments';
         this.exec(url, 'GET', this.accessToken, null, {
-            success: function (json) {
+            success: (json) => {
                 callback.success(json);
             },
-            error: function (status, body) {
+            error: (status, body) => {
                 callback.error(status, body.msg);
             }
         });
-    };
-    AppClientImpl.prototype.saveEnvironment = function (env, callback) {
+    }
+    saveEnvironment(env, callback) {
         if (!ClientValidator.isValidSaveEnvironment(env, callback)) {
             return;
         }
         var url = this.url + '/api/v1/environments';
         this.exec(url, 'PUT', this.accessToken, env, {
-            success: function (json) {
+            success: (json) => {
                 callback.success();
             },
-            error: function (status, body) {
+            error: (status, body) => {
                 callback.error(status, body.msg);
             }
         });
-    };
-    AppClientImpl.prototype.getMyCompanyName = function (callback) {
+    }
+    getMyCompanyName(callback) {
         var url = this.url + '/api/v1/myCompany/name';
         this.exec(url, 'GET', null, null, {
-            success: function (json) {
+            success: (json) => {
                 callback.success(json['name']);
             },
-            error: function (status, body) {
+            error: (status, body) => {
                 callback.error(status, body.msg);
             }
         });
-    };
-    AppClientImpl.prototype.getNextNumber = function (type, date, callback) {
+    }
+    getNextNumber(type, date, callback) {
         var url = this.url + '/api/v1/sequences/' + type;
         var params = {
-            date: date
+            date: date,
         };
         this.exec(url, 'POST', this.accessToken, params, {
-            success: function (json) {
+            success: (json) => {
                 callback.success(json['number']);
             },
-            error: function (status, body) {
+            error: (status, body) => {
                 callback.error(status, body.msg);
             }
         });
-    };
-    AppClientImpl.prototype.createInvoice = function (items, callback) {
+    }
+    createInvoice(items, callback) {
         var params = {
             access_token: this.accessToken,
             customer: {
                 name: "サンプル会社",
-                address: "サンプル住所"
+                address: "サンプル住所",
             },
             myCompany: {
                 name: "サンプル会社",
-                address: "住所\n\n担当"
+                address: "住所\n\n担当",
             },
             item_title: 'ご請求書在中',
             date: new Date().getTime(),
-            items: items
+            items: items,
         };
         var xhr = new XMLHttpRequest();
         xhr.open('POST', this.url + '/php/invoice.php', true);
@@ -528,100 +527,98 @@ var AppClientImpl = (function () {
             }
         };
         xhr.send(JSON.stringify(params));
-    };
-    AppClientImpl.prototype.createTrading = function (item, callback) {
+    }
+    createTrading(item, callback) {
         var url = this.url + '/api/v1/tradings';
         this.exec(url, 'POST', this.accessToken, item, {
-            success: function (json) {
+            success: (json) => {
                 callback.success(json.id);
             },
-            error: function (status, body) {
+            error: (status, body) => {
                 callback.error(status, body.msg);
             }
         });
-    };
-    AppClientImpl.prototype.updateTrading = function (item, callback) {
+    }
+    updateTrading(item, callback) {
         var url = this.url + '/api/v1/tradings/' + item.id;
         this.exec(url, 'PUT', this.accessToken, item, {
-            success: function (json) {
+            success: (json) => {
                 callback.success(item.id);
             },
-            error: function (status, body) {
+            error: (status, body) => {
                 callback.error(status, body.msg);
             }
         });
-    };
-    AppClientImpl.prototype.createTradingItem = function (tradingId, item, callback) {
+    }
+    createTradingItem(tradingId, item, callback) {
         var url = this.url + '/api/v1/tradings/' + tradingId + '/items';
         this.exec(url, 'POST', this.accessToken, item, {
-            success: function (json) {
+            success: (json) => {
                 callback.success(json.id);
             },
-            error: function (status, body) {
+            error: (status, body) => {
                 callback.error(status, body.msg);
             }
         });
-    };
-    AppClientImpl.prototype.updateTradingItem = function (tradingId, item, callback) {
+    }
+    updateTradingItem(tradingId, item, callback) {
         var url = this.url + '/api/v1/tradings/' + tradingId +
             '/items/' + item.id;
         this.exec(url, 'PUT', this.accessToken, item, {
-            success: function (json) {
+            success: (json) => {
                 callback.success(item.id);
             },
-            error: function (status, body) {
+            error: (status, body) => {
                 callback.error(status, body.msg);
             }
         });
-    };
-    AppClientImpl.prototype.createCompany = function (item, callback) {
+    }
+    createCompany(item, callback) {
         var url = this.url + '/api/v1/companies';
         this.exec(url, 'POST', this.accessToken, item, {
-            success: function (json) {
+            success: (json) => {
                 callback.success(json.id);
             },
-            error: function (status, body) {
+            error: (status, body) => {
                 callback.error(status, body.msg);
             }
         });
-    };
-    AppClientImpl.prototype.updateCompany = function (item, callback) {
+    }
+    updateCompany(item, callback) {
         var url = this.url + '/api/v1/companies/' + item.id;
         this.exec(url, 'PUT', this.accessToken, item, {
-            success: function (json) {
+            success: (json) => {
                 callback.success(json.id);
             },
-            error: function (status, body) {
+            error: (status, body) => {
                 callback.error(status, body.msg);
             }
         });
-    };
-    AppClientImpl.prototype.tokenRefresh = function (url, method, params, callback) {
-        var _this = this;
+    }
+    tokenRefresh(url, method, params, callback) {
         var refreshURL = this.url + '/api/v1/token/refresh';
         var refreshParams = {
             token: this.refreshToken
         };
         this.exec(refreshURL, 'POST', null, refreshParams, {
-            success: function (json) {
-                _this.accessToken = json.access_token;
-                _this.is_admin = json.is_admin;
-                _this.isRetry = true;
-                _this.exec(url, method, _this.accessToken, params, callback);
+            success: (json) => {
+                this.accessToken = json.access_token;
+                this.is_admin = json.is_admin;
+                this.isRetry = true;
+                this.exec(url, method, this.accessToken, params, callback);
             },
-            error: function (status, body) {
+            error: (status, body) => {
                 callback.error(status, body.msg);
             }
         });
-    };
-    AppClientImpl.prototype.exec = function (url, method, token, params, callback) {
-        var _this = this;
+    }
+    exec(url, method, token, params, callback) {
         var data = {
             url: url,
             type: method,
             dataType: 'json',
             scriptCharset: 'utf-8',
-            processData: false
+            processData: false,
         };
         if (token != null) {
             data.headers = {
@@ -631,330 +628,297 @@ var AppClientImpl = (function () {
         if (params != null) {
             data.data = JSON.stringify(params);
         }
-        $.ajax(data).done(function (data_, status, data) {
-            _this.isRetry = false;
+        $.ajax(data).done((data_, status, data) => {
+            this.isRetry = false;
             if (data.status == 204) {
                 callback.success({});
             }
             else {
                 callback.success(JSON.parse(data.responseText));
             }
-        }).fail(function (data) {
+        }).fail((data) => {
             if (data.status == 204) {
-                _this.isRetry = false;
+                this.isRetry = false;
                 callback.success({});
             }
             else if (data.status == 401) {
-                if (_this.isRetry) {
-                    _this.isRetry = false;
+                if (this.isRetry) {
+                    this.isRetry = false;
                     callback.error(data.status, JSON.parse(data.responseText));
                 }
                 else {
-                    _this.isRetry = true;
-                    _this.tokenRefresh(url, method, params, callback);
+                    this.isRetry = true;
+                    this.tokenRefresh(url, method, params, callback);
                 }
             }
             else {
-                _this.isRetry = false;
+                this.isRetry = false;
                 callback.error(data.status, JSON.parse(data.responseText));
             }
         });
-    };
-    return AppClientImpl;
-}());
+    }
+}
 function createClient() {
     return new AppClientImpl(baseURL);
 }
-var User = (function () {
-    function User() {
-    }
-    return User;
-}());
-var Company = (function () {
-    function Company() {
-    }
-    return Company;
-}());
-var Trading = (function () {
-    function Trading() {
-    }
-    return Trading;
-}());
-var TradingItem = (function () {
-    function TradingItem() {
-    }
-    return TradingItem;
-}());
-var Environment = (function () {
-    function Environment() {
-    }
-    return Environment;
-}());
+class User {
+}
+class Company {
+}
+class Trading {
+}
+class TradingItem {
+}
+class Environment {
+}
 ///<reference path="./Dialog.ts"/>
 ///<reference path="./Client.ts"/>
 ///<reference path="./Functions.ts"/>
-var App = (function () {
-    function App() {
-    }
+class App {
     // getter
-    App.prototype.getTradings = function () {
+    getTradings() {
         return Utils.toList(this.tradingsMap);
-    };
-    App.prototype.showDialog = function (dialog) {
+    }
+    showDialog(dialog) {
         document.querySelector('#dialogs').style.display = 'block';
-        app.dialogs.push('dialogs', dialog).then(function () {
+        app.dialogs.push('dialogs', dialog).then(() => {
             var list = app.dialogs.get('dialogs');
             app.updateDialogs(list);
         });
         $('#container').addClass('dialogOpened');
-    };
-    App.prototype.updateDialogs = function (list) {
+    }
+    updateDialogs(list) {
         for (var i = 0; i < list.length; ++i) {
             var s = document.querySelector('#dialog' + i);
             list[i].attach(this, s);
         }
-    };
-    App.prototype.closeDialog = function () {
-        var _this = this;
-        this.dialogs.pop('dialogs').then(function () {
+    }
+    closeDialog() {
+        this.dialogs.pop('dialogs').then(() => {
             // hide overlay
-            var list = _this.dialogs.get('dialogs');
+            var list = this.dialogs.get('dialogs');
             if (list.length == 0) {
                 document.querySelector('#dialogs').style.display = 'none';
                 $('#container').removeClass('dialogOpened');
             }
             else {
-                _this.updateDialogs(list);
+                this.updateDialogs(list);
             }
         });
-    };
+    }
     // snack bar
-    App.prototype.addSnack = function (item) {
-        var _this = this;
+    addSnack(item) {
         this.snackbars.push('snackbars', item);
-        var closeFunc = function () {
-            var list = _this.snackbars.get('snackbars');
+        var closeFunc = () => {
+            var list = this.snackbars.get('snackbars');
             if (list.length == 0) {
                 return;
             }
-            _this.snackbars.splice('snackbars', 0, 1);
-            if (_this.snackbars.get('snackbars').length > 0) {
+            this.snackbars.splice('snackbars', 0, 1);
+            if (this.snackbars.get('snackbars').length > 0) {
                 setTimeout(closeFunc, 3000);
             }
         };
         setTimeout(closeFunc, 3000);
-    };
-    App.prototype.start = function () {
+    }
+    start() {
         this.client = createClient();
         var refreshToken = localStorage.getItem('refreshToken');
         this.client.setRefreshToken(refreshToken);
         this.initDialog();
         this.initSnackbar();
         this.loadMyCompanyName();
-    };
-    App.prototype.initDialog = function () {
-        var _this = this;
+    }
+    initDialog() {
         // dialogの準備
         this.dialogs = new Ractive({
             el: '#dialogs',
             template: '#dialogsTemplate',
             data: {
-                dialogs: []
+                dialogs: [],
             }
         });
         this.dialogs.on({
-            'closeClick': function () {
-                _this.closeDialog();
+            'closeClick': () => {
+                this.closeDialog();
             }
         });
-    };
-    App.prototype.initSnackbar = function () {
-        var _this = this;
+    }
+    initSnackbar() {
         // snackbarsの準備
         this.snackbars = new Ractive({
             el: '#snacks',
             template: '#snackbarsTemplate',
             data: {
-                snackbars: []
+                snackbars: [],
             }
         });
         this.snackbars.on({
-            'close': function (e, index) {
-                _this.snackbars.splice('snackbars', index, 1);
+            'close': (e, index) => {
+                this.snackbars.splice('snackbars', index, 1);
             }
         });
-    };
-    App.prototype.loadMyCompanyName = function () {
-        var _this = this;
+    }
+    loadMyCompanyName() {
         if (this.myCompanyName != null && this.myCompanyName.length > 0) {
             return;
         }
         this.client.getMyCompanyName({
-            success: function (name) {
-                _this.myCompanyName = name;
+            success: (name) => {
+                this.myCompanyName = name;
             },
-            error: function (status, msg) {
+            error: (status, msg) => {
                 console.log('Failed to get my company name status=' + status);
             }
         });
-    };
-    App.prototype.loadData = function (callback) {
+    }
+    loadData(callback) {
         this.loadEnvironment(callback);
-    };
-    App.prototype.loadEnvironment = function (callback) {
-        var _this = this;
+    }
+    loadEnvironment(callback) {
         if (this.environment != null) {
             this.loadUsers(callback);
             return;
         }
         this.client.getEnvironment({
-            success: function (item) {
-                _this.environment = item;
-                _this.loadUsers(callback);
+            success: (item) => {
+                this.environment = item;
+                this.loadUsers(callback);
             },
-            error: function (status, msg) {
+            error: (status, msg) => {
                 console.log('Failed to get environment status=' + status);
                 callback.error();
             }
         });
-    };
-    App.prototype.loadUsers = function (callback) {
-        var _this = this;
+    }
+    loadUsers(callback) {
         if (this.users != null) {
             this.loadTradings(callback);
             return;
         }
         this.client.getUsers({
-            success: function (list) {
-                _this.users = list;
-                _this.loadTradings(callback);
+            success: (list) => {
+                this.users = list;
+                this.loadTradings(callback);
             },
-            error: function (status, msg) {
+            error: (status, msg) => {
                 console.log('Failed to get users status=' + status);
                 callback.error();
             }
         });
-    };
-    App.prototype.loadTradings = function (callback) {
-        var _this = this;
+    }
+    loadTradings(callback) {
         if (this.tradingsMap != null) {
             this.loadCompanies(callback);
             return;
         }
         this.client.getTradings({
-            success: function (list) {
-                _this.tradingsMap = {};
-                _.each(list, function (item) {
-                    _this.tradingsMap[item.id] = item;
+            success: (list) => {
+                this.tradingsMap = {};
+                _.each(list, (item) => {
+                    this.tradingsMap[item.id] = item;
                 });
-                _this.loadCompanies(callback);
+                this.loadCompanies(callback);
             },
-            error: function (status, msg) {
+            error: (status, msg) => {
                 console.log('Failed to get tradings status=' + status);
                 callback.error();
             }
         });
-    };
-    App.prototype.loadCompanies = function (callback) {
-        var _this = this;
+    }
+    loadCompanies(callback) {
         if (this.companies != null) {
             callback.done();
             return;
         }
         this.client.getCompanies({
-            success: function (list) {
-                _this.companies = list;
-                _this.companyMap = {};
-                _.each(_this.companies, function (item) {
-                    _this.companyMap[item.id] = item;
+            success: (list) => {
+                this.companies = list;
+                this.companyMap = {};
+                _.each(this.companies, (item) => {
+                    this.companyMap[item.id] = item;
                 });
                 callback.done();
             },
-            error: function (status, msg) {
+            error: (status, msg) => {
                 console.log('Failed to get companies status=' + status);
                 callback.error();
             }
         });
-    };
-    App.prototype.addUser = function (u) {
+    }
+    addUser(u) {
         this.users.push(u);
-    };
-    App.prototype.deleteUser = function (u) {
+    }
+    deleteUser(u) {
         var list = [];
-        _.each(this.users, function (item) {
+        _.each(this.users, (item) => {
             if (item.id == u.id) {
                 return;
             }
             list.push(item);
         });
         this.users = list;
-    };
-    App.prototype.addCompany = function (c) {
+    }
+    addCompany(c) {
         this.companies.push(c);
         this.companyMap[c.id] = c;
-    };
-    return App;
-}());
+    }
+}
 ///<reference path="./Application.ts"/>
 ///<reference path="./Dialog.ts"/>
-var UserListDialog = (function () {
-    function UserListDialog() {
-    }
-    UserListDialog.prototype.attach = function (app, el) {
-        var _this = this;
+class UserListDialog {
+    attach(app, el) {
         this.ractive = new Ractive({
             // どの箱に入れるかをIDで指定
             el: el,
             // 指定した箱に、どのHTMLを入れるかをIDで指定
             template: '#userListTemplate',
             data: {
-                userList: app.users
+                userList: app.users,
             }
         });
         this.ractive.on({
-            'windowClicked': function () {
+            'windowClicked': () => {
                 return false;
             },
-            'close': function () {
+            'close': () => {
                 app.closeDialog();
                 return false;
             },
-            'showEdit': function (e, item) {
-                _this.showEditDialog(app, item);
+            'showEdit': (e, item) => {
+                this.showEditDialog(app, item);
                 return false;
             },
-            'delete': function (e, item) {
-                _this.deleteUser(app, item);
+            'delete': (e, item) => {
+                this.deleteUser(app, item);
                 return false;
             },
-            'create': function () {
-                _this.createUser(app);
+            'create': () => {
+                this.createUser(app);
                 return false;
             }
         });
         //dialog内だけスクロールするように調整
         var listUserHeight = $('.listTemplate').height();
         $('.listTemplate .list').css('height', listUserHeight - 330);
-    };
-    UserListDialog.prototype.showEditDialog = function (app, item) {
-        var _this = this;
-        app.showDialog(new AddUserDialog(item, function (result) {
-            _this.ractive.update();
+    }
+    showEditDialog(app, item) {
+        app.showDialog(new AddUserDialog(item, (result) => {
+            this.ractive.update();
         }));
-    };
-    UserListDialog.prototype.createUser = function (app) {
-        var _this = this;
+    }
+    createUser(app) {
         var loginName = this.ractive.get('loginName');
         var displayName = this.ractive.get('displayName');
         var tel = this.ractive.get('tel');
         var password = this.ractive.get('password');
         app.client.createUser(loginName, displayName, tel, password, {
-            success: function (user) {
+            success: (user) => {
                 app.addUser(user);
-                _this.clear();
+                this.clear();
                 app.addSnack('ユーザーを作成しました！');
             },
-            error: function (status, msg) {
+            error: (status, msg) => {
                 switch (status) {
                     case 1000:
                         app.addSnack('ユーザー名を入力してください');
@@ -973,40 +937,38 @@ var UserListDialog = (function () {
                         app.addSnack('ユーザー作成に失敗しました');
                         break;
                 }
-            }
+            },
         });
-    };
-    UserListDialog.prototype.deleteUser = function (app, user) {
-        var _this = this;
+    }
+    deleteUser(app, user) {
         if (!window.confirm('この担当者を削除しますか？')) {
             return;
         }
         app.client.deleteUser(user.id, {
-            success: function () {
+            success: () => {
                 app.deleteUser(user);
-                _this.ractive.set('userList', app.users);
+                this.ractive.set('userList', app.users);
                 app.addSnack('担当者を削除しました');
             },
-            error: function (status, msg) {
+            error: (status, msg) => {
                 switch (status) {
                     default: app.addSnack('削除に失敗しました');
                 }
             }
         });
-    };
-    UserListDialog.prototype.clear = function () {
+    }
+    clear() {
         this.ractive.set('loginName', '');
         this.ractive.set('displayName', '');
         this.ractive.set('tel', '');
         this.ractive.set('password', '');
-    };
-    return UserListDialog;
-}());
+    }
+}
 ///<reference path="./Application.ts"/>
 ///<reference path="./Dialog.ts"/>
 ///<reference path="./Functions.ts"/>
-var AddCompanyDialog = (function () {
-    function AddCompanyDialog(company, callback) {
+class AddCompanyDialog {
+    constructor(company, callback) {
         if (company == null) {
             this.isNew = true;
             this.company = new Company();
@@ -1020,8 +982,7 @@ var AddCompanyDialog = (function () {
         }
         this.callback = callback;
     }
-    AddCompanyDialog.prototype.attach = function (app, el) {
-        var _this = this;
+    attach(app, el) {
         this.ractive = new Ractive({
             // どの箱に入れるかをIDで指定
             el: el,
@@ -1029,48 +990,47 @@ var AddCompanyDialog = (function () {
             template: '#addCompanyTemplate',
             data: {
                 isNew: this.isNew,
-                company: this.company
+                company: this.company,
             }
         });
         this.ractive.on({
-            'windowClicked': function () {
+            'windowClicked': () => {
                 return false;
             },
-            'close': function () {
+            'close': () => {
                 app.closeDialog();
                 return false;
             },
-            'save': function () {
-                _this.save(app);
+            'save': () => {
+                this.save(app);
                 return false;
             }
         });
-    };
-    AddCompanyDialog.prototype.save = function (app) {
-        var _this = this;
+    }
+    save(app) {
         var company = this.ractive.get('company');
         console.log(company);
         app.client.saveCompany(company, {
-            success: function (id) {
+            success: (id) => {
                 // clone?
                 company.id = id;
-                if (_this.companyOrg == null) {
+                if (this.companyOrg == null) {
                     app.addCompany(company);
                 }
                 else {
-                    _this.companyOrg.name = company.name;
-                    _this.companyOrg.unit = company.unit;
-                    _this.companyOrg.assignee = company.assignee;
-                    _this.companyOrg.zip = company.zip;
-                    _this.companyOrg.address = company.address;
-                    _this.companyOrg.phone = company.phone;
-                    _this.companyOrg.fax = company.fax;
+                    this.companyOrg.name = company.name;
+                    this.companyOrg.unit = company.unit;
+                    this.companyOrg.assignee = company.assignee;
+                    this.companyOrg.zip = company.zip;
+                    this.companyOrg.address = company.address;
+                    this.companyOrg.phone = company.phone;
+                    this.companyOrg.fax = company.fax;
                 }
-                _this.callback(company);
+                this.callback(company);
                 app.addSnack('保存しました。');
                 app.closeDialog();
             },
-            error: function (status, msg) {
+            error: (status, msg) => {
                 switch (status) {
                     case 1001:
                         app.addSnack('会社名を入力してください');
@@ -1081,58 +1041,53 @@ var AddCompanyDialog = (function () {
                 }
             }
         });
-    };
-    return AddCompanyDialog;
-}());
+    }
+}
 ///<reference path="./Application.ts"/>
 ///<reference path="./Dialog.ts"/>
 ///<reference path="./AddCompanyDialog.ts"/>
-var CompanyListDialog = (function () {
-    function CompanyListDialog() {
-    }
-    CompanyListDialog.prototype.attach = function (app, el) {
-        var _this = this;
+class CompanyListDialog {
+    attach(app, el) {
         this.ractive = new Ractive({
             // どの箱に入れるかをIDで指定
             el: el,
             // 指定した箱に、どのHTMLを入れるかをIDで指定
             template: '#companyListTemplate',
             data: {
-                companyList: app.companies
+                companyList: app.companies,
             }
         });
         this.ractive.on({
-            'windowClicked': function () {
+            'windowClicked': () => {
                 return false;
             },
-            'close': function () {
+            'close': () => {
                 app.closeDialog();
                 return false;
             },
-            'showEdit': function (e, item) {
+            'showEdit': (e, item) => {
                 console.log('clickEvent');
-                _this.showEditDialog(app, item);
+                this.showEditDialog(app, item);
                 return false;
             },
-            'deleteCompany': function (e, index) {
-                _this.deleteCompany(app, index);
+            'deleteCompany': (e, index) => {
+                this.deleteCompany(app, index);
                 return false;
             },
-            'submit': function () {
-                _this.save(app);
+            'submit': () => {
+                this.save(app);
             }
         });
         //dialog内だけスクロールするように調整
         var listUserHeight = $('.listTemplate').height();
         $('.listTemplate .list').css('height', listUserHeight - 370);
-    };
-    CompanyListDialog.prototype.showEditDialog = function (app, item) {
-        app.showDialog(new AddCompanyDialog(item, function (result) {
+    }
+    showEditDialog(app, item) {
+        app.showDialog(new AddCompanyDialog(item, (result) => {
             // nop
         }));
-    };
-    CompanyListDialog.prototype.save = function (app) {
-        var _this = this;
+    }
+    save(app) {
         var name = this.ractive.get('name');
         var unit = this.ractive.get('unit');
         var assignee = this.ractive.get('assignee');
@@ -1150,14 +1105,14 @@ var CompanyListDialog = (function () {
         company.unit = unit;
         company.assignee = assignee;
         app.client.saveCompany(company, {
-            success: function (id) {
+            success: (id) => {
                 company.id = id;
                 app.companyMap[id] = company;
-                _this.ractive.unshift('companyList', company);
+                this.ractive.unshift('companyList', company);
                 app.addSnack('保存しました。');
-                _this.clearForm(app);
+                this.clearForm(app);
             },
-            error: function (status, msg) {
+            error: (status, msg) => {
                 switch (status) {
                     case 1001:
                         app.addSnack('会社名を入力してください。');
@@ -1168,8 +1123,8 @@ var CompanyListDialog = (function () {
             }
         });
         console.log(company);
-    };
-    CompanyListDialog.prototype.clearForm = function (app) {
+    }
+    clearForm(app) {
         this.ractive.set('name', '');
         this.ractive.set('unit', '');
         this.ractive.set('assignee', '');
@@ -1177,32 +1132,27 @@ var CompanyListDialog = (function () {
         this.ractive.set('address', '');
         this.ractive.set('tel', '');
         this.ractive.set('fax', '');
-    };
-    CompanyListDialog.prototype.deleteCompany = function (app, index) {
-        var _this = this;
+    }
+    deleteCompany(app, index) {
         if (!window.confirm('この会社情報を削除しますか？')) {
             return;
         }
         var company = this.ractive.get('companyList')[index];
         app.client.deleteCompany(company.id, {
-            success: function () {
-                _this.ractive.splice('companyList', index, 1);
+            success: () => {
+                this.ractive.splice('companyList', index, 1);
                 app.addSnack('削除しました！');
             },
-            error: function (status, msg) {
+            error: (status, msg) => {
                 console.log('Failed to delete company status=' + status);
             }
         });
-    };
-    return CompanyListDialog;
-}());
+    }
+}
 ///<reference path="./Application.ts"/>
 ///<reference path="./Dialog.ts"/>
-var SettingsDialog = (function () {
-    function SettingsDialog() {
-    }
-    SettingsDialog.prototype.attach = function (app, el) {
-        var _this = this;
+class SettingsDialog {
+    attach(app, el) {
         this.ractive = new Ractive({
             // どの箱に入れるかをIDで指定
             el: el,
@@ -1222,24 +1172,24 @@ var SettingsDialog = (function () {
                 company_bankname: app.environment.company_bankname,
                 company_bank_type: app.environment.company_bank_type,
                 company_bank_num: app.environment.company_bank_num,
-                company_bank_name: app.environment.company_bank_name
+                company_bank_name: app.environment.company_bank_name,
             }
         });
         this.ractive.on({
-            'windowClicked': function () {
+            'windowClicked': () => {
                 return false;
             },
-            'close': function () {
+            'close': () => {
                 app.closeDialog();
                 return false;
             },
-            'save': function () {
-                _this.save(app);
+            'save': () => {
+                this.save(app);
                 return false;
             }
         });
-    };
-    SettingsDialog.prototype.save = function (app) {
+    }
+    save(app) {
         var env = new Environment();
         env.tax_rate = this.ractive.get('tax_rate');
         env.quotation_limit = this.ractive.get('quotation_limit');
@@ -1255,34 +1205,48 @@ var SettingsDialog = (function () {
         env.company_bank_num = this.ractive.get('company_bank_num');
         env.company_bank_name = this.ractive.get('company_bank_name');
         app.client.saveEnvironment(env, {
-            success: function () {
+            success: () => {
                 app.environment = env;
                 app.addSnack('設定を保存しました！');
                 app.closeDialog();
             },
-            error: function (status, msg) {
+            error: (status, msg) => {
                 console.log('Failed to save environment statu=' + status);
             }
         });
-    };
-    return SettingsDialog;
-}());
+    }
+}
 ///<reference path="./app.ts"/>
 ///<reference path="./Page.ts"/>
 ///<reference path="./UserListDialog.ts"/>
 ///<reference path="./CompanyListDialog.ts"/>
 ///<reference path="./SettingsDialog.ts"/>
-var SignInPage = (function () {
-    function SignInPage() {
-    }
-    SignInPage.prototype.onCreate = function (app) {
-        var _this = this;
+class SignInPage {
+    onCreate(app) {
         if (navigator.credentials !== undefined) {
             navigator.credentials.get({
-                password: true
-            }).then(function (c) {
-                _this.signIn(app, c.id, c.password);
-            }).catch(function (e) {
+                password: true,
+            }).then((c) => {
+                fetch('/api/v1/token', {
+                    method: 'POST',
+                    credentials: c,
+                }).then((resp) => {
+                    if (resp.ok) {
+                        return resp.json();
+                    }
+                    else {
+                        return Promise.reject('');
+                    }
+                }).then((json) => {
+                    app.client.accessToken = json.access_token;
+                    app.client.refreshToken = json.refresh_token;
+                    app.client.is_admin = json.is_admin;
+                    localStorage.setItem('refreshToken', json.refresh_token);
+                    app.router.navigate('top', { trigger: true });
+                }).catch((e) => {
+                });
+                //this.signIn(app, c.id, c.password);
+            }).catch((e) => {
             });
         }
         // Racriveオブジェクトを作る
@@ -1294,22 +1258,22 @@ var SignInPage = (function () {
             // データを設定。テンプレートで使います。
             data: {
                 myCompanyName: app.myCompanyName,
-                inProgress: false
+                inProgress: false,
             }
         });
         app.ractive.on({
-            'signIn': function (e, item) {
+            'signIn': (e, item) => {
                 var username = r.get('username');
                 var password = r.get('password');
-                _this.signIn(app, username, password);
-            }
+                this.signIn(app, username, password);
+            },
         });
-    };
-    SignInPage.prototype.signIn = function (app, username, password) {
+    }
+    signIn(app, username, password) {
         app.ractive.set('inProgress', true);
         app.ractive.update();
         app.client.login(username, password, {
-            success: function (token) {
+            success: (token) => {
                 localStorage.setItem('refreshToken', token);
                 if (navigator.credentials === undefined) {
                     app.router.navigate('top', { trigger: true });
@@ -1317,12 +1281,12 @@ var SignInPage = (function () {
                 }
                 navigator.credentials.store(new PasswordCredential({
                     id: username,
-                    password: password
-                })).then(function (c) {
+                    password: password,
+                })).then((c) => {
                     app.router.navigate('top', { trigger: true });
                 });
             },
-            error: function (status, msg) {
+            error: (status, msg) => {
                 app.ractive.set('inProgress', false);
                 app.ractive.update();
                 switch (status) {
@@ -1336,43 +1300,40 @@ var SignInPage = (function () {
                 console.log('failed to login status=' + status);
             }
         });
-    };
-    return SignInPage;
-}());
+    }
+}
 ///<reference path="./app.ts"/>
 ///<reference path="./Page.ts"/>
 ///<reference path="./UserListDialog.ts"/>
 ///<reference path="./CompanyListDialog.ts"/>
 ///<reference path="./SettingsDialog.ts"/>
 ///<reference path="./Functions.ts"/>
-var TopPage = (function () {
-    function TopPage() {
+class TopPage {
+    constructor() {
         // sort
-        this.modifiedSorter = function (l, r) {
+        this.modifiedSorter = (l, r) => {
             return r.modified_time - l.modified_time;
         };
     }
-    TopPage.prototype.onCreate = function (app) {
-        var _this = this;
+    onCreate(app) {
         this.app = app;
         app.loadData({
-            done: function () {
-                _this.show(app);
+            done: () => {
+                this.show(app);
             },
-            error: function () {
+            error: () => {
                 // nop
             }
         });
-    };
-    TopPage.prototype.show = function (app) {
-        var _this = this;
+    }
+    show(app) {
         var sheets = app.getTradings();
         sheets.sort(this.modifiedSorter);
         var total = 0;
-        _.each(sheets, function (item) {
+        _.each(sheets, (item) => {
             total += item.total;
         });
-        var fabDecorate = function (node) {
+        var fabDecorate = (node) => {
             $(node).hover(function () {
                 $(this).find(".menu").toggleClass("current");
                 $(this).find(".submenu").toggleClass("current");
@@ -1383,7 +1344,7 @@ var TopPage = (function () {
                 $(this).next("span").fadeOut();
             });
             return {
-                teardown: function () { }
+                teardown: () => { }
             };
         };
         // Racriveオブジェクトを作る
@@ -1393,7 +1354,7 @@ var TopPage = (function () {
             // 指定した箱に、どのHTMLを入れるかをIDで指定
             template: '#topTemplate',
             decorators: {
-                fab: fabDecorate
+                fab: fabDecorate,
             },
             // データを設定。テンプレートで使います。
             data: {
@@ -1405,7 +1366,7 @@ var TopPage = (function () {
                 total: total,
                 sortIndex: 1,
                 sortDesc: true,
-                showSortMark: function (index, sortIndex, desc) {
+                showSortMark: (index, sortIndex, desc) => {
                     if (index != sortIndex) {
                         return '';
                     }
@@ -1415,46 +1376,46 @@ var TopPage = (function () {
                     else {
                         return '△';
                     }
-                }
+                },
             }
         });
         tooltipster();
         app.ractive.on({
-            'addSheet': function (e, item) {
+            'addSheet': (e, item) => {
                 // #sheetに遷移する
                 app.router.navigate('sheets/new', { trigger: true });
             },
-            'showSheet': function (e, item) {
+            'showSheet': (e, item) => {
                 // #sheetに遷移する
                 app.router.navigate('sheets/' + item.id, { trigger: true });
             },
-            'deleteSheet': function (e, index) {
-                _this.deleteSheet(app, index);
+            'deleteSheet': (e, index) => {
+                this.deleteSheet(app, index);
                 return false;
             },
-            'copySheet': function (e, item) {
+            'copySheet': (e, item) => {
                 // #sheetに遷移する
                 app.router.navigate('sheets/' + item.id + '/copy', { trigger: true });
                 return false;
             },
-            'printQuotation': function (e, item) {
+            'printQuotation': (e, item) => {
                 window.location.href = "/php/quotation.php?access_token=" + app.accessToken + "&trading_id=" + item.id;
                 return false;
             },
-            'printBill': function (e, item) {
+            'printBill': (e, item) => {
                 window.location.href = "/php/bill.php?access_token=" + app.accessToken + "&trading_id=" + item.id;
                 return false;
             },
-            'showUserList': function () {
+            'showUserList': () => {
                 app.showDialog(new UserListDialog());
             },
-            'showCompanyList': function () {
+            'showCompanyList': () => {
                 app.showDialog(new CompanyListDialog());
             },
-            'showSetting': function (e) {
+            'showSetting': (e) => {
                 app.showDialog(new SettingsDialog());
             },
-            sortBy: function (e, index) {
+            sortBy: (e, index) => {
                 var list = app.ractive.get('sheets');
                 var currentIndex = app.ractive.get('sortIndex');
                 var desc = app.ractive.get('sortDesc');
@@ -1470,70 +1431,69 @@ var TopPage = (function () {
                 var sortFunc;
                 switch (index) {
                     case 1:
-                        sortFunc = _this.numberSorter('modified_time');
+                        sortFunc = this.numberSorter('modified_time');
                         break;
                     case 2:
-                        sortFunc = _this.companySorter();
+                        sortFunc = this.companySorter();
                         break;
                     case 3:
-                        sortFunc = _this.numberSorter('total');
+                        sortFunc = this.numberSorter('total');
                         break;
                     case 4:
-                        sortFunc = _this.stringSorter('quotation_number');
+                        sortFunc = this.stringSorter('quotation_number');
                         break;
                     case 5:
-                        sortFunc = _this.stringSorter('bill_number');
+                        sortFunc = this.stringSorter('bill_number');
                         break;
                 }
                 if (desc) {
-                    list.sort(function (l, r) {
+                    list.sort((l, r) => {
                         return -1 * sortFunc(l, r);
                     });
                 }
                 else {
                     list.sort(sortFunc);
                 }
-            }
+            },
         });
-    };
-    TopPage.prototype.deleteSheet = function (app, index) {
+    }
+    deleteSheet(app, index) {
         if (!window.confirm('このシートを削除しますか？')) {
             return;
         }
         var item = app.ractive.get('sheets')[index];
         app.client.deleteTrading(item.id, {
-            success: function () {
+            success: () => {
                 app.ractive.splice('sheets', index, 1);
                 app.addSnack('削除しました！');
             },
-            error: function (status, msg) {
+            error: (status, msg) => {
                 console.log('Failed to delete item status=' + status);
             }
         });
-    };
-    TopPage.prototype.numberSorter = function (key) {
-        return function (l, r) {
+    }
+    numberSorter(key) {
+        return (l, r) => {
             return l[key] - r[key];
         };
-    };
-    TopPage.prototype.stringSorter = function (key) {
-        return function (l, r) {
+    }
+    stringSorter(key) {
+        return (l, r) => {
             return l[key].localeCompare(r[key]);
         };
-    };
-    TopPage.prototype.companySorter = function () {
+    }
+    companySorter() {
         var company = this.app.companyMap;
-        return function (l, r) {
+        return (l, r) => {
             return company[l.company_id].name.localeCompare(company[r.company_id].name);
         };
-    };
-    return TopPage;
-}());
+    }
+}
 ///<reference path="./Application.ts"/>
 ///<reference path="./Dialog.ts"/>
 ///<reference path="./Functions.ts"/>
-var AddUserDialog = (function () {
-    function AddUserDialog(user, callback) {
+class AddUserDialog {
+    constructor(user, callback) {
         if (user == null) {
             this.isNew = true;
             this.user = new User();
@@ -1546,8 +1506,7 @@ var AddUserDialog = (function () {
         }
         this.callback = callback;
     }
-    AddUserDialog.prototype.attach = function (app, el) {
-        var _this = this;
+    attach(app, el) {
         this.ractive = new Ractive({
             // どの箱に入れるかをIDで指定
             el: el,
@@ -1555,36 +1514,35 @@ var AddUserDialog = (function () {
             template: '#addUserTemplate',
             data: {
                 isNew: this.isNew,
-                user: this.user
+                user: this.user,
             }
         });
         this.ractive.on({
-            'windowClicked': function () {
+            'windowClicked': () => {
                 return false;
             },
-            'close': function () {
+            'close': () => {
                 app.closeDialog();
                 return false;
             },
-            'save': function () {
-                _this.save(app);
+            'save': () => {
+                this.save(app);
                 return false;
             }
         });
-    };
-    AddUserDialog.prototype.save = function (app) {
-        var _this = this;
+    }
+    save(app) {
         var user = this.ractive.get('user');
         var password = this.ractive.get('password');
         if (this.isNew) {
             app.client.createUser(user.login_name, user.display_name, user.tel, password, {
-                success: function (item) {
+                success: (item) => {
                     app.addUser(item);
-                    _this.callback(item);
+                    this.callback(item);
                     app.addSnack('作成しました');
                     app.closeDialog();
                 },
-                error: function (status, msg) {
+                error: (status, msg) => {
                     switch (status) {
                         case 1000:
                             app.addSnack('ユーザーIDを入力してください');
@@ -1606,15 +1564,15 @@ var AddUserDialog = (function () {
         }
         else {
             app.client.saveUser(user, password, {
-                success: function (item) {
-                    _this.userOrg.login_name = user.login_name;
-                    _this.userOrg.display_name = user.display_name;
-                    _this.userOrg.tel = user.tel;
-                    _this.callback(item);
+                success: (item) => {
+                    this.userOrg.login_name = user.login_name;
+                    this.userOrg.display_name = user.display_name;
+                    this.userOrg.tel = user.tel;
+                    this.callback(item);
                     app.addSnack('保存しました');
                     app.closeDialog();
                 },
-                error: function (status, msg) {
+                error: (status, msg) => {
                     switch (status) {
                         case 1001:
                             app.addSnack('ユーザーIDを入力してください');
@@ -1633,54 +1591,51 @@ var AddUserDialog = (function () {
                 }
             });
         }
-    };
-    return AddUserDialog;
-}());
+    }
+}
 ///<reference path="./Application.ts"/>
 ///<reference path="./Dialog.ts"/>
 ///<reference path="./Functions.ts"/>
-var CreateInvoiceDialog = (function () {
-    function CreateInvoiceDialog() {
+class CreateInvoiceDialog {
+    constructor() {
     }
-    CreateInvoiceDialog.prototype.attach = function (app, el) {
-        var _this = this;
+    attach(app, el) {
         this.ractive = new Ractive({
             // どの箱に入れるかをIDで指定
             el: el,
             // 指定した箱に、どのHTMLを入れるかをIDで指定
             template: '#createInvoiceTemplate',
             data: {
-                items: [{ "name": "", "num": "" }]
+                items: [{ "name": "", "num": "" }],
             }
         });
         this.ractive.on({
-            'windowClicked': function () {
+            'windowClicked': () => {
                 return false;
             },
-            'close': function () {
+            'close': () => {
                 app.closeDialog();
                 return false;
             },
-            'addItem': function () {
-                _this.ractive.push('items', { "name": "", "num": "" });
+            'addItem': () => {
+                this.ractive.push('items', { "name": "", "num": "" });
                 return false;
             },
-            'save': function () {
-                _this.save(app);
+            'save': () => {
+                this.save(app);
                 return false;
             }
         });
         var listUserHeight = $('.listTemplate').height();
         $('.listTemplate .list').css('height', listUserHeight - 370);
-    };
-    CreateInvoiceDialog.prototype.save = function (app) {
-        var _this = this;
+    }
+    save(app) {
         var items = this.ractive.get('items');
         app.client.createInvoice(items, {
-            success: function (body) {
-                _this.downloadBody(body);
+            success: (body) => {
+                this.downloadBody(body);
             },
-            error: function (status, msg) {
+            error: (status, msg) => {
                 switch (status) {
                     default:
                         app.addSnack('PDF作成に失敗しました');
@@ -1688,27 +1643,26 @@ var CreateInvoiceDialog = (function () {
                 }
             }
         });
-    };
-    CreateInvoiceDialog.prototype.downloadBody = function (body) {
+    }
+    downloadBody(body) {
         var blob = new Blob([body], { "type": "application/x-download" });
         var url = window.URL || window.webkitURL;
         window.URL = window.URL || window.webkitURL;
         window.location.href = url.createObjectURL(blob);
-    };
-    return CreateInvoiceDialog;
-}());
+    }
+}
 ///<reference path="./Application.ts"/>
 ///<reference path="./Page.ts"/>
 ///<reference path="./Functions.ts"/>
 ///<reference path="./AddCompanyDialog.ts"/>
 ///<reference path="./AddUserDialog.ts"/>
 ///<reference path="./CreateInvoiceDialog.ts"/>
-var SheetPage = (function () {
-    function SheetPage(id, copyMode) {
+class SheetPage {
+    constructor(id, copyMode) {
         this.id = id;
         this.copyMode = copyMode;
     }
-    SheetPage.prototype.onCreate = function (app) {
+    onCreate(app) {
         var item;
         if (app.environment == null) {
             window.history.back();
@@ -1726,28 +1680,26 @@ var SheetPage = (function () {
             return;
         }
         this.loadItems(app, Utils.clone(item));
-    };
-    SheetPage.prototype.loadItems = function (app, trading) {
-        var _this = this;
+    }
+    loadItems(app, trading) {
         app.client.getTradingItems(trading.id, {
-            success: function (list) {
+            success: (list) => {
                 // if copyMode = true remove ids
-                if (_this.copyMode) {
+                if (this.copyMode) {
                     trading.id = null;
-                    _.each(list, function (item) {
+                    _.each(list, (item) => {
                         item.id = null;
                     });
                 }
-                _this.show(app, trading, list);
+                this.show(app, trading, list);
             },
-            error: function (status, msg) {
+            error: (status, msg) => {
                 console.log('Failed to get items status=' + status);
                 window.history.back();
             }
         });
-    };
-    SheetPage.prototype.show = function (app, trading, itemList) {
-        var _this = this;
+    }
+    show(app, trading, itemList) {
         // Racriveオブジェクトを作る
         var r = app.ractive = new Ractive({
             // どの箱に入れるかをIDで指定
@@ -1767,15 +1719,15 @@ var SheetPage = (function () {
                 'companies': app.companies,
                 'users': this.createUserList(app),
                 'tradingItems': itemList,
-                'deletedItems': []
+                'deletedItems': [],
             }
         });
-        var updateItemSum = function (keypath) {
+        var updateItemSum = (keypath) => {
             var unitPrice = Utils.toNumber(r.get(keypath + 'unit_price'));
             var amount = Utils.toNumber(r.get(keypath + 'amount'));
             r.set(keypath + 'sum', unitPrice * amount);
         };
-        var updateSum = function () {
+        var updateSum = () => {
             var itemList = r.get('tradingItems');
             var sum = 0;
             var tax = 0;
@@ -1799,7 +1751,7 @@ var SheetPage = (function () {
             r.set('trading.total', sum + tax);
             r.update();
         };
-        var observeItem = function () {
+        var observeItem = () => {
             return r.observe({
                 'tradingItems.*.unit_price': function (newValue, oldValue, keypath) {
                     updateItemSum(keypath.replace('unit_price', ''));
@@ -1814,10 +1766,10 @@ var SheetPage = (function () {
         };
         var itemObserver = observeItem();
         r.on({
-            'close': function () {
+            'close': () => {
                 window.history.back();
             },
-            'addItem': function () {
+            'addItem': () => {
                 r.push('tradingItems', {
                     id: null,
                     subject: '',
@@ -1829,24 +1781,24 @@ var SheetPage = (function () {
                     sum: 0
                 });
             },
-            'addCompany': function () {
-                _this.showAddCompanyDialog(app);
+            'addCompany': () => {
+                this.showAddCompanyDialog(app);
             },
-            'addUser': function () {
-                _this.showAddUserDialog(app);
+            'addUser': () => {
+                this.showAddUserDialog(app);
             },
-            'printQuotation': function () {
-                _this.printQuotation(app);
+            'printQuotation': () => {
+                this.printQuotation(app);
             },
-            'printBill': function () {
-                _this.printBill(app);
+            'printBill': () => {
+                this.printBill(app);
             },
-            'printDelivery': function () {
-                _this.printDelivery(app);
+            'printDelivery': () => {
+                this.printDelivery(app);
             },
-            'printInvoide': function () {
-                _this.showInvoiceDialog(app);
-            }
+            'printInvoide': () => {
+                this.showInvoiceDialog(app);
+            },
         });
         r.on('deleteItem', function (e, index) {
             itemObserver.cancel();
@@ -1857,8 +1809,8 @@ var SheetPage = (function () {
             }
             itemObserver = observeItem();
         });
-        r.on('save', function () {
-            _this.save(app, function (id) {
+        r.on('save', () => {
+            this.save(app, (id) => {
                 window.history.back();
             });
         });
@@ -1867,34 +1819,32 @@ var SheetPage = (function () {
         });
         // この下にjQuery関連のコードおねがいしやす
         tooltipster();
-    };
-    SheetPage.prototype.showAddCompanyDialog = function (app) {
-        app.showDialog(new AddCompanyDialog(null, function (result) {
+    }
+    showAddCompanyDialog(app) {
+        app.showDialog(new AddCompanyDialog(null, (result) => {
             app.ractive.update();
         }));
-    };
-    SheetPage.prototype.showAddUserDialog = function (app) {
-        var _this = this;
-        app.showDialog(new AddUserDialog(null, function (result) {
-            app.ractive.set('users', _this.createUserList(app));
+    }
+    showAddUserDialog(app) {
+        app.showDialog(new AddUserDialog(null, (result) => {
+            app.ractive.set('users', this.createUserList(app));
             app.ractive.update();
         }));
-    };
-    SheetPage.prototype.printQuotation = function (app) {
-        var _this = this;
+    }
+    printQuotation(app) {
         var trading = app.ractive.get('trading');
         var quotationDate = app.ractive.get('quotationDate');
-        var doneFunc = function (id) {
+        var doneFunc = (id) => {
             app.ractive.update();
             window.location.href = "/php/quotation.php?access_token=" + app.client.getAccessToken() + "&trading_id=" + id;
         };
         if (trading.quotation_number == null || trading.quotation_number.length == 0) {
             app.client.getNextNumber('quotation', new Date(quotationDate).getTime(), {
-                success: function (val) {
+                success: (val) => {
                     trading.quotation_number = '' + val + '-I';
-                    _this.save(app, doneFunc);
+                    this.save(app, doneFunc);
                 },
-                error: function (status, msg) {
+                error: (status, msg) => {
                     console.log('Failed to get next quotation number status=' + status);
                 }
             });
@@ -1902,22 +1852,21 @@ var SheetPage = (function () {
         else {
             this.save(app, doneFunc);
         }
-    };
-    SheetPage.prototype.printBill = function (app) {
-        var _this = this;
+    }
+    printBill(app) {
         var trading = app.ractive.get('trading');
         var billDate = app.ractive.get('billDate');
-        var doneFunc = function (id) {
+        var doneFunc = (id) => {
             app.ractive.update();
             window.location.href = "/php/bill.php?access_token=" + app.client.getAccessToken() + "&trading_id=" + id;
         };
         if (trading.bill_number == null || trading.bill_number.length == 0) {
             app.client.getNextNumber('bill', new Date(billDate).getTime(), {
-                success: function (val) {
+                success: (val) => {
                     trading.bill_number = '' + val + '-V';
-                    _this.save(app, doneFunc);
+                    this.save(app, doneFunc);
                 },
-                error: function (status, msg) {
+                error: (status, msg) => {
                     console.log('Failed to get next bill number status=' + status);
                 }
             });
@@ -1925,22 +1874,21 @@ var SheetPage = (function () {
         else {
             this.save(app, doneFunc);
         }
-    };
-    SheetPage.prototype.printDelivery = function (app) {
-        var _this = this;
+    }
+    printDelivery(app) {
         var trading = app.ractive.get('trading');
         var deliveryDate = app.ractive.get('deliveryDate');
-        var doneFunc = function (id) {
+        var doneFunc = (id) => {
             app.ractive.update();
             window.location.href = "/php/delivery.php?access_token=" + app.client.getAccessToken() + "&trading_id=" + id;
         };
         if (trading.delivery_number == null || trading.delivery_number.length == 0) {
             app.client.getNextNumber('delivery', new Date(deliveryDate).getTime(), {
-                success: function (val) {
+                success: (val) => {
                     trading.delivery_number = '' + val + '-D';
-                    _this.save(app, doneFunc);
+                    this.save(app, doneFunc);
                 },
-                error: function (status, msg) {
+                error: (status, msg) => {
                     console.log('Failed to get next delivery number status=' + status);
                 }
             });
@@ -1948,23 +1896,22 @@ var SheetPage = (function () {
         else {
             this.save(app, doneFunc);
         }
-    };
-    SheetPage.prototype.showInvoiceDialog = function (app) {
+    }
+    showInvoiceDialog(app) {
         app.showDialog(new CreateInvoiceDialog());
-    };
-    SheetPage.prototype.createUserList = function (app) {
+    }
+    createUserList(app) {
         var list = [];
         var emptyUser = new User();
         emptyUser.id = "empty";
         emptyUser.display_name = "担当者なし";
         list.push(emptyUser);
-        _.each(app.users, function (item) {
+        _.each(app.users, (item) => {
             list.push(item);
         });
         return list;
-    };
-    SheetPage.prototype.save = function (app, doneFunc) {
-        var _this = this;
+    }
+    save(app, doneFunc) {
         var trading = app.ractive.get('trading');
         var workFrom = app.ractive.get('workFrom');
         var workTo = app.ractive.get('workTo');
@@ -1982,14 +1929,14 @@ var SheetPage = (function () {
         trading.tax_rate = Number(trading.tax_rate);
         console.log(trading);
         app.client.saveTrading(trading, {
-            success: function (id) {
+            success: (id) => {
                 trading.id = id;
                 trading.modified_time = new Date().getTime();
                 app.tradingsMap[id] = trading;
                 var deleted = app.ractive.get('deletedItems');
-                _this.deleteItems(app, id, deleted, doneFunc);
+                this.deleteItems(app, id, deleted, doneFunc);
             },
-            error: function (status, msg) {
+            error: (status, msg) => {
                 switch (status) {
                     case 1001:
                         app.addSnack('件名を入力してください。');
@@ -2005,12 +1952,11 @@ var SheetPage = (function () {
                 console.log('Failed to save trading status=' + status);
             }
         });
-    };
-    SheetPage.prototype.deleteItems = function (app, id, list, doneFunc) {
-        var _this = this;
+    }
+    deleteItems(app, id, list, doneFunc) {
         if (list.length == 0) {
             var list3 = [];
-            _.each(app.ractive.get('tradingItems'), function (item, index) {
+            _.each(app.ractive.get('tradingItems'), (item, index) => {
                 item.sort_order = index;
                 item.unit_price = Number(item.unit_price);
                 item.amount = Number(item.amount);
@@ -2022,17 +1968,16 @@ var SheetPage = (function () {
         }
         var item = list[0];
         app.client.deleteTradingItem(id, item.id, {
-            success: function (itemId) {
+            success: (itemId) => {
                 list.splice(0, 1);
-                _this.deleteItems(app, id, list, doneFunc);
+                this.deleteItems(app, id, list, doneFunc);
             },
-            error: function (status, msg) {
+            error: (status, msg) => {
                 console.log('Failed to delete items status=' + status);
             }
         });
-    };
-    SheetPage.prototype.saveItems = function (app, id, list, doneFunc) {
-        var _this = this;
+    }
+    saveItems(app, id, list, doneFunc) {
         if (list.length == 0) {
             app.addSnack('保存しました！');
             doneFunc(id);
@@ -2040,12 +1985,12 @@ var SheetPage = (function () {
         }
         var item = list[0];
         app.client.saveTradingItem(id, item, {
-            success: function (itemId) {
+            success: (itemId) => {
                 item.id = itemId;
                 list.splice(0, 1);
-                _this.saveItems(app, id, list, doneFunc);
+                this.saveItems(app, id, list, doneFunc);
             },
-            error: function (status, msg) {
+            error: (status, msg) => {
                 switch (status) {
                     case 1002:
                         app.addSnack('項目名を入力してください。');
@@ -2058,9 +2003,8 @@ var SheetPage = (function () {
                 console.log('Failed to save items status=' + status);
             }
         });
-    };
-    return SheetPage;
-}());
+    }
+}
 ///<reference path="./ractive.d.ts"/>
 ///<reference path="./data.ts"/>
 ///<reference path="./Application.ts"/>
@@ -2091,15 +2035,15 @@ var AppRouter = Backbone.Router.extend({
         app.page = new TopPage();
         app.page.onCreate(app);
     },
-    sheet: function (id) {
+    sheet: (id) => {
         app.page = new SheetPage(id, false);
         app.page.onCreate(app);
     },
-    copySheet: function (id) {
+    copySheet: (id) => {
         app.page = new SheetPage(id, true);
         app.page.onCreate(app);
     },
-    setting: function () {
+    setting: () => {
         // ダイアログ用の要素を作る
         var dialog = document.createElement('section');
         document.querySelector('#dialogs').appendChild(dialog);
@@ -2110,7 +2054,7 @@ var AppRouter = Backbone.Router.extend({
             // 指定した箱に、どのHTMLを入れるかをIDで指定
             template: '#settingTemplate'
         });
-    }
+    },
 });
 $(function () {
     app.start();

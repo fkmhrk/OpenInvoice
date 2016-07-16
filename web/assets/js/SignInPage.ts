@@ -6,6 +6,7 @@
 declare class PasswordCredential{
     constructor(data : any);
 }
+declare function fetch(url : string, params : any);
 
 class SignInPage implements Page {
     onCreate(app : App) {
@@ -13,7 +14,24 @@ class SignInPage implements Page {
             (<any>navigator).credentials.get({
                 password: true,
             }).then((c : any) => {
-                this.signIn(app, c.id, c.password);
+                fetch('/api/v1/token', {
+                    method : 'POST',
+                    credentials : c,
+                }).then((resp : any) => {
+                    if (resp.ok) {
+                        return resp.json();
+                    } else {
+                        return Promise.reject('');
+                    }
+                }).then((json : any) => {
+                    (<any>app.client).accessToken = json.access_token;
+                    (<any>app.client).refreshToken = json.refresh_token;
+                    (<any>app.client).is_admin = json.is_admin;
+                    localStorage.setItem('refreshToken', json.refresh_token);
+                    app.router.navigate('top', {trigger:true});
+                }).catch((e : any) => {
+                });
+                //this.signIn(app, c.id, c.password);
             }).catch((e : any) => {
             });
         }        

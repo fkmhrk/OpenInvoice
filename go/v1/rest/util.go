@@ -23,6 +23,12 @@ func parseAuth(value string) (string, string) {
 	return strings.ToUpper(vals[0]), vals[1]
 }
 
+func getContentType(req *http.Request) string {
+	contentType := req.Header.Get("Content-Type")
+	vals := strings.SplitN(contentType, ";", -1)
+	return vals[0]
+}
+
 func makeJsonHandler(f func(token, tokenType string, json rj.RawJsonObject) s.Result) func(w http.ResponseWriter, req *http.Request) {
 	return makeHandler(func(token, tokenType string, req *http.Request) s.Result {
 		// to json

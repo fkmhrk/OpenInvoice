@@ -8,11 +8,19 @@ import (
 
 func getToken(user s.UserService) handler {
 	return makeBaseHandler(func(req *http.Request) s.Result {
-		// read input
-		json, _ := rj.ObjectFromString(readBody(req))
-		// get values
-		username, _ := json.String("username")
-		password, _ := json.String("password")
+		var username, password string
+		contentType := getContentType(req)
+		if contentType == "multipart/form-data" {
+			req.ParseMultipartForm(8192)
+			username = req.Form.Get("username")
+			password = req.Form.Get("password")
+		} else {
+			// read input
+			json, _ := rj.ObjectFromString(readBody(req))
+			// get values
+			username, _ = json.String("username")
+			password, _ = json.String("password")
+		}
 		// execute
 		return user.GetToken(username, password)
 	})
