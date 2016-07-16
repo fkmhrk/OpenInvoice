@@ -1,4 +1,4 @@
 app:
-	tsc ClientImpl.ts app.ts -out app.js
+	tsc -target es2015 ClientImpl.ts app.ts -out app.js
 mock:
-	tsc MockClient.ts app.ts -out app.js
+	tsc -target es2015 MockClient.ts app.ts -out app.js
