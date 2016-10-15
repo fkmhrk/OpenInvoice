@@ -3,6 +3,7 @@ package rest
 import (
 	s "../service"
 	"github.com/gorilla/mux"
+	"github.com/mokelab-go/hop"
 	"net/http"
 )
 
@@ -16,10 +17,12 @@ const (
 type handler func(http.ResponseWriter, *http.Request)
 
 func SetHandlers(r *mux.Router, services s.Services, u s.UserService, t s.TradingService, c s.CompanyService) {
-	r.HandleFunc("/token", getToken(u)).
-		Methods(method_POST)
-	r.HandleFunc("/token/refresh", refreshToken(services)).
-		Methods(method_POST)
+	r.HandleFunc("/token", hop.Operations(
+		hop.GetContentType,
+	)(getToken(u))).Methods(method_POST)
+	r.HandleFunc("/token/refresh", hop.Operations(
+		hop.GetBodyAsJSON,
+	)(refreshToken(services))).Methods(method_POST)
 	r.HandleFunc("/users", getUsers(u)).
 		Methods(method_GET)
 	r.HandleFunc("/users", createUser(services)).
