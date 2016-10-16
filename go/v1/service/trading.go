@@ -5,7 +5,7 @@ import (
 )
 
 type TradingService interface {
-	GetListByUser(token string) Result
+	GetListByUser() Result
 	Create(token, companyId, subject, product, memo string, titleType int, workFrom, workTo, total, quotationDate, billDate, deliveryDate int64, taxRate float32) Result
 	Update(token string, trading Trading) Result
 
@@ -13,7 +13,7 @@ type TradingService interface {
 	Delete(token, tradingId string) Result
 
 	// Gets trading items
-	GetItemListByTradingId(token, tradingId string) Result
+	GetItemListByTradingId(tradingId string) Result
 	CreateItem(token, tradingId, subject, degree, memo string, sortOrder, unitPrice int, amount float64, taxType int) Result
 	// Updates trading item
 	UpdateItem(token, id, tradingId, subject, degree, memo string, sortOrder, unitPrice int, amount float64, taxType int) Result

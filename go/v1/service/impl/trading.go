@@ -23,15 +23,7 @@ func NewTradingSerivce(s m.SessionDAO, t m.TradingDAO, models *m.Models) *tradin
 	}
 }
 
-func (s *tradingService) GetListByUser(token string) s.Result {
-	// input check
-	session, err := s.sessionDAO.GetByToken(token)
-	if err != nil {
-		return errorResult(500, MSG_SERVER_ERROR)
-	}
-	if session == nil {
-		return errorResult(401, MSG_WRONG_TOKEN)
-	}
+func (s *tradingService) GetListByUser() s.Result {
 	// get : fixed we use GetList
 	tradings, err := s.tradingDAO.GetList()
 	if err != nil {
@@ -144,17 +136,8 @@ func (o *tradingService) Delete(token, tradingId string) s.Result {
 	}
 }
 
-func (s *tradingService) GetItemListByTradingId(token, tradingId string) s.Result {
-	// input check
-	session, err := s.sessionDAO.GetByToken(token)
-	if err != nil {
-		return errorResult(500, MSG_SERVER_ERROR)
-	}
-	if session == nil {
-		return errorResult(401, MSG_WRONG_TOKEN)
-	}
-	// get trading
-	// get
+func (s *tradingService) GetItemListByTradingId(tradingId string) s.Result {
+	// get trading items
 	items, err := s.tradingDAO.GetItemsById(tradingId)
 	if err != nil {
 		return errorResult(500, MSG_SERVER_ERROR)

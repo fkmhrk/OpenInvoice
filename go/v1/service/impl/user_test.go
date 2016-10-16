@@ -126,14 +126,10 @@ func TestUser0100_GetList(t *testing.T) {
 	userDAO, _ := models.User.(*mock.UserDAO)
 	userDAO.GetListResult = list
 	sessionDAO, _ := models.Session.(*mock.SessionDAO)
-	sessionDAO.GetByTokenResult = &m.Session{
-		Token: "testToken",
-	}
 
 	s := NewUserSerivce(userDAO, sessionDAO, models)
 
-	token := "token1122"
-	r := s.GetUsers(token)
+	r := s.GetUsers()
 	if r == nil {
 		t.Errorf("Result must not be nil")
 		return

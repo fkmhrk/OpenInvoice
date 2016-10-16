@@ -8,10 +8,9 @@ import (
 	"net/http"
 )
 
-func getTradings(trading s.TradingService) handler {
-	return makeHandler(func(token, tType string,
-		req *http.Request) s.Result {
-		return trading.GetListByUser(token)
+func getTradings(trading s.TradingService) http.HandlerFunc {
+	return makeBaseHandler(func(req *http.Request) s.Result {
+		return trading.GetListByUser()
 	})
 }
 
@@ -100,14 +99,13 @@ func deleteTrading(services s.Services) handler {
 	})
 }
 
-func getTradingItems(trading s.TradingService) handler {
-	return makeHandler(func(token, tType string,
-		req *http.Request) s.Result {
+func getTradingItems(trading s.TradingService) http.HandlerFunc {
+	return makeBaseHandler(func(req *http.Request) s.Result {
 		// read path param
 		vars := mux.Vars(req)
 		tradingId := vars["tradingId"]
 
-		return trading.GetItemListByTradingId(token, tradingId)
+		return trading.GetItemListByTradingId(tradingId)
 	})
 }
 

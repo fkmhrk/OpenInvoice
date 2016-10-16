@@ -11,9 +11,6 @@ import (
 func TestTrading0000_GetListByUser(t *testing.T) {
 	models := mock.NewMock()
 	sessionDAO, _ := models.Session.(*mock.SessionDAO)
-	sessionDAO.GetByTokenResult = &m.Session{
-		Token: "testToken",
-	}
 
 	var list []*m.Trading
 	list = append(list, &m.Trading{
@@ -43,8 +40,7 @@ func TestTrading0000_GetListByUser(t *testing.T) {
 
 	service := NewTradingSerivce(sessionDAO, tradingDAO, models)
 
-	token := "token1122"
-	r := service.GetListByUser(token)
+	r := service.GetListByUser()
 	if r == nil {
 		t.Errorf("Result must not be nil")
 		return
@@ -196,9 +192,6 @@ func TestTrading0200_Update(t *testing.T) {
 func TestTrading0200_GetItemsByTradingId(t *testing.T) {
 	models := mock.NewMock()
 	sessionDAO, _ := models.Session.(*mock.SessionDAO)
-	sessionDAO.GetByTokenResult = &m.Session{
-		Token: "testToken",
-	}
 	var list []*m.TradingItem
 	for i := 0; i < 2; i++ {
 		list = append(list, &m.TradingItem{
@@ -216,9 +209,8 @@ func TestTrading0200_GetItemsByTradingId(t *testing.T) {
 
 	s := NewTradingSerivce(sessionDAO, tradingDAO, models)
 
-	token := "token1122"
 	tradingId := "tradingId1"
-	r := s.GetItemListByTradingId(token, tradingId)
+	r := s.GetItemListByTradingId(tradingId)
 	if r == nil {
 		t.Errorf("Result must not be nil")
 		return

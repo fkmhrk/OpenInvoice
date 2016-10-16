@@ -7,10 +7,9 @@ import (
 	"net/http"
 )
 
-func getUsers(user s.UserService) handler {
-	return makeHandler(func(token, tType string,
-		req *http.Request) s.Result {
-		return user.GetUsers(token)
+func getUsers(user s.UserService) http.HandlerFunc {
+	return makeBaseHandler(func(req *http.Request) s.Result {
+		return user.GetUsers()
 	})
 }
 

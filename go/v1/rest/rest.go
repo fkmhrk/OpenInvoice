@@ -1,6 +1,7 @@
 package rest
 
 import (
+	m "../model"
 	s "../service"
 	"github.com/gorilla/mux"
 	"github.com/mokelab-go/hop"
@@ -16,14 +17,19 @@ const (
 
 type handler func(http.ResponseWriter, *http.Request)
 
-func SetHandlers(r *mux.Router, services s.Services, u s.UserService, t s.TradingService, c s.CompanyService) {
+func SetHandlers(r *mux.Router, services s.Services, u s.UserService, t s.TradingService, c s.CompanyService, models *m.Models) {
+	authRequired := hop.Operations(
+		hop.GetCredential,
+		getSession(models.Session),
+	)
+
 	r.HandleFunc("/token", hop.Operations(
 		hop.GetContentType,
 	)(getToken(u))).Methods(method_POST)
 	r.HandleFunc("/token/refresh", hop.Operations(
 		hop.GetBodyAsJSON,
 	)(refreshToken(services))).Methods(method_POST)
-	r.HandleFunc("/users", getUsers(u)).
+	r.HandleFunc("/users", authRequired(getUsers(u))).
 		Methods(method_GET)
 	r.HandleFunc("/users", createUser(services)).
 		Methods(method_POST)
@@ -31,7 +37,7 @@ func SetHandlers(r *mux.Router, services s.Services, u s.UserService, t s.Tradin
 		Methods(method_PUT)
 	r.HandleFunc("/users/{id}", deleteUser(services)).
 		Methods(method_DELETE)
-	r.HandleFunc("/tradings", getTradings(t)).
+	r.HandleFunc("/tradings", authRequired(getTradings(t))).
 		Methods(method_GET)
 	r.HandleFunc("/tradings", createTrading(t)).
 		Methods(method_POST)
@@ -39,7 +45,7 @@ func SetHandlers(r *mux.Router, services s.Services, u s.UserService, t s.Tradin
 		Methods(method_PUT)
 	r.HandleFunc("/tradings/{tradingId}", deleteTrading(services)).
 		Methods(method_DELETE)
-	r.HandleFunc("/tradings/{tradingId}/items", getTradingItems(t)).
+	r.HandleFunc("/tradings/{tradingId}/items", authRequired(getTradingItems(t))).
 		Methods(method_GET)
 	r.HandleFunc("/tradings/{tradingId}/items", createTradingItem(t)).
 		Methods(method_POST)

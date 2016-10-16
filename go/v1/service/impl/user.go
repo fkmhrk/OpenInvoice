@@ -85,15 +85,7 @@ func (o *userService) RefreshToken(token string) s.Result {
 	return jsonResult(200, body)
 }
 
-func (s *userService) GetUsers(token string) s.Result {
-	// input check
-	session, err := s.sessionDAO.GetByToken(token)
-	if err != nil {
-		return errorResult(500, MSG_SERVER_ERROR)
-	}
-	if session == nil {
-		return errorResult(401, MSG_WRONG_TOKEN)
-	}
+func (s *userService) GetUsers() s.Result {
 	// get User
 	users, err := s.userDAO.GetList()
 	if err != nil {
