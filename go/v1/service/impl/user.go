@@ -106,15 +106,7 @@ func (s *userService) GetUsers() s.Result {
 	return jsonResult(200, body)
 }
 
-func (s *userService) Create(token, loginName, displayName, tel, password string) s.Result {
-	// get session
-	session, err := s.sessionDAO.GetByToken(token)
-	if err != nil {
-		return errorResult(500, MSG_SERVER_ERROR)
-	}
-	if session == nil {
-		return errorResult(401, MSG_WRONG_TOKEN)
-	}
+func (s *userService) Create(session *m.Session, loginName, displayName, tel, password string) s.Result {
 	if !session.Role.IsAdmin() {
 		return errorResult(403, MSG_NOT_AUTHORIZED)
 	}
@@ -133,22 +125,14 @@ func (s *userService) Create(token, loginName, displayName, tel, password string
 	return jsonResult(201, body)
 }
 
-func (s *userService) Update(token, id, loginName, displayName, tel, password string) s.Result {
-	// get session
-	session, err := s.sessionDAO.GetByToken(token)
-	if err != nil {
-		return errorResult(500, MSG_SERVER_ERROR)
-	}
-	if session == nil {
-		return errorResult(401, MSG_WRONG_TOKEN)
-	}
+func (s *userService) Update(session *m.Session, id, loginName, displayName, tel, password string) s.Result {
 	if !session.Role.IsAdmin() {
 		if session.UserId != id {
 			return errorResult(403, MSG_NOT_AUTHORIZED)
 		}
 	}
 	// update
-	_, err = s.userDAO.Update(id, loginName, displayName, "", tel, password)
+	_, err := s.userDAO.Update(id, loginName, displayName, "", tel, password)
 	if err != nil {
 		return errorResult(500, MSG_SERVER_ERROR)
 	}
@@ -162,15 +146,7 @@ func (s *userService) Update(token, id, loginName, displayName, tel, password st
 	return jsonResult(200, body)
 }
 
-func (o *userService) Delete(token, id string) s.Result {
-	// get session
-	session, err := o.sessionDAO.GetByToken(token)
-	if err != nil {
-		return errorResult(500, MSG_SERVER_ERROR)
-	}
-	if session == nil {
-		return errorResult(401, MSG_WRONG_TOKEN)
-	}
+func (o *userService) Delete(session *m.Session, id string) s.Result {
 	if !session.Role.IsAdmin() {
 		return errorResult(403, MSG_NOT_AUTHORIZED)
 	}

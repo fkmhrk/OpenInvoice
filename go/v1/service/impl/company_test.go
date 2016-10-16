@@ -9,10 +9,6 @@ import (
 
 func TestCompany0000_GetList(t *testing.T) {
 	models := mock.NewMock()
-	sessionDAO, _ := models.Session.(*mock.SessionDAO)
-	sessionDAO.GetByTokenResult = &m.Session{
-		Token: "testToken",
-	}
 	var list []*m.Company
 	for i := 0; i < 3; i++ {
 		list = append(list, &m.Company{
@@ -29,8 +25,7 @@ func TestCompany0000_GetList(t *testing.T) {
 
 	s := NewCompanySerivce(models)
 
-	token := "token1122"
-	r := s.GetList(token)
+	r := s.GetList()
 	if r == nil {
 		t.Errorf("Result must not be nil")
 		return
@@ -56,10 +51,6 @@ func TestCompany0000_GetList(t *testing.T) {
 
 func TestCompany0100_Create(t *testing.T) {
 	models := mock.NewMock()
-	sessionDAO, _ := models.Session.(*mock.SessionDAO)
-	sessionDAO.GetByTokenResult = &m.Session{
-		Token: "testToken",
-	}
 	companyDAO, _ := models.Company.(*mock.CompanyDAO)
 	companyDAO.CreateResult = &m.Company{
 		Id:      "company",
@@ -72,8 +63,7 @@ func TestCompany0100_Create(t *testing.T) {
 
 	s := NewCompanySerivce(models)
 
-	token := "token1122"
-	r := s.Create(token, "name", "zip", "address", "phone", "unit")
+	r := s.Create("name", "zip", "address", "phone", "unit")
 	if r == nil {
 		t.Errorf("Result must not be nil")
 		return
@@ -91,10 +81,6 @@ func TestCompany0100_Create(t *testing.T) {
 
 func TestCompany0200_Update(t *testing.T) {
 	models := mock.NewMock()
-	sessionDAO, _ := models.Session.(*mock.SessionDAO)
-	sessionDAO.GetByTokenResult = &m.Session{
-		Token: "testToken",
-	}
 	companyDAO, _ := models.Company.(*mock.CompanyDAO)
 	companyDAO.UpdateResult = &m.Company{
 		Id:      "company",
@@ -107,8 +93,7 @@ func TestCompany0200_Update(t *testing.T) {
 
 	s := NewCompanySerivce(models)
 
-	token := "token1122"
-	r := s.Update(token, "id", "name", "zip", "address", "phone", "unit")
+	r := s.Update("id", "name", "zip", "address", "phone", "unit")
 	if r == nil {
 		t.Errorf("Result must not be nil")
 		return
@@ -126,17 +111,12 @@ func TestCompany0200_Update(t *testing.T) {
 
 func TestCompany0300_Delete(t *testing.T) {
 	models := mock.NewMock()
-	sessionDAO, _ := models.Session.(*mock.SessionDAO)
-	sessionDAO.GetByTokenResult = &m.Session{
-		Token: "testToken",
-	}
 	companyDAO, _ := models.Company.(*mock.CompanyDAO)
 	companyDAO.DeleteResult = nil
 
 	s := NewCompanySerivce(models)
 
-	token := "token1122"
-	result := s.Delete(token, "company1")
+	result := s.Delete("company1")
 	if result == nil {
 		t.Errorf("Result must not be nil")
 		return

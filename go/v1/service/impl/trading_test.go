@@ -85,7 +85,11 @@ func TestTrading0100_Create(t *testing.T) {
 	service := NewTradingSerivce(sessionDAO, tradingDAO, models)
 
 	// params
-	token := "token1122"
+	session := &m.Session{
+		Token:  "testToken",
+		UserId: "user2233",
+	}
+
 	companyId := "company1122"
 	titleType := 1
 	subject := "subject3344"
@@ -99,7 +103,7 @@ func TestTrading0100_Create(t *testing.T) {
 	deliveryDate := int64(500)
 	taxRate := float32(8)
 
-	r := service.Create(token, companyId, subject, product, memo, titleType, workFrom, workTo, total, quotationDate, billDate, deliveryDate, taxRate)
+	r := service.Create(session, companyId, subject, product, memo, titleType, workFrom, workTo, total, quotationDate, billDate, deliveryDate, taxRate)
 	if r == nil {
 		t.Errorf("Result must not be nil")
 		return
@@ -118,10 +122,6 @@ func TestTrading0100_Create(t *testing.T) {
 func TestTrading0200_Update(t *testing.T) {
 	models := mock.NewMock()
 	sessionDAO, _ := models.Session.(*mock.SessionDAO)
-	sessionDAO.GetByTokenResult = &m.Session{
-		Token:  "testToken",
-		UserId: "user1122",
-	}
 	tradingDAO, _ := models.Trading.(*mock.TradingDAO)
 	tradingDAO.GetByIdResult = &m.Trading{
 		Id:         "trade1111",
@@ -146,7 +146,6 @@ func TestTrading0200_Update(t *testing.T) {
 	service := NewTradingSerivce(sessionDAO, tradingDAO, models)
 
 	// params
-	token := "token1122"
 	id := "20150203"
 	companyId := "company1122"
 	subject := "subject3344"
@@ -159,7 +158,7 @@ func TestTrading0200_Update(t *testing.T) {
 	billDate := int64(400)
 	taxRate := float32(8)
 
-	r := service.Update(token, s.Trading{
+	r := service.Update(s.Trading{
 		m.Trading{
 			Id:            id,
 			CompanyId:     companyId,
@@ -253,9 +252,6 @@ func TestTrading0200_GetItemsByTradingId(t *testing.T) {
 func TestTrading0300_CreateItem(t *testing.T) {
 	models := mock.NewMock()
 	sessionDAO, _ := models.Session.(*mock.SessionDAO)
-	sessionDAO.GetByTokenResult = &m.Session{
-		Token: "testToken",
-	}
 	tradingDAO, _ := models.Trading.(*mock.TradingDAO)
 	tradingDAO.CreateItemResult = &m.TradingItem{
 		Id: "item2233",
@@ -263,9 +259,8 @@ func TestTrading0300_CreateItem(t *testing.T) {
 
 	s := NewTradingSerivce(sessionDAO, tradingDAO, models)
 
-	token := "token1122"
 	tradingId := "tradingId1"
-	r := s.CreateItem(token, tradingId, "subject", "M/M", "Memo",
+	r := s.CreateItem(tradingId, "subject", "M/M", "Memo",
 		1, 100, 2, 1)
 	if r == nil {
 		t.Errorf("Result must not be nil")
@@ -285,9 +280,6 @@ func TestTrading0300_CreateItem(t *testing.T) {
 func TestTrading0400_UpdateItem(t *testing.T) {
 	models := mock.NewMock()
 	sessionDAO, _ := models.Session.(*mock.SessionDAO)
-	sessionDAO.GetByTokenResult = &m.Session{
-		Token: "testToken",
-	}
 	tradingDAO, _ := models.Trading.(*mock.TradingDAO)
 	tradingDAO.UpdateItemResult = &m.TradingItem{
 		Id: "item2233",
@@ -295,10 +287,9 @@ func TestTrading0400_UpdateItem(t *testing.T) {
 
 	s := NewTradingSerivce(sessionDAO, tradingDAO, models)
 
-	token := "token1122"
 	id := "item1122"
 	tradingId := "tradingId1"
-	r := s.UpdateItem(token, id, tradingId, "subject", "M/M", "Memo",
+	r := s.UpdateItem(id, tradingId, "subject", "M/M", "Memo",
 		1, 100, 2, 1)
 	if r == nil {
 		t.Errorf("Result must not be nil")
@@ -364,9 +355,8 @@ func TestTrading0600_GetNextNumber(t *testing.T) {
 	}
 
 	for _, item := range table {
-		token := "token1122"
 		date := int64(1434162098716) // 2015-6-13
-		r := s.GetNextNumber(token, item.Arg, date)
+		r := s.GetNextNumber(item.Arg, date)
 		if r == nil {
 			t.Errorf("Result must not be nil")
 			return

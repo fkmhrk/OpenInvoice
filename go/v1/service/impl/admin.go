@@ -17,18 +17,7 @@ func NewAdminService(models *m.Models) *adminService {
 	}
 }
 
-func (o *adminService) GetEnvironment(token string) s.Result {
-	if isEmpty(token) {
-		return errorResult(401, s.ERR_AUTHORIZATION_EMPTY)
-	}
-	// get Session
-	session, err := o.sessionDAO.GetByToken(token)
-	if err != nil {
-		return errorResult(500, s.ERR_SERVER_ERROR)
-	}
-	if session == nil {
-		return errorResult(401, s.ERR_NOT_AUTHORIZED)
-	}
+func (o *adminService) GetEnvironment() s.Result {
 	// get list
 	envList, err := o.envDAO.GetList()
 	if err != nil {
@@ -43,20 +32,9 @@ func (o *adminService) GetEnvironment(token string) s.Result {
 	return jsonResult(200, body)
 }
 
-func (o *adminService) SaveEnvironment(token string, list []*m.Env) s.Result {
-	if isEmpty(token) {
-		return errorResult(401, s.ERR_AUTHORIZATION_EMPTY)
-	}
-	// get Session
-	session, err := o.sessionDAO.GetByToken(token)
-	if err != nil {
-		return errorResult(500, s.ERR_SERVER_ERROR)
-	}
-	if session == nil {
-		return errorResult(401, s.ERR_NOT_AUTHORIZED)
-	}
+func (o *adminService) SaveEnvironment(list []*m.Env) s.Result {
 	// saves
-	err = o.envDAO.Save(list)
+	err := o.envDAO.Save(list)
 	if err != nil {
 		return errorResult(500, s.ERR_SERVER_ERROR)
 	}

@@ -4,7 +4,6 @@ import (
 	m "../model"
 	s "../service"
 	rj "github.com/fkmhrk-go/rawjson"
-	"github.com/gorilla/mux"
 	"github.com/mokelab-go/hop"
 	"net/http"
 )
@@ -15,10 +14,13 @@ func getTradings(trading s.TradingService) http.HandlerFunc {
 	})
 }
 
-func createTrading(trading s.TradingService) handler {
-	return makeJsonHandler(func(token, tType string,
-		json rj.RawJsonObject) s.Result {
+func createTrading(trading s.TradingService) http.HandlerFunc {
+	return makeBaseHandler(func(req *http.Request) s.Result {
 		// read input
+		c := req.Context()
+		session := session(c)
+		json := rj.RawJsonObject(hop.BodyJSON(c))
+
 		companyId, _ := json.String("company_id")
 		titleType, _ := json.Int("title_type")
 		subject, _ := json.String("subject")
@@ -32,21 +34,19 @@ func createTrading(trading s.TradingService) handler {
 		product, _ := json.String("product")
 		memo, _ := json.String("memo")
 
-		return trading.Create(token, companyId,
+		return trading.Create(session, companyId,
 			subject, product, memo, titleType, workFrom, workTo,
 			total, quotationDate, billDate, deliveryDate, float32(taxRate))
 	})
 }
 
-func updateTrading(trading s.TradingService) handler {
-	return makeHandler(func(token, tType string,
-		req *http.Request) s.Result {
-		// read path param
-		vars := mux.Vars(req)
-		tradingId := vars["tradingId"]
+func updateTrading(trading s.TradingService) http.HandlerFunc {
+	return makeBaseHandler(func(req *http.Request) s.Result {
+		c := req.Context()
+		tradingId := hop.PathString(c, "tradingId")
 
 		// to json
-		json, _ := rj.ObjectFromString(readBody(req))
+		json := rj.RawJsonObject(hop.BodyJSON(c))
 
 		// read input
 		companyId, _ := json.String("company_id")
@@ -66,7 +66,7 @@ func updateTrading(trading s.TradingService) handler {
 		product, _ := json.String("product")
 		memo, _ := json.String("memo")
 
-		return trading.Update(token, s.Trading{
+		return trading.Update(s.Trading{
 			m.Trading{
 				Id:              tradingId,
 				CompanyId:       companyId,
@@ -108,15 +108,13 @@ func getTradingItems(trading s.TradingService) http.HandlerFunc {
 	})
 }
 
-func createTradingItem(trading s.TradingService) handler {
-	return makeHandler(func(token, tType string,
-		req *http.Request) s.Result {
-		// read path param
-		vars := mux.Vars(req)
-		tradingId := vars["tradingId"]
+func createTradingItem(trading s.TradingService) http.HandlerFunc {
+	return makeBaseHandler(func(req *http.Request) s.Result {
+		c := req.Context()
+		tradingId := hop.PathString(c, "tradingId")
 
 		// to json
-		json, _ := rj.ObjectFromString(readBody(req))
+		json := rj.RawJsonObject(hop.BodyJSON(c))
 
 		// get values
 		sortOrder, _ := json.Int("sort_order")
@@ -127,20 +125,19 @@ func createTradingItem(trading s.TradingService) handler {
 		taxType, _ := json.Int("tax_type")
 		memo, _ := json.String("memo")
 
-		return trading.CreateItem(token, tradingId, subject, degree, memo, sortOrder, unitPrice, amount, taxType)
+		return trading.CreateItem(tradingId, subject, degree, memo, sortOrder, unitPrice, amount, taxType)
 	})
 }
 
-func updateTradingItem(trading s.TradingService) handler {
-	return makeHandler(func(token, tType string,
-		req *http.Request) s.Result {
+func updateTradingItem(trading s.TradingService) http.HandlerFunc {
+	return makeBaseHandler(func(req *http.Request) s.Result {
 		// read path param
-		vars := mux.Vars(req)
-		tradingId := vars["tradingId"]
-		id := vars["itemId"]
+		c := req.Context()
+		tradingId := hop.PathString(c, "tradingId")
+		id := hop.PathString(c, "itemId")
 
 		// to json
-		json, _ := rj.ObjectFromString(readBody(req))
+		json := rj.RawJsonObject(hop.BodyJSON(c))
 
 		// get values
 		sortOrder, _ := json.Int("sort_order")
@@ -151,7 +148,7 @@ func updateTradingItem(trading s.TradingService) handler {
 		taxType, _ := json.Int("tax_type")
 		memo, _ := json.String("memo")
 
-		return trading.UpdateItem(token, id, tradingId, subject, degree, memo, sortOrder, unitPrice, amount, taxType)
+		return trading.UpdateItem(id, tradingId, subject, degree, memo, sortOrder, unitPrice, amount, taxType)
 	})
 }
 

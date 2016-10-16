@@ -5,7 +5,6 @@ import (
 	s "../service"
 	"github.com/gorilla/mux"
 	"github.com/mokelab-go/hop"
-	"net/http"
 )
 
 const (
@@ -15,13 +14,17 @@ const (
 	method_DELETE = "DELETE"
 )
 
-type handler func(http.ResponseWriter, *http.Request)
-
 func SetHandlers(r *mux.Router, services s.Services, u s.UserService, t s.TradingService, c s.CompanyService, models *m.Models) {
 	auth := hop.Operations(
 		hop.GetPathParams,
 		hop.GetCredential,
 		getSession(models.Session),
+	)
+	authBody := hop.Operations(
+		hop.GetPathParams,
+		hop.GetCredential,
+		getSession(models.Session),
+		hop.GetBodyAsJSON,
 	)
 
 	r.HandleFunc("/token", hop.Operations(
@@ -30,46 +33,66 @@ func SetHandlers(r *mux.Router, services s.Services, u s.UserService, t s.Tradin
 	r.HandleFunc("/token/refresh", hop.Operations(
 		hop.GetBodyAsJSON,
 	)(refreshToken(services))).Methods(method_POST)
-	r.HandleFunc("/users", auth(getUsers(u))).
+
+	r.HandleFunc("/users",
+		auth(getUsers(u))).
 		Methods(method_GET)
-	r.HandleFunc("/users", createUser(services)).
+	r.HandleFunc("/users",
+		authBody(createUser(services))).
 		Methods(method_POST)
-	r.HandleFunc("/users/{id}", updateUser(services)).
+	r.HandleFunc("/users/{id}",
+		authBody(updateUser(services))).
 		Methods(method_PUT)
-	r.HandleFunc("/users/{id}", deleteUser(services)).
+	r.HandleFunc("/users/{id}",
+		auth(deleteUser(services))).
 		Methods(method_DELETE)
-	r.HandleFunc("/tradings", auth(getTradings(t))).
+	r.HandleFunc("/tradings",
+		auth(getTradings(t))).
 		Methods(method_GET)
-	r.HandleFunc("/tradings", createTrading(t)).
+	r.HandleFunc("/tradings",
+		authBody(createTrading(t))).
 		Methods(method_POST)
-	r.HandleFunc("/tradings/{tradingId}", updateTrading(t)).
+	r.HandleFunc("/tradings/{tradingId}",
+		authBody(updateTrading(t))).
 		Methods(method_PUT)
-	r.HandleFunc("/tradings/{tradingId}", auth(deleteTrading(services))).
+	r.HandleFunc("/tradings/{tradingId}",
+		auth(deleteTrading(services))).
 		Methods(method_DELETE)
-	r.HandleFunc("/tradings/{tradingId}/items", auth(getTradingItems(t))).
+	r.HandleFunc("/tradings/{tradingId}/items",
+		auth(getTradingItems(t))).
 		Methods(method_GET)
-	r.HandleFunc("/tradings/{tradingId}/items", createTradingItem(t)).
+	r.HandleFunc("/tradings/{tradingId}/items",
+		authBody(createTradingItem(t))).
 		Methods(method_POST)
-	r.HandleFunc("/tradings/{tradingId}/items/{itemId}", updateTradingItem(t)).
+	r.HandleFunc("/tradings/{tradingId}/items/{itemId}",
+		authBody(updateTradingItem(t))).
 		Methods(method_PUT)
 	r.HandleFunc("/tradings/{tradingId}/items/{itemId}",
 		auth(deleteTradingItem(t))).
 		Methods(method_DELETE)
-	r.HandleFunc("/companies", getCompanies(c)).
+	r.HandleFunc("/companies",
+		auth(getCompanies(c))).
 		Methods(method_GET)
-	r.HandleFunc("/companies", createCompany(c)).
+	r.HandleFunc("/companies",
+		authBody(createCompany(c))).
 		Methods(method_POST)
-	r.HandleFunc("/companies/{companyId}", updateCompany(c)).
+	r.HandleFunc("/companies/{companyId}",
+		authBody(updateCompany(c))).
 		Methods(method_PUT)
-	r.HandleFunc("/companies/{companyId}", deleteCompany(services)).
+	r.HandleFunc("/companies/{companyId}",
+		auth(deleteCompany(services))).
 		Methods(method_DELETE)
-	r.HandleFunc("/sequences/{seqType}", getNextNumber(services)).
+	r.HandleFunc("/sequences/{seqType}",
+		authBody(getNextNumber(services))).
 		Methods(method_POST)
 	// Environment
-	r.HandleFunc("/environments", getEnvironment(services)).
+	r.HandleFunc("/environments",
+		auth(getEnvironment(services))).
 		Methods(method_GET)
-	r.HandleFunc("/environments", saveEnvironment(services)).
+	r.HandleFunc("/environments",
+		authBody(saveEnvironment(services))).
 		Methods(method_PUT)
-	r.HandleFunc("/myCompany/name", getMyCompanyName(services)).
+	r.HandleFunc("/myCompany/name",
+		getMyCompanyName(services)).
 		Methods(method_GET)
 }

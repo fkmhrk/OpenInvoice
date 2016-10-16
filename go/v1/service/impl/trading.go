@@ -39,7 +39,7 @@ func (s *tradingService) GetListByUser() s.Result {
 	return jsonResult(200, body)
 }
 
-func (s *tradingService) Create(token, companyId, subject, product, memo string, titleType int, workFrom, workTo, total, quotationDate, billDate, deliveryDate int64, taxRate float32) s.Result {
+func (s *tradingService) Create(session *m.Session, companyId, subject, product, memo string, titleType int, workFrom, workTo, total, quotationDate, billDate, deliveryDate int64, taxRate float32) s.Result {
 	// input check
 	if len(companyId) == 0 {
 		return errorResult(400, MSG_ERR_COMPANY_ID_EMPTY)
@@ -48,14 +48,6 @@ func (s *tradingService) Create(token, companyId, subject, product, memo string,
 		return errorResult(400, MSG_ERR_SUBJECT_EMPTY)
 	}
 
-	// get session
-	session, err := s.sessionDAO.GetByToken(token)
-	if err != nil {
-		return errorResult(500, MSG_SERVER_ERROR)
-	}
-	if session == nil {
-		return errorResult(401, MSG_WRONG_TOKEN)
-	}
 	// create
 	item, err := s.tradingDAO.Create(companyId, subject, titleType, workFrom, workTo, total, quotationDate, billDate, deliveryDate, taxRate, session.UserId, product, memo)
 	if err != nil {
@@ -68,7 +60,7 @@ func (s *tradingService) Create(token, companyId, subject, product, memo string,
 	return jsonResult(201, body)
 }
 
-func (s *tradingService) Update(token string, trading s.Trading) s.Result {
+func (s *tradingService) Update(trading s.Trading) s.Result {
 	// input check
 	if len(trading.Id) == 0 {
 		return errorResult(400, MSG_ERR_ID_EMPTY)
@@ -78,15 +70,6 @@ func (s *tradingService) Update(token string, trading s.Trading) s.Result {
 	}
 	if len(trading.Subject) == 0 {
 		return errorResult(400, MSG_ERR_SUBJECT_EMPTY)
-	}
-
-	// get session
-	session, err := s.sessionDAO.GetByToken(token)
-	if err != nil {
-		return errorResult(500, MSG_SERVER_ERROR)
-	}
-	if session == nil {
-		return errorResult(401, MSG_WRONG_TOKEN)
 	}
 
 	// get item
@@ -151,17 +134,7 @@ func (s *tradingService) GetItemListByTradingId(tradingId string) s.Result {
 	return jsonResult(200, body)
 }
 
-func (s *tradingService) CreateItem(token, tradingId, subject, degree, memo string, sortOrder, unitPrice int, amount float64, taxType int) s.Result {
-	// input check
-	// get session
-	session, err := s.sessionDAO.GetByToken(token)
-	if err != nil {
-		return errorResult(500, MSG_SERVER_ERROR)
-	}
-	if session == nil {
-		return errorResult(401, MSG_WRONG_TOKEN)
-	}
-	// get trading
+func (s *tradingService) CreateItem(tradingId, subject, degree, memo string, sortOrder, unitPrice int, amount float64, taxType int) s.Result {
 	// create
 	item, err := s.tradingDAO.CreateItem(tradingId, subject, degree, memo, sortOrder, unitPrice, amount, taxType)
 	if err != nil {
@@ -173,18 +146,9 @@ func (s *tradingService) CreateItem(token, tradingId, subject, degree, memo stri
 	return jsonResult(201, body)
 }
 
-func (s *tradingService) UpdateItem(token, id, tradingId, subject, degree, memo string, sortOrder, unitPrice int, amount float64, taxType int) s.Result {
+func (s *tradingService) UpdateItem(id, tradingId, subject, degree, memo string, sortOrder, unitPrice int, amount float64, taxType int) s.Result {
 	// input check
-	// get session
-	session, err := s.sessionDAO.GetByToken(token)
-	if err != nil {
-		return errorResult(500, MSG_SERVER_ERROR)
-	}
-	if session == nil {
-		return errorResult(401, MSG_WRONG_TOKEN)
-	}
-	// get trading
-	// create
+	// Update
 	item, err := s.tradingDAO.UpdateItem(id, tradingId, subject, degree, memo, sortOrder, unitPrice, amount, taxType)
 	if err != nil {
 		return errorResult(500, MSG_SERVER_ERROR)
@@ -207,11 +171,7 @@ func (s *tradingService) DeleteItem(id, tradingId string) s.Result {
 	}
 }
 
-func (o *tradingService) GetNextNumber(token, seqType string, date int64) s.Result {
-	// input check
-	if isEmpty(token) {
-		return errorResult(401, s.ERR_TOKEN_EMPTY)
-	}
+func (o *tradingService) GetNextNumber(seqType string, date int64) s.Result {
 	var seqTypeInt m.SeqType
 	switch seqType {
 	case "quotation":
@@ -225,14 +185,6 @@ func (o *tradingService) GetNextNumber(token, seqType string, date int64) s.Resu
 		break
 	default:
 		return errorResult(400, s.ERR_INVALID_SEQUENCE_TYPE)
-	}
-	// get session
-	session, err := o.sessionDAO.GetByToken(token)
-	if err != nil {
-		return errorResult(500, MSG_SERVER_ERROR)
-	}
-	if session == nil {
-		return errorResult(401, MSG_WRONG_TOKEN)
 	}
 	// determine year
 	t := time.Unix(date/1000, 0)

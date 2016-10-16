@@ -1,8 +1,8 @@
 package service
 
 type CompanyService interface {
-	GetList(token string) Result
-	Create(token, name, zip, address, phone, unit string) Result
-	Update(token, id, name, zip, address, phone, unit string) Result
-	Delete(token, id string) Result
+	GetList() Result
+	Create(name, zip, address, phone, unit string) Result
+	Update(id, name, zip, address, phone, unit string) Result
+	Delete(id string) Result
 }
