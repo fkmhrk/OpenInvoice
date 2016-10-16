@@ -17,15 +17,7 @@ func NewCompanySerivce(models *m.Models) *companyService {
 	}
 }
 
-func (s *companyService) GetList(token string) s.Result {
-	// input check
-	session, err := s.sessionDAO.GetByToken(token)
-	if err != nil {
-		return errorResult(500, MSG_SERVER_ERROR)
-	}
-	if session == nil {
-		return errorResult(401, MSG_WRONG_TOKEN)
-	}
+func (s *companyService) GetList() s.Result {
 	// get item
 	companies, err := s.companyDAO.GetList()
 	if err != nil {
@@ -41,15 +33,7 @@ func (s *companyService) GetList(token string) s.Result {
 	return jsonResult(200, body)
 }
 
-func (s *companyService) Create(token, name, zip, address, phone, unit string) s.Result {
-	// input check
-	session, err := s.sessionDAO.GetByToken(token)
-	if err != nil {
-		return errorResult(500, MSG_SERVER_ERROR)
-	}
-	if session == nil {
-		return errorResult(401, MSG_WRONG_TOKEN)
-	}
+func (s *companyService) Create(name, zip, address, phone, unit string) s.Result {
 	// create
 	company, err := s.companyDAO.Create(name, zip, address, phone, unit)
 	if err != nil {
@@ -61,15 +45,7 @@ func (s *companyService) Create(token, name, zip, address, phone, unit string) s
 	return jsonResult(201, body)
 }
 
-func (s *companyService) Update(token, id, name, zip, address, phone, unit string) s.Result {
-	// input check
-	session, err := s.sessionDAO.GetByToken(token)
-	if err != nil {
-		return errorResult(500, MSG_SERVER_ERROR)
-	}
-	if session == nil {
-		return errorResult(401, MSG_WRONG_TOKEN)
-	}
+func (s *companyService) Update(id, name, zip, address, phone, unit string) s.Result {
 	// create
 	company, err := s.companyDAO.Update(id, name, zip, address, phone, unit)
 	if err != nil {
@@ -81,17 +57,9 @@ func (s *companyService) Update(token, id, name, zip, address, phone, unit strin
 	return jsonResult(200, body)
 }
 
-func (o *companyService) Delete(token, id string) s.Result {
-	// input check
-	session, err := o.sessionDAO.GetByToken(token)
-	if err != nil {
-		return errorResult(500, MSG_SERVER_ERROR)
-	}
-	if session == nil {
-		return errorResult(401, MSG_WRONG_TOKEN)
-	}
+func (o *companyService) Delete(id string) s.Result {
 	// delete
-	err = o.companyDAO.Delete(id)
+	err := o.companyDAO.Delete(id)
 	if err != nil {
 		return errorResult(500, s.ERR_SERVER_ERROR)
 	}

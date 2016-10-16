@@ -6,9 +6,9 @@ import (
 
 type AdminService interface {
 	// Gets Environment
-	GetEnvironment(token string) Result
+	GetEnvironment() Result
 	// Saves Environment. If key exists, api updates it.
-	SaveEnvironment(token string, list []*m.Env) Result
+	SaveEnvironment(list []*m.Env) Result
 	// Gets My comanpy name
 	GetMyCompanyname() Result
 }

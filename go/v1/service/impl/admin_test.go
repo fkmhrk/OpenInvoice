@@ -9,11 +9,6 @@ import (
 
 func TestAdmin_0000_GetEnvironment(t *testing.T) {
 	models := mock.NewMock()
-	sessionDAO, _ := models.Session.(*mock.SessionDAO)
-	sessionDAO.GetByTokenResult = &m.Session{
-		Token:  "token1122",
-		UserId: "user1122",
-	}
 	envDAO, _ := models.Env.(*mock.EnvDAO)
 	envDAO.GetListResult = []*m.Env{
 		&m.Env{
@@ -27,7 +22,7 @@ func TestAdmin_0000_GetEnvironment(t *testing.T) {
 	}
 
 	var service s.AdminService = NewAdminService(models)
-	r := service.GetEnvironment("token")
+	r := service.GetEnvironment()
 
 	// Assertion
 	if r.Status() != 200 {
@@ -45,11 +40,6 @@ func TestAdmin_0000_GetEnvironment(t *testing.T) {
 
 func TestAdmin_0200_SavetEnvironment(t *testing.T) {
 	models := mock.NewMock()
-	sessionDAO, _ := models.Session.(*mock.SessionDAO)
-	sessionDAO.GetByTokenResult = &m.Session{
-		Token:  "token1122",
-		UserId: "user1122",
-	}
 	envDAO, _ := models.Env.(*mock.EnvDAO)
 	envDAO.SaveResult = nil
 
@@ -61,7 +51,7 @@ func TestAdmin_0200_SavetEnvironment(t *testing.T) {
 	}
 
 	var service s.AdminService = NewAdminService(models)
-	r := service.SaveEnvironment("token", list)
+	r := service.SaveEnvironment(list)
 
 	// Assertion
 	if r.Status() != 200 {

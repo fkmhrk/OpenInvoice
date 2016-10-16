@@ -3,13 +3,14 @@ package rest
 import (
 	s "../service"
 	rj "github.com/fkmhrk-go/rawjson"
+	"github.com/mokelab-go/hop"
 	"net/http"
 )
 
-func getToken(user s.UserService) handler {
+func getToken(user s.UserService) http.HandlerFunc {
 	return makeBaseHandler(func(req *http.Request) s.Result {
 		var username, password string
-		contentType := getContentType(req)
+		contentType := hop.ContentType(req.Context())
 		if contentType == "multipart/form-data" {
 			req.ParseMultipartForm(8192)
 			username = req.Form.Get("username")
@@ -26,10 +27,10 @@ func getToken(user s.UserService) handler {
 	})
 }
 
-func refreshToken(services s.Services) handler {
+func refreshToken(services s.Services) http.HandlerFunc {
 	return makeBaseHandler(func(req *http.Request) s.Result {
 		// read input
-		json, _ := rj.ObjectFromString(readBody(req))
+		json := rj.RawJsonObject(hop.BodyJSON(req.Context()))
 		// get values
 		token, _ := json.String("token")
 		// execute
