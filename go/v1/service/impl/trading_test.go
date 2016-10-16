@@ -318,18 +318,14 @@ func TestTrading0400_UpdateItem(t *testing.T) {
 func TestTrading0500_DeleteItem(t *testing.T) {
 	models := mock.NewMock()
 	sessionDAO, _ := models.Session.(*mock.SessionDAO)
-	sessionDAO.GetByTokenResult = &m.Session{
-		Token: "testToken",
-	}
 	tradingDAO, _ := models.Trading.(*mock.TradingDAO)
 	tradingDAO.SoftDeleteItemResult = nil
 
 	s := NewTradingSerivce(sessionDAO, tradingDAO, models)
 
-	token := "token1122"
 	id := "item1122"
 	tradingId := "tradingId1"
-	r := s.DeleteItem(token, id, tradingId)
+	r := s.DeleteItem(id, tradingId)
 	if r == nil {
 		t.Errorf("Result must not be nil")
 		return
@@ -391,15 +387,11 @@ func TestTrading0600_GetNextNumber(t *testing.T) {
 func TestTrading0700_Delete(t *testing.T) {
 	models := mock.NewMock()
 	sessionDAO, _ := models.Session.(*mock.SessionDAO)
-	sessionDAO.GetByTokenResult = &m.Session{
-		Token: "testToken",
-	}
 	tradingDAO, _ := models.Trading.(*mock.TradingDAO)
 	tradingDAO.DeleteResult = nil
 
 	s := NewTradingSerivce(sessionDAO, tradingDAO, models)
-	token := "token1122"
-	r := s.Delete(token, "trade1122")
+	r := s.Delete("trade1122")
 	if r == nil {
 		t.Errorf("Result must not be nil")
 		return

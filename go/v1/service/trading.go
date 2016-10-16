@@ -10,7 +10,7 @@ type TradingService interface {
 	Update(token string, trading Trading) Result
 
 	// Deletes trading and child items
-	Delete(token, tradingId string) Result
+	Delete(tradingId string) Result
 
 	// Gets trading items
 	GetItemListByTradingId(tradingId string) Result
@@ -19,7 +19,7 @@ type TradingService interface {
 	UpdateItem(token, id, tradingId, subject, degree, memo string, sortOrder, unitPrice int, amount float64, taxType int) Result
 
 	// Deletes trading item
-	DeleteItem(token, id, tradingId string) Result
+	DeleteItem(id, tradingId string) Result
 
 	// Gets next number
 	GetNextNumber(token, seqType string, date int64) Result

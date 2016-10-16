@@ -18,7 +18,8 @@ const (
 type handler func(http.ResponseWriter, *http.Request)
 
 func SetHandlers(r *mux.Router, services s.Services, u s.UserService, t s.TradingService, c s.CompanyService, models *m.Models) {
-	authRequired := hop.Operations(
+	auth := hop.Operations(
+		hop.GetPathParams,
 		hop.GetCredential,
 		getSession(models.Session),
 	)
@@ -29,7 +30,7 @@ func SetHandlers(r *mux.Router, services s.Services, u s.UserService, t s.Tradin
 	r.HandleFunc("/token/refresh", hop.Operations(
 		hop.GetBodyAsJSON,
 	)(refreshToken(services))).Methods(method_POST)
-	r.HandleFunc("/users", authRequired(getUsers(u))).
+	r.HandleFunc("/users", auth(getUsers(u))).
 		Methods(method_GET)
 	r.HandleFunc("/users", createUser(services)).
 		Methods(method_POST)
@@ -37,21 +38,22 @@ func SetHandlers(r *mux.Router, services s.Services, u s.UserService, t s.Tradin
 		Methods(method_PUT)
 	r.HandleFunc("/users/{id}", deleteUser(services)).
 		Methods(method_DELETE)
-	r.HandleFunc("/tradings", authRequired(getTradings(t))).
+	r.HandleFunc("/tradings", auth(getTradings(t))).
 		Methods(method_GET)
 	r.HandleFunc("/tradings", createTrading(t)).
 		Methods(method_POST)
 	r.HandleFunc("/tradings/{tradingId}", updateTrading(t)).
 		Methods(method_PUT)
-	r.HandleFunc("/tradings/{tradingId}", deleteTrading(services)).
+	r.HandleFunc("/tradings/{tradingId}", auth(deleteTrading(services))).
 		Methods(method_DELETE)
-	r.HandleFunc("/tradings/{tradingId}/items", authRequired(getTradingItems(t))).
+	r.HandleFunc("/tradings/{tradingId}/items", auth(getTradingItems(t))).
 		Methods(method_GET)
 	r.HandleFunc("/tradings/{tradingId}/items", createTradingItem(t)).
 		Methods(method_POST)
 	r.HandleFunc("/tradings/{tradingId}/items/{itemId}", updateTradingItem(t)).
 		Methods(method_PUT)
-	r.HandleFunc("/tradings/{tradingId}/items/{itemId}", deleteTradingItem(t)).
+	r.HandleFunc("/tradings/{tradingId}/items/{itemId}",
+		auth(deleteTradingItem(t))).
 		Methods(method_DELETE)
 	r.HandleFunc("/companies", getCompanies(c)).
 		Methods(method_GET)

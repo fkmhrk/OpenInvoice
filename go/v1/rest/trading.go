@@ -5,6 +5,7 @@ import (
 	s "../service"
 	rj "github.com/fkmhrk-go/rawjson"
 	"github.com/gorilla/mux"
+	"github.com/mokelab-go/hop"
 	"net/http"
 )
 
@@ -89,21 +90,19 @@ func updateTrading(trading s.TradingService) handler {
 	})
 }
 
-func deleteTrading(services s.Services) handler {
-	return makeHandler(func(token, tType string, req *http.Request) s.Result {
+func deleteTrading(services s.Services) http.HandlerFunc {
+	return makeBaseHandler(func(req *http.Request) s.Result {
 		// read path param
-		vars := mux.Vars(req)
-		tradingId := vars["tradingId"]
+		tradingId := hop.PathString(req.Context(), "tradingId")
 
-		return services.Trading.Delete(token, tradingId)
+		return services.Trading.Delete(tradingId)
 	})
 }
 
 func getTradingItems(trading s.TradingService) http.HandlerFunc {
 	return makeBaseHandler(func(req *http.Request) s.Result {
 		// read path param
-		vars := mux.Vars(req)
-		tradingId := vars["tradingId"]
+		tradingId := hop.PathString(req.Context(), "tradingId")
 
 		return trading.GetItemListByTradingId(tradingId)
 	})
@@ -156,14 +155,13 @@ func updateTradingItem(trading s.TradingService) handler {
 	})
 }
 
-func deleteTradingItem(trading s.TradingService) handler {
-	return makeHandler(func(token, tType string,
-		req *http.Request) s.Result {
+func deleteTradingItem(trading s.TradingService) http.HandlerFunc {
+	return makeBaseHandler(func(req *http.Request) s.Result {
 		// read path param
-		vars := mux.Vars(req)
-		tradingId := vars["tradingId"]
-		id := vars["itemId"]
+		c := req.Context()
+		tradingId := hop.PathString(c, "tradingId")
+		id := hop.PathString(c, "itemId")
 
-		return trading.DeleteItem(token, id, tradingId)
+		return trading.DeleteItem(id, tradingId)
 	})
 }
