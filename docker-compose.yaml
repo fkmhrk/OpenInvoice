@@ -7,3 +7,12 @@ services:
             - ./composer-conf/mysql-conf.d:/etc/mysql/conf.d:ro
             - ./sql:/docker-entrypoint-initdb.d
         env_file: ./composer-conf/mysql.env
+    api:
+        build: ./go
+        image: fkmhrk/oiv:latest
+        ports:
+            - 10080:80
+        depends_on:
+            - mysql
+        links:
+            - mysql:db
