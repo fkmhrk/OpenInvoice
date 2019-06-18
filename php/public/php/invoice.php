@@ -1,7 +1,7 @@
 <?php
-require_once (dirname(__FILE__). '/../../libs/model/impl/MySQLConnection.php');
-require_once (dirname(__FILE__). '/../../libs/model/impl/MySQLSessionDAO.php');
-require_once (dirname(__FILE__). '/../../libs/view/impl/TQInvoicePDFViewImpl.php');
+require_once (dirname(__FILE__). '/../libs/model/impl/MySQLConnection.php');
+require_once (dirname(__FILE__). '/../libs/model/impl/MySQLSessionDAO.php');
+require_once (dirname(__FILE__). '/../libs/view/impl/TQInvoicePDFViewImpl.php');
 
 date_default_timezone_set('Asia/Tokyo');
 
@@ -32,6 +32,7 @@ function isValidInput($json) {
  
 $db = connect();
 if ($db === null) {
+    echo 'Failed to connect DB';
     return;
 }
 $sessionDAO = new MySQLSessionDAO($db);

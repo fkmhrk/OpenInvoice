@@ -1,5 +1,5 @@
 <?php
-define('DB_HOST', "localhost");
+define('DB_HOST', "db");
 define('DB_USER', "openinvoice_test");
 define('DB_PASS', "openinvoice");
 define('DB_NAME', "openinvoice");
@@ -16,6 +16,7 @@ function connect() {
         $db->query("SET NAMES utf8");
         return $db;
     } catch (PDOException $e) {
+        echo $e;
         return null;
     }
 }

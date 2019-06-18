@@ -8,12 +8,13 @@ import (
 	si "./service/impl"
 
 	"database/sql"
+
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/gorilla/mux"
 )
 
 func InitRouter(r *mux.Router) error {
-	db, err := sql.Open("mysql", "openinvoice_test:openinvoice@/openinvoice")
+	db, err := sql.Open("mysql", "openinvoice_test:openinvoice@tcp(db:3306)/openinvoice")
 	if err != nil {
 		return err
 	}

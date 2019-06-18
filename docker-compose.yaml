@@ -1,0 +1,26 @@
+version: "3"
+services:
+    mysql:
+        image: mysql:5.7
+        volumes:
+            - ./data/db:/var/lib/mysql
+            - ./composer-conf/mysql-conf.d:/etc/mysql/conf.d:ro
+            - ./sql:/docker-entrypoint-initdb.d
+        env_file: ./composer-conf/mysql.env
+    front:
+        build: ./go
+        image: fkmhrk/oiv:latest
+        ports:
+            - 10080:80
+        depends_on:
+            - mysql
+        links:
+            - mysql:db
+            - pdf:pdf
+    pdf:
+        build: ./php
+        image: fkmhrk/oiv_pdf:latest
+        depends_on:
+            - mysql
+        links:
+            - mysql:db

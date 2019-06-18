@@ -1,19 +1,20 @@
 <?php
 
-require_once (dirname(__FILE__). '/../../libs/model/impl/MySQLConnection.php');
-require_once (dirname(__FILE__). '/../../libs/model/impl/MySQLSessionDAO.php');
-require_once (dirname(__FILE__). '/../../libs/model/impl/MySQLTradingDAO.php');
-require_once (dirname(__FILE__). '/../../libs/model/impl/MySQLTradingItemDAO.php');
-require_once (dirname(__FILE__). '/../../libs/model/impl/MySQLCompanyDAO.php');
-require_once (dirname(__FILE__). '/../../libs/model/impl/MySQLUserDAO.php');
-require_once (dirname(__FILE__). '/../../libs/model/impl/MySQLEnvDAO.php');
+require_once (dirname(__FILE__). '/../libs/model/impl/MySQLConnection.php');
+require_once (dirname(__FILE__). '/../libs/model/impl/MySQLSessionDAO.php');
+require_once (dirname(__FILE__). '/../libs/model/impl/MySQLTradingDAO.php');
+require_once (dirname(__FILE__). '/../libs/model/impl/MySQLTradingItemDAO.php');
+require_once (dirname(__FILE__). '/../libs/model/impl/MySQLCompanyDAO.php');
+require_once (dirname(__FILE__). '/../libs/model/impl/MySQLUserDAO.php');
+require_once (dirname(__FILE__). '/../libs/model/impl/MySQLEnvDAO.php');
 
-require_once (dirname(__FILE__). '/../../libs/view/impl/TQPDFViewImpl.php');
+require_once (dirname(__FILE__). '/../libs/view/impl/TQPDFViewImpl.php');
 
 date_default_timezone_set('Asia/Tokyo');
 
 $db = connect();
 if ($db === null) {
+    echo 'Failed to connect DB';
     return;
 }
 
@@ -69,7 +70,7 @@ $view->writeMyCompany($env, $user);
 
 $summary = $view->writeItemTable(16, 120, $items, $trading['tax_rate'], 'ご請求金額');
 $view->writeTheTimeForPayment($trading['bill_date'] / 1000, $env['pay_limit']);
-$view->writeProduct($trading['work_from'] / 1000, $trading['work_to'] / 1000, $trading['product']);
+$view->writeProduct($trading['work_from'] / 1000, $trading['work_to'] / 1000, $trading['product'], $trading['memo']);
 $view->writeTotal("御請求金額計 ￥" . number_format($summary['total']));
 $view->writeStamp();
 $view->output('納品書_'. $company['name']);
