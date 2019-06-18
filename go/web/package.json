@@ -1,0 +1,27 @@
+{
+  "name": "oiv",
+  "version": "1.0.0",
+  "description": "Web front",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fkmhrk/OpenInvoice.git"
+  },
+  "keywords": [
+    "invoice",
+    "system"
+  ],
+  "author": "fkm",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/fkmhrk/OpenInvoice/issues"
+  },
+  "homepage": "https://github.com/fkmhrk/OpenInvoice#readme",
+  "devDependencies": {
+    "typescript": "^3.5.2",
+    "webpack": "^4.34.0"
+  }
+}
