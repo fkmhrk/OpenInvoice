@@ -1,16 +1,25 @@
 package rest
 
 import (
+	"net/http"
+
 	m "../model"
 	s "../service"
 	rj "github.com/fkmhrk-go/rawjson"
 	"github.com/mokelab-go/hop"
-	"net/http"
 )
 
 func getTradings(trading s.TradingService) http.HandlerFunc {
 	return makeBaseHandler(func(req *http.Request) s.Result {
 		return trading.GetListByUser()
+	})
+}
+
+func getTrading(trading s.TradingService) http.HandlerFunc {
+	return makeBaseHandler(func(req *http.Request) s.Result {
+		c := req.Context()
+		tradingId := hop.PathString(c, "tradingId")
+		return trading.GetTradingByID(tradingId)
 	})
 }
 

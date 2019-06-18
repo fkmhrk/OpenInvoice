@@ -1,0 +1,3 @@
+interface IAccessToken {
+    token: string;
+}
