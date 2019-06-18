@@ -378,7 +378,7 @@
                       <th></th>
                     </tr>
                     {{#companyList:i}}
-                    <tr on-click="showEdit:{{.}}">
+                    <tr on-click="['showEdit',.]">
                       <td>{{name}}</td>
                       <td>{{unit}}</td>
                       <td>{{assignee}}</td>
@@ -407,16 +407,16 @@
                    <section id="addCompany">
                      <div class="wrapper">
                        <div class="names">
-                         <p><span>会社名</span><input type="text" placeholder="例）株式会社ABC" value="{{company.name}}"></p>
-                         <p><span>部署名</span><input type="text" placeholder="例）第2システム営業部" value="{{company.unit}}"></p>
-                         <p><span>担当者</span><input type="text" placeholder="例）山田 太郎" value="{{company.assignee}}"></p>
+                         <p><span>会社名</span><input type="text" placeholder="例）株式会社ABC" value="{{name}}"></p>
+                         <p><span>部署名</span><input type="text" placeholder="例）第2システム営業部" value="{{unit}}"></p>
+                         <p><span>担当者</span><input type="text" placeholder="例）山田 太郎" value="{{assignee}}"></p>
                        </div>
                        <div class="infos">
-                         <p class="zip"><span>郵便番号</span><input type="text" placeholder="例）160-0022" value="{{company.zip}}"></p>
+                         <p class="zip"><span>郵便番号</span><input type="text" placeholder="例）160-0022" value="{{zip}}"></p>
                          <p class="address"><span>住所</span><input type="text" placeholder="例）東京都新宿区新宿1-1-1 ○○ビル 6F"
-                                                                                             value="{{company.address}}"></p>
-                         <p><span>TEL</span><input type="text" placeholder="例）03-1234-5678" value="{{company.phone}}"></p>
-                         <p><span>FAX</span><input type="text" placeholder="FAX" value="{{company.fax}}"></p>
+                                                                                             value="{{address}}"></p>
+                         <p><span>TEL</span><input type="text" placeholder="例）03-1234-5678" value="{{phone}}"></p>
+                         <p><span>FAX</span><input type="text" placeholder="FAX" value="{{fax}}"></p>
                        </div>
                      </div>
                      {{#if isNew }}

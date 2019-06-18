@@ -3,6 +3,7 @@
 ///<reference path="./AddCompanyDialog.ts"/>
 
 import { Ractive } from "./ractive";
+import { AddCompanyDialog } from "./AddCompanyDialog";
 
 export class CompanyListDialog implements IDialog {
     dialogId: number = 0;
@@ -43,14 +44,20 @@ export class CompanyListDialog implements IDialog {
         var listUserHeight = $(".listTemplate").height()!;
         $(".listTemplate .list").css("height", listUserHeight - 370);
     }
-    private showEditDialog(item: Company) {
-        /*        
+    private showEditDialog(item: ICompany) {
         this.app.showDialog(
-            new AddCompanyDialog(item, (result: any) => {
-                // nop
+            new AddCompanyDialog(this.app, item, (result: ICompany) => {
+                // update
+                item.name = result.name;
+                item.address = result.address;
+                item.assignee = result.assignee;
+                item.fax = result.fax;
+                item.phone = result.phone;
+                item.unit = result.unit;
+                item.zip = result.zip;
+                this.ractive.update();
             })
         );
-*/
     }
 
     private async save() {

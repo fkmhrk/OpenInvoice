@@ -2,59 +2,69 @@
 ///<reference path="./Dialog.ts"/>
 ///<reference path="./Functions.ts"/>
 
-/*
-class AddCompanyDialog implements Dialog {
-    ractive : Ractive;
-    company : Company;
-    companyOrg : Company;
-    isNew : boolean;
-    callback : (result : Company) => void;
+import { Ractive } from "./ractive";
 
-    constructor(company : Company, callback : (result : Company) => void) {
-        if (company == null) {
-            this.isNew = true;
-            this.company = new Company();
-            this.company.id = null;
-            this.companyOrg = null;
-        } else {
-            this.isNew = false;
-            this.company = Utils.clone(company);
-            this.companyOrg = company;
-        }
+export class AddCompanyDialog implements IDialog {
+    dialogId: number = 0;
+    private app: IApplication;
+    private ractive!: Ractive;
+    private company: Company;
+    private callback: (result: Company) => void;
+
+    constructor(
+        app: IApplication,
+        company: Company,
+        callback: (result: Company) => void
+    ) {
+        this.app = app;
+        this.company = company;
         this.callback = callback;
     }
-    
-    attach(app : App, el : HTMLElement) {
+
+    onCreate(elem: HTMLElement): void {
         this.ractive = new Ractive({
-            // どの箱に入れるかをIDで指定
-            el : el,
-            // 指定した箱に、どのHTMLを入れるかをIDで指定
-            template : '#addCompanyTemplate',
-            data : {
-                isNew : this.isNew,
-                company : this.company,
-            }
+            el: elem,
+            template: "#addCompanyTemplate",
+            data: {
+                id: this.company.id,
+                name: this.company.name,
+                unit: this.company.unit,
+                assignee: this.company.assignee,
+                zip: this.company.zip,
+                address: this.company.address,
+                phone: this.company.phone,
+                fax: this.company.fax,
+            },
+            on: {
+                windowClicked: () => false,
+                close: () => {
+                    this.app.closeDialog(this);
+                    return false;
+                },
+                save: () => this.save(),
+            },
         });
-        this.ractive.on({
-            'windowClicked' : () => {
-                return false;
-            },
-            'close' : () => {
-                app.closeDialog();
-                return false;
-            },
-            'save' : () => {
-                this.save(app);
-                return false;
-            }
-        });        
     }
 
-    private save(app : App) {
-        var company = this.ractive.get('company');
-        console.log(company);
+    private async save() {
+        const company = {
+            id: this.ractive.get("id"),
+            name: this.ractive.get("name"),
+            unit: this.ractive.get("unit"),
+            assignee: this.ractive.get("assignee"),
+            zip: this.ractive.get("zip"),
+            address: this.ractive.get("address"),
+            phone: this.ractive.get("phone"),
+            fax: this.ractive.get("fax"),
+        };
+
+        const saved = await this.app.models.company.save(company);
+        this.callback(saved);
+        // app.addSnack("保存しました。");
+        this.app.closeDialog(this);
+        /*        
         app.client.saveCompany(company, {
-            success : (id : string) => {
+            success: (id: string) => {
                 // clone?
                 company.id = id;
                 if (this.companyOrg == null) {
@@ -69,16 +79,20 @@ class AddCompanyDialog implements Dialog {
                     this.companyOrg.fax = company.fax;
                 }
                 this.callback(company);
-                app.addSnack('保存しました。');
+                app.addSnack("保存しました。");
                 app.closeDialog();
             },
-            error : (status : number, msg : string) => {
+            error: (status: number, msg: string) => {
                 switch (status) {
-                case 1001: app.addSnack('会社名を入力してください'); break;                    
-                default: app.addSnack('保存に失敗しました。'); break;
+                    case 1001:
+                        app.addSnack("会社名を入力してください");
+                        break;
+                    default:
+                        app.addSnack("保存に失敗しました。");
+                        break;
                 }
-            }
+            },
         });
+*/
     }
 }
-*/

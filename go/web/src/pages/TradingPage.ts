@@ -1,4 +1,5 @@
 import Ractive from "../ractive";
+import { AddCompanyDialog } from "../AddCompanyDialog";
 
 const toDateStr = (time: number) => {
     var date = new Date(time);
@@ -65,6 +66,7 @@ export class TradingPage implements IPage {
             },
             on: {
                 close: () => window.history.back(),
+                addCompany: () => this.showAddCompanyDialog(),
                 addItem: () => this.addItem(),
                 deleteItem: (e: any, index: number) => this.deleteItem(index),
                 save: async () => {
@@ -111,6 +113,18 @@ export class TradingPage implements IPage {
             "trading.tax": tax,
             "trading.total": sum + tax,
         });
+    }
+
+    private showAddCompanyDialog(): void {
+        const company = <ICompany>{
+            id: "",
+        };
+        this.app.showDialog(
+            new AddCompanyDialog(this.app, company, (result: ICompany) => {
+                // cache is already updated
+                this.ractive.update();
+            })
+        );
     }
 
     private addItem(): void {
