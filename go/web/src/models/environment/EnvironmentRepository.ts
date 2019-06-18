@@ -15,4 +15,12 @@ export default class EnvironmentRepository implements IEnvironmentRepository {
             .then(getBody)
             .then((json: any) => <IEnvironment>json);
     }
+
+    save(env: IEnvironment): Promise<IEnvironment> {
+        const url = "/api/v1/environments";
+        return this.client
+            .send(Method.PUT, url, {}, JSON.stringify(env))
+            .then(isStatus200)
+            .then((r: HTTPResponse) => env);
+    }
 }

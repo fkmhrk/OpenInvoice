@@ -240,8 +240,8 @@
                       <td>
                         <span class="selectbox">
                           <select id="pay_limit" value="{{pay_limit}}">
-                            <option value="1">翌月末</option>
-                            <option value="2">翌々月末</option>
+                            <option value="{{1}}">翌月末</option>
+                            <option value="{{2}}">翌々月末</option>
                           </select>
                         </span>
                       </td>
@@ -264,10 +264,10 @@
                     <p>
                       <input type="text" placeholder="銀行名" value="{{company_bankname}}">
                       <span class="selectbox">
-                        <select id="bank_type" value="company_bank_type">
-                          <option value="1">普通</option>
-                          <option value="2">当座</option>
-                          <option value="3">定期</option>
+                        <select id="bank_type" value="{{company_bank_type}}">
+                          <option value="{{1}}">普通</option>
+                          <option value="{{2}}">当座</option>
+                          <option value="{{3}}">定期</option>
                         </select>
                       </span>
                       <input type="text" placeholder="口座番号" value="{{company_bank_num}}">

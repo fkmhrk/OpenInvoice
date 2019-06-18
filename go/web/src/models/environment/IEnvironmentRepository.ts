@@ -1,5 +1,6 @@
 interface IEnvironmentRepository {
     get(): Promise<IEnvironment>;
+    save(env: IEnvironment): Promise<IEnvironment>;
 }
 
 interface IEnvironment {
