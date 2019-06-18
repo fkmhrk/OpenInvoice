@@ -1,5 +1,7 @@
 interface ICompanyRepository {
     getAll(): Promise<ICompany[]>;
+    save(company: ICompany): Promise<ICompany>;
+    deleteCompany(company: ICompany): Promise<boolean>;
 }
 
 interface ICompany {

@@ -1,6 +1,7 @@
 import Ractive from "../ractive";
 import $ from "jquery";
 import { SettingsDialog } from "../SettingsDialog";
+import { CompanyListDialog } from "../CompanyListDialog";
 
 const fabDecorate = (node: any) => {
     $(node).hover(
@@ -81,6 +82,8 @@ export class TopPage implements IPage {
                     this.app.navigate(`/tradings/${item.id}/copy`);
                     return false;
                 },
+                showCompanyList: () =>
+                    this.app.showDialog(new CompanyListDialog(this.app)),
                 showSetting: () =>
                     this.app.showDialog(new SettingsDialog(this.app)),
             },

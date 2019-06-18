@@ -383,7 +383,7 @@
                       <td>{{unit}}</td>
                       <td>{{assignee}}</td>
                       <td>{{address}}</td>
-                      <td><a on-click="deleteCompany:{{i}}" class="btn" title="削除"><i class="fa fa-trash-o"></i></a></td>
+                      <td><a on-click="['deleteCompany',i]" class="btn" title="削除"><i class="fa fa-trash-o"></i></a></td>
                     </tr>
                     {{/}}
                   </table>
