@@ -1,6 +1,8 @@
 package rest
 
 import (
+	"net/http"
+
 	m "../model"
 	s "../service"
 	"github.com/gorilla/mux"
@@ -52,6 +54,9 @@ func SetHandlers(r *mux.Router, services s.Services, u s.UserService, t s.Tradin
 	r.HandleFunc("/tradings",
 		authBody(createTrading(t))).
 		Methods(method_POST)
+	r.HandleFunc("/tradings/{tradingId}",
+		auth(getTrading(t))).
+		Methods(http.MethodGet)
 	r.HandleFunc("/tradings/{tradingId}",
 		authBody(updateTrading(t))).
 		Methods(method_PUT)

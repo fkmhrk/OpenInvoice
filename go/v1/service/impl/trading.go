@@ -1,10 +1,11 @@
 package impl
 
 import (
-	s "../"
-	m "../../model"
 	"strconv"
 	"time"
+
+	s "../"
+	m "../../model"
 )
 
 type tradingService struct {
@@ -36,6 +37,16 @@ func (s *tradingService) GetListByUser() s.Result {
 	body := map[string]interface{}{
 		"tradings": list,
 	}
+	return jsonResult(200, body)
+}
+
+func (s *tradingService) GetTradingByID(id string) s.Result {
+	// get : fixed we use GetList
+	trading, err := s.tradingDAO.GetById(id)
+	if err != nil {
+		return errorResult(500, MSG_SERVER_ERROR)
+	}
+	body := s.toJson(trading)
 	return jsonResult(200, body)
 }
 

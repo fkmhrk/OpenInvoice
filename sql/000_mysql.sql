@@ -127,4 +127,4 @@ create table if not exists seq(
 
 /* default admin user */
 insert into user(id,login_name,password,display_name,role,tel,created_time,modified_time,deleted)
- values('idadmin', 'admin', 'c8ea932352eae95d3ae36891cdf42eb4', 'admin', 'admin','',unix_timestamp(), unix_timestamp(), 0);
+ values('idadmin', 'admin', 'c8ea932352eae95d3ae36891cdf42eb4', 'admin', 'Admin','',unix_timestamp(), unix_timestamp(), 0);
