@@ -18,6 +18,10 @@ export const handleError = (app: IApplication, e: any, fallback: string) => {
             case me.ERR_EMPTY_TEL:
                 app.addSnack("電話番号を入力してください");
                 return;
+
+            case me.ERR_EMPTY_COMPANY_NAME:
+                app.addSnack("会社名を入力してください");
+                return;
         }
     }
     app.addSnack(fallback);

@@ -3,6 +3,7 @@
 ///<reference path="./Functions.ts"/>
 
 import { Ractive } from "./ractive";
+import { handleError } from "./pages/ErrorHandler";
 
 export class AddCompanyDialog implements IDialog {
     dialogId: number = 0;
@@ -58,41 +59,13 @@ export class AddCompanyDialog implements IDialog {
             fax: this.ractive.get("fax"),
         };
 
-        const saved = await this.app.models.company.save(company);
-        this.callback(saved);
-        // app.addSnack("保存しました。");
-        this.app.closeDialog(this);
-        /*        
-        app.client.saveCompany(company, {
-            success: (id: string) => {
-                // clone?
-                company.id = id;
-                if (this.companyOrg == null) {
-                    app.addCompany(company);
-                } else {
-                    this.companyOrg.name = company.name;
-                    this.companyOrg.unit = company.unit;
-                    this.companyOrg.assignee = company.assignee;
-                    this.companyOrg.zip = company.zip;
-                    this.companyOrg.address = company.address;
-                    this.companyOrg.phone = company.phone;
-                    this.companyOrg.fax = company.fax;
-                }
-                this.callback(company);
-                app.addSnack("保存しました。");
-                app.closeDialog();
-            },
-            error: (status: number, msg: string) => {
-                switch (status) {
-                    case 1001:
-                        app.addSnack("会社名を入力してください");
-                        break;
-                    default:
-                        app.addSnack("保存に失敗しました。");
-                        break;
-                }
-            },
-        });
-*/
+        try {
+            const saved = await this.app.models.company.save(company);
+            this.callback(saved);
+            this.app.addSnack("保存しました。");
+            this.app.closeDialog(this);
+        } catch (e) {
+            handleError(this.app, e, "保存に失敗しました");
+        }
     }
 }

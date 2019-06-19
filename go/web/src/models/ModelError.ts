@@ -14,3 +14,4 @@ export const ERR_EMPTY_PASSWORD = 2;
 export const ERR_SHORT_PASSWORD = 3;
 export const ERR_EMPTY_DISPLAY_NAME = 4;
 export const ERR_EMPTY_TEL = 5;
+export const ERR_EMPTY_COMPANY_NAME = 10;
