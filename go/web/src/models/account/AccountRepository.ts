@@ -28,4 +28,20 @@ export default class AccountRepository implements IAccountRepository {
                 return refreshToken;
             });
     }
+
+    refresh(): Promise<void> {
+        const url = "/api/v1/token/refresh";
+        const params = {
+            token: this.token.refresh,
+        };
+        return this.client
+            .send(Method.POST, url, {}, JSON.stringify(params))
+            .then(isStatus200)
+            .then(getBody)
+            .then((body: any) => {
+                const nextToken = body["access_token"];
+                const isAdmin = body["is_admin"];
+                this.token.save(nextToken, this.token.refresh, isAdmin);
+            });
+    }
 }

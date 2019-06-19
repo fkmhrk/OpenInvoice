@@ -2,96 +2,126 @@
 ///<reference path="./Dialog.ts"/>
 ///<reference path="./Functions.ts"/>
 
-/*
-class AddUserDialog implements Dialog {
-    ractive : Ractive;
-    user : User;
-    userOrg : User;
-    isNew : boolean;
-    callback : (result : User) => void;
+import { Ractive } from "./ractive";
 
-    constructor(user : User, callback : (result : User) => void) {
-        if (user == null) {
-            this.isNew = true;
-            this.user = new User();
-            this.userOrg = null;
-        } else {
-            this.isNew = false;
-            this.user = Utils.clone(user);
-            this.userOrg = user;
-        }
+export class AddUserDialog implements IDialog {
+    dialogId: number = 0;
+    private app: IApplication;
+    private ractive!: Ractive;
+    private user: IUser;
+    callback: (result: IUser) => void;
+
+    constructor(
+        app: IApplication,
+        user: IUser,
+        callback: (result: User) => void
+    ) {
+        this.app = app;
+        this.user = user;
         this.callback = callback;
     }
-    
-    attach(app : App, el : HTMLElement) {
+
+    async onCreate(elem: HTMLElement) {
         this.ractive = new Ractive({
             // どの箱に入れるかをIDで指定
-            el : el,
+            el: elem,
             // 指定した箱に、どのHTMLを入れるかをIDで指定
-            template : '#addUserTemplate',
-            data : {
-                isNew : this.isNew,
-                user : this.user,
-            }
+            template: "#addUserTemplate",
+            data: {
+                isNew: this.user.id.length == 0,
+                user: this.user,
+            },
+            on: {
+                windowClicked: () => false,
+                close: () => {
+                    this.app.closeDialog(this);
+                    return false;
+                },
+                save: () => {
+                    this.save();
+                    return false;
+                },
+            },
         });
-        this.ractive.on({
-            'windowClicked' : () => {
-                return false;
-            },
-            'close' : () => {
-                app.closeDialog();
-                return false;
-            },
-            'save' : () => {
-                this.save(app);
-                return false;
-            }
-        });        
     }
 
-    private save(app : App) {
-        var user = this.ractive.get('user');
-        var password = this.ractive.get('password');
+    private async save() {
+        const user = this.ractive.get("user");
+        const password = this.ractive.get("password");
+
+        const saved = await this.app.models.user.save(user, password);
+        //app.addSnack("作成しました");
+        this.app.closeDialog(this);
+        this.callback(saved);
+        /*
         if (this.isNew) {
-            app.client.createUser(user.login_name, user.display_name, user.tel, password, {
-                success : (item : User) => {
-                    app.addUser(item);
-                    this.callback(item);
-                    app.addSnack('作成しました');
-                    app.closeDialog();
-                },
-                error : (status : number, msg : string) => {
-                    switch (status) {
-                    case 1000: app.addSnack('ユーザーIDを入力してください'); break;
-                    case 1001: app.addSnack('担当者名を入力してください'); break;            
-                    case 1002: app.addSnack('TELを入力してください'); break;
-                    case 1003: 
-                    case 1004: app.addSnack('パスワードを6文字以上入力してください'); break;
-                    default : app.addSnack('保存に失敗しました。');
-                    }
+            app.client.createUser(
+                user.login_name,
+                user.display_name,
+                user.tel,
+                password,
+                {
+                    success: (item: User) => {
+                        app.addUser(item);
+                        this.callback(item);
+                        app.addSnack("作成しました");
+                        app.closeDialog();
+                    },
+                    error: (status: number, msg: string) => {
+                        switch (status) {
+                            case 1000:
+                                app.addSnack("ユーザーIDを入力してください");
+                                break;
+                            case 1001:
+                                app.addSnack("担当者名を入力してください");
+                                break;
+                            case 1002:
+                                app.addSnack("TELを入力してください");
+                                break;
+                            case 1003:
+                            case 1004:
+                                app.addSnack(
+                                    "パスワードを6文字以上入力してください"
+                                );
+                                break;
+                            default:
+                                app.addSnack("保存に失敗しました。");
+                        }
+                    },
                 }
-            });
+            );
         } else {
             app.client.saveUser(user, password, {
-                success : (item : User) => {
+                success: (item: User) => {
                     this.userOrg.login_name = user.login_name;
                     this.userOrg.display_name = user.display_name;
                     this.userOrg.tel = user.tel;
                     this.callback(item);
-                    app.addSnack('保存しました');
+                    app.addSnack("保存しました");
                     app.closeDialog();
                 },
-                error : (status : number, msg : string) => {
+                error: (status: number, msg: string) => {
                     switch (status) {
-                    case 1001: app.addSnack('ユーザーIDを入力してください'); break;
-                    case 1002: app.addSnack('担当者名を入力してください'); break;            
-                    case 1003: app.addSnack('TELを入力してください'); break;
-                    case 1004: app.addSnack('パスワードを6文字以上入力してください'); break;
-                    default : app.addSnack('保存に失敗しました。');
+                        case 1001:
+                            app.addSnack("ユーザーIDを入力してください");
+                            break;
+                        case 1002:
+                            app.addSnack("担当者名を入力してください");
+                            break;
+                        case 1003:
+                            app.addSnack("TELを入力してください");
+                            break;
+                        case 1004:
+                            app.addSnack(
+                                "パスワードを6文字以上入力してください"
+                            );
+                            break;
+                        default:
+                            app.addSnack("保存に失敗しました。");
                     }
-                }
-            });            
+                },
+            });
         }
+*/
     }
 }
-*/

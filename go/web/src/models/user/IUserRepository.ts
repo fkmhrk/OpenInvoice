@@ -1,5 +1,7 @@
 interface IUserRepository {
     getAll(): Promise<IUser[]>;
+    save(user: IUser, password: string): Promise<IUser>;
+    deleteUser(user: IUser): Promise<boolean>;
 }
 
 interface IUser {

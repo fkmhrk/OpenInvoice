@@ -1,62 +1,75 @@
 ///<reference path="./Application.ts"/>
 ///<reference path="./Dialog.ts"/>
 
-/*
-class UserListDialog implements Dialog {
+import { Ractive } from "./ractive";
+import { AddUserDialog } from "./AddUserDialog";
+
+export class UserListDialog implements IDialog {
+    dialogId: number = 0;
+    private app: IApplication;
     private ractive!: Ractive;
 
-    callback?: (result: any) => void;
+    private callback: (result: IUser) => void;
 
-    attach(app: App, el: HTMLElement) {
-        this.ractive = new Ractive({
-            // どの箱に入れるかをIDで指定
-            el: el,
-            // 指定した箱に、どのHTMLを入れるかをIDで指定
-            template: "#userListTemplate",
-            data: {
-                userList: app.users,
-            },
-        });
-        this.ractive.on({
-            windowClicked: () => {
-                return false;
-            },
-            close: () => {
-                app.closeDialog();
-                return false;
-            },
-            showEdit: (e: any, item: User) => {
-                this.showEditDialog(app, item);
-                return false;
-            },
-            delete: (e: any, item: User) => {
-                this.deleteUser(app, item);
-                return false;
-            },
-            create: () => {
-                this.createUser(app);
-                return false;
-            },
-        });
-        //dialog内だけスクロールするように調整
-        // var listUserHeight = $(".listTemplate").height();
-        // $(".listTemplate .list").css("height", listUserHeight - 330);
+    constructor(app: IApplication, callback: (result: IUser) => void) {
+        this.app = app;
+        this.callback = callback;
     }
 
-    private showEditDialog(app: App, item: User) {
-        app.showDialog(
-            new AddUserDialog(item, (result: User) => {
+    async onCreate(elem: HTMLElement) {
+        const userList = await this.app.models.user.getAll();
+
+        this.ractive = new Ractive({
+            el: elem,
+            template: "#userListTemplate",
+            data: {
+                userList: userList,
+            },
+            on: {
+                windowClicked: () => false,
+                close: () => {
+                    this.app.closeDialog(this);
+                    return false;
+                },
+                showEdit: (e: any, item: User) => {
+                    this.showEditDialog(item);
+                    return false;
+                },
+                delete: (e: any, item: User) => {
+                    this.deleteUser(item);
+                    return false;
+                },
+                create: () => {
+                    this.createUser();
+                    return false;
+                },
+            },
+        });
+    }
+
+    private showEditDialog(item: User) {
+        this.app.showDialog(
+            new AddUserDialog(this.app, item, (result: User) => {
                 this.ractive!.update();
             })
         );
     }
 
-    private createUser(app: App) {
-        var loginName = this.ractive.get("loginName");
-        var displayName = this.ractive.get("displayName");
-        var tel = this.ractive.get("tel");
-        var password = this.ractive.get("password");
+    private async createUser() {
+        const user = <IUser>{
+            id: "",
+            login_name: this.ractive.get("loginName"),
+            display_name: this.ractive.get("displayName"),
+            tel: this.ractive.get("tel"),
+        };
+        const password = this.ractive.get("password");
 
+        const u = await this.app.models.user.save(user, password);
+        this.clear();
+        // list is cached array. so we don't need to add
+        this.ractive.set("userList", await this.app.models.user.getAll());
+        // app.addSnack("ユーザーを作成しました！");
+        /*
         app.client.createUser(loginName, displayName, tel, password, {
             success: (user: User) => {
                 app.addUser(user);
@@ -84,12 +97,19 @@ class UserListDialog implements Dialog {
                 }
             },
         });
+*/
     }
 
-    private deleteUser(app: App, user: User) {
+    private async deleteUser(user: IUser) {
         if (!window.confirm("この担当者を削除しますか？")) {
             return;
         }
+
+        await this.app.models.user.deleteUser(user);
+        this.ractive.set("userList", await this.app.models.user.getAll());
+        //app.addSnack("担当者を削除しました");
+
+        /*        
         app.client.deleteUser(user.id, {
             success: () => {
                 app.deleteUser(user);
@@ -103,14 +123,15 @@ class UserListDialog implements Dialog {
                 }
             },
         });
+*/
     }
 
     private clear() {
-        this.ractive.set("loginName", "");
-        this.ractive.set("displayName", "");
-        this.ractive.set("tel", "");
-        this.ractive.set("password", "");
+        this.ractive.set({
+            loginName: "",
+            displayName: "",
+            tel: "",
+            password: "",
+        });
     }
 }
-
-*/

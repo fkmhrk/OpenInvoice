@@ -1,10 +1,10 @@
 export default class AccessToken implements IAccessToken {
     token: string;
     refresh: string;
-    isAdmin: boolean;
+    isAdmin_: boolean;
 
     constructor() {
-        this.isAdmin = false;
+        this.isAdmin_ = false;
         try {
             this.token = getFromStorage("token");
             this.refresh = getFromStorage("refresh");
@@ -17,7 +17,7 @@ export default class AccessToken implements IAccessToken {
     save(token: string, refresh: string, isAdmin: boolean) {
         this.token = token;
         this.refresh = refresh;
-        this.isAdmin = isAdmin;
+        this.isAdmin_ = isAdmin;
         try {
             localStorage.setItem("token", token);
             localStorage.setItem("refresh", refresh);
@@ -28,6 +28,10 @@ export default class AccessToken implements IAccessToken {
 
     isLoggedIn(): boolean {
         return this.token.length > 0;
+    }
+
+    isAdmin(): boolean {
+        return this.isAdmin_;
     }
 }
 

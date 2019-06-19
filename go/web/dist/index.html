@@ -304,11 +304,11 @@
                       <th></th>
                     </tr>
                     {{#userList}}
-                    <tr on-click="showEdit:{{.}}">
+                    <tr on-click="['showEdit',.]">
                       <td>{{display_name}}</td>
                       <td>{{tel}}</td>
                       <td>{{login_name}}</td>
-                      <td><a class="btn" title="削除" on-click="delete:{{.}}"><i class="fa fa-trash-o"></i></a></td>
+                      <td><a class="btn" title="削除" on-click="['delete', .]"><i class="fa fa-trash-o"></i></a></td>
                     </tr>
                     {{/}}
                   </table>
@@ -452,7 +452,7 @@
                </section>
         </script>
 
-        <script src="https://code.jquery.com/jquery-1.9.0.min.js"></script>
+        <!-- <script src="https://code.jquery.com/jquery-1.9.0.min.js"></script> -->
         <!-- <script src="/assets/js/jquery.tooltipster.min.js"></script> -->
         <script>
             //$("#sheet .sum")
@@ -466,7 +466,6 @@
             });
         </script>
 
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/ractive/0.7.1/ractive.js"></script>
         <script
             src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.7.0/underscore-min.js"
             type="text/javascript"

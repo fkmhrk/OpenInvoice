@@ -53,7 +53,8 @@ export default class AuthedClient implements IAuthedClient {
                     return originalResp;
                 }
                 const nextToken = r.body["access_token"];
-                this.token.save(nextToken, this.token.refresh, false);
+                const isAdmin = r.body["is_admin"];
+                this.token.save(nextToken, this.token.refresh, isAdmin);
                 return this.send(method, url, header, body);
             });
     }

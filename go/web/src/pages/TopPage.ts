@@ -2,6 +2,7 @@ import Ractive from "../ractive";
 import $ from "jquery";
 import { SettingsDialog } from "../SettingsDialog";
 import { CompanyListDialog } from "../CompanyListDialog";
+import { UserListDialog } from "../UserListDialog";
 
 const fabDecorate = (node: any) => {
     $(node).hover(
@@ -67,8 +68,25 @@ export class TopPage implements IPage {
                 fab: fabDecorate,
             },
             data: {
+                is_admin: this.app.models.token.isAdmin(),
                 sheets: tradings,
                 toDateStr: toDateStr,
+                sortIndex: 1,
+                sortDesc: true,
+                showSortMark: (
+                    index: number,
+                    sortIndex: number,
+                    desc: boolean
+                ) => {
+                    if (index != sortIndex) {
+                        return "";
+                    }
+                    if (desc) {
+                        return "▽";
+                    } else {
+                        return "△";
+                    }
+                },
             },
             on: {
                 addSheet: () => this.app.navigate("/tradings/new"),
@@ -82,6 +100,10 @@ export class TopPage implements IPage {
                     this.app.navigate(`/tradings/${item.id}/copy`);
                     return false;
                 },
+                showUserList: () =>
+                    this.app.showDialog(
+                        new UserListDialog(this.app, (result: IUser) => {})
+                    ),
                 showCompanyList: () =>
                     this.app.showDialog(new CompanyListDialog(this.app)),
                 showSetting: () =>

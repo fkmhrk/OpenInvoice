@@ -74,6 +74,10 @@ const boot = async () => {
     const authedClient = new AuthedClient(client, token);
     const models = new Models(client, authedClient, token);
 
+    if (token.refresh.length > 0) {
+        await models.account.refresh();
+    }
+
     const app = new Application(
         new XHRClient("text"),
         models,
