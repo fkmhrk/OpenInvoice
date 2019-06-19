@@ -1,4 +1,5 @@
 import Ractive from "../ractive";
+import { handleError } from "./ErrorHandler";
 
 export class SignInPage implements IPage {
     private app: IApplication;
@@ -35,7 +36,7 @@ export class SignInPage implements IPage {
             // TODO save credential
             this.app.navigate("/top");
         } catch (e) {
-            alert(e);
+            handleError(this.app, e, "サインインに失敗しました");
         }
     }
 }

@@ -1,5 +1,10 @@
 import { isStatus200, getBody } from "../../clients/Functions";
 import AccessToken from "../token/AccessToken";
+import {
+    ModelError,
+    ERR_EMPTY_USERNAME,
+    ERR_EMPTY_PASSWORD,
+} from "../ModelError";
 
 export default class AccountRepository implements IAccountRepository {
     private client: HTTPClient;
@@ -11,6 +16,16 @@ export default class AccountRepository implements IAccountRepository {
     }
 
     signIn(username: string, password: string): Promise<string> {
+        if (username.length == 0) {
+            return Promise.reject(
+                new ModelError(ERR_EMPTY_USERNAME, "empty username", null)
+            );
+        }
+        if (password.length == 0) {
+            return Promise.reject(
+                new ModelError(ERR_EMPTY_PASSWORD, "empty password", null)
+            );
+        }
         const url = "/api/v1/token";
         const params = {
             username: username,
