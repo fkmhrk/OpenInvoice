@@ -3,8 +3,8 @@ package rest
 import (
 	"net/http"
 
-	m "../model"
-	s "../service"
+	m "github.com/fkmhrk/OpenInvoice/v1/model"
+	s "github.com/fkmhrk/OpenInvoice/v1/service"
 	"github.com/gorilla/mux"
 	"github.com/mokelab-go/hop"
 )

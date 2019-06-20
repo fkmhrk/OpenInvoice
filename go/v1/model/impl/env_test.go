@@ -1,9 +1,10 @@
 package impl
 
 import (
-	m "../"
 	"database/sql"
 	"testing"
+
+	m "github.com/fkmhrk/OpenInvoice/v1/model"
 )
 
 func createEnvDAO(db *sql.DB) *envDAO {

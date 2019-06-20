@@ -1,8 +1,9 @@
 package impl
 
 import (
-	m "../"
 	"database/sql"
+
+	m "github.com/fkmhrk/OpenInvoice/v1/model"
 )
 
 type session_refreshDAO struct {

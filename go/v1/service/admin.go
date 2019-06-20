@@ -1,7 +1,7 @@
 package service
 
 import (
-	m "../model"
+	m "github.com/fkmhrk/OpenInvoice/v1/model"
 )
 
 type AdminService interface {
