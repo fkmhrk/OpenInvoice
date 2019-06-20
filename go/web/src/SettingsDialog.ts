@@ -2,6 +2,7 @@
 ///<reference path="./Dialog.ts"/>
 
 import { Ractive } from "./ractive";
+import { handleError } from "./pages/ErrorHandler";
 
 export class SettingsDialog implements IDialog {
     dialogId: number = 0;
@@ -60,8 +61,13 @@ export class SettingsDialog implements IDialog {
             company_bank_num: this.ractive.get("company_bank_num"),
             company_bank_name: this.ractive.get("company_bank_name"),
         };
-        await this.app.models.environment.save(env);
-        // app.addSnack("設定を保存しました！");
-        this.app.closeDialog(this);
+
+        try {
+            await this.app.models.environment.save(env);
+            this.app.addSnack("設定を保存しました！");
+            this.app.closeDialog(this);
+        } catch (e) {
+            handleError(this.app, e, "保存に失敗しました");
+        }
     }
 }
