@@ -4,6 +4,14 @@ import {
     isStatus201,
     isStatus204,
 } from "../../clients/Functions";
+import { ModelError, ERR_EMPTY_COMPANY_NAME } from "../ModelError";
+
+const validateCompany = (company: ICompany) => {
+    if (company.name.length == 0) {
+        return new ModelError(ERR_EMPTY_COMPANY_NAME, "empty name", null);
+    }
+    return null;
+};
 
 export default class CompanyRepository implements ICompanyRepository {
     private client: IAuthedClient;
@@ -30,6 +38,10 @@ export default class CompanyRepository implements ICompanyRepository {
     }
 
     save(company: ICompany): Promise<ICompany> {
+        const err = validateCompany(company);
+        if (err != null) {
+            return Promise.reject(err);
+        }
         if (company.id.length == 0) {
             return this.createCompany(company);
         } else {

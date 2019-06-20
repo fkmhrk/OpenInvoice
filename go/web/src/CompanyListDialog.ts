@@ -4,12 +4,12 @@
 
 import { Ractive } from "./ractive";
 import { AddCompanyDialog } from "./AddCompanyDialog";
+import { handleError } from "./pages/ErrorHandler";
 
 export class CompanyListDialog implements IDialog {
     dialogId: number = 0;
     private app: IApplication;
     private ractive!: Ractive;
-    // callback: (result: any) => void;
 
     constructor(app: IApplication) {
         this.app = app;
@@ -80,32 +80,13 @@ export class CompanyListDialog implements IDialog {
             assignee: assignee,
         };
 
-        const saved = await this.app.models.company.save(company);
-        this.ractive.unshift("companyList", saved);
-        this.clearForm();
-
-        /*        
-        app.client.saveCompany(company, {
-            success: (id: string) => {
-                company.id = id;
-                app.companyMap[id] = company;
-                this.ractive.unshift("companyList", company);
-                app.addSnack("保存しました。");
-                this.clearForm();
-            },
-            error: (status: number, msg: string) => {
-                switch (status) {
-                    case 1001:
-                        app.addSnack("会社名を入力してください。");
-                        break;
-                    default:
-                        app.addSnack("保存に失敗しました。");
-                }
-                console.log("Failed to create company status=" + status);
-            },
-        });
-        console.log(company);
-*/
+        try {
+            const saved = await this.app.models.company.save(company);
+            this.ractive.unshift("companyList", saved);
+            this.clearForm();
+        } catch (e) {
+            handleError(this.app, e, "保存に失敗しました");
+        }
     }
 
     private clearForm() {
@@ -126,19 +107,12 @@ export class CompanyListDialog implements IDialog {
         }
         const company = this.ractive.get("companyList")[index] as ICompany;
 
-        await this.app.models.company.deleteCompany(company);
-        this.ractive.splice("companyList", index, 1);
-        // app.addSnack("削除しました！");
-        /*
-        app.client.deleteCompany(company.id, {
-            success: () => {
-                this.ractive.splice("companyList", index, 1);
-                app.addSnack("削除しました！");
-            },
-            error: (status: number, msg: string) => {
-                console.log("Failed to delete company status=" + status);
-            },
-        });
-*/
+        try {
+            await this.app.models.company.deleteCompany(company);
+            this.ractive.splice("companyList", index, 1);
+            this.app.addSnack("削除しました！");
+        } catch (e) {
+            handleError(this.app, e, "削除に失敗しました");
+        }
     }
 }

@@ -4,6 +4,30 @@ import {
     isStatus201,
     isStatus204,
 } from "../../clients/Functions";
+import {
+    ModelError,
+    ERR_EMPTY_USERNAME,
+    ERR_EMPTY_DISPLAY_NAME,
+    ERR_EMPTY_TEL,
+    ERR_SHORT_PASSWORD,
+} from "../ModelError";
+
+const validateUser = (user: IUser) => {
+    if (user.login_name.length == 0) {
+        return new ModelError(ERR_EMPTY_USERNAME, "empty username", null);
+    }
+    if (user.display_name.length == 0) {
+        return new ModelError(
+            ERR_EMPTY_DISPLAY_NAME,
+            "empty display name",
+            null
+        );
+    }
+    if (user.tel.length == 0) {
+        return new ModelError(ERR_EMPTY_TEL, "empty tel", null);
+    }
+    return null;
+};
 
 export default class UserRepository implements IUserRepository {
     private client: IAuthedClient;
@@ -30,6 +54,14 @@ export default class UserRepository implements IUserRepository {
     }
 
     save(user: IUser, password: string): Promise<IUser> {
+        const err = validateUser(user);
+        if (err != null) return Promise.reject(err);
+        if (password.length < 6) {
+            return Promise.reject(
+                new ModelError(ERR_SHORT_PASSWORD, "short password", null)
+            );
+        }
+
         if (user.id.length == 0) {
             return this.create(user, password);
         } else {

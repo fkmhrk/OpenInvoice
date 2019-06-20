@@ -3,17 +3,15 @@
 
 import { Ractive } from "./ractive";
 import { AddUserDialog } from "./AddUserDialog";
+import { handleError } from "./pages/ErrorHandler";
 
 export class UserListDialog implements IDialog {
     dialogId: number = 0;
     private app: IApplication;
     private ractive!: Ractive;
 
-    private callback: (result: IUser) => void;
-
-    constructor(app: IApplication, callback: (result: IUser) => void) {
+    constructor(app: IApplication) {
         this.app = app;
-        this.callback = callback;
     }
 
     async onCreate(elem: HTMLElement) {
@@ -64,40 +62,15 @@ export class UserListDialog implements IDialog {
         };
         const password = this.ractive.get("password");
 
-        const u = await this.app.models.user.save(user, password);
-        this.clear();
-        // list is cached array. so we don't need to add
-        this.ractive.set("userList", await this.app.models.user.getAll());
-        // app.addSnack("ユーザーを作成しました！");
-        /*
-        app.client.createUser(loginName, displayName, tel, password, {
-            success: (user: User) => {
-                app.addUser(user);
-                this.clear();
-                app.addSnack("ユーザーを作成しました！");
-            },
-            error: (status: number, msg: string) => {
-                switch (status) {
-                    case 1000:
-                        app.addSnack("ユーザー名を入力してください");
-                        break;
-                    case 1001:
-                        app.addSnack("担当者名を入力してください");
-                        break;
-                    case 1002:
-                        app.addSnack("電話番号を入力してください");
-                        break;
-                    case 1003: // same message
-                    case 1004:
-                        app.addSnack("パスワードを6文字以上入力してください");
-                        break;
-                    default:
-                        app.addSnack("ユーザー作成に失敗しました");
-                        break;
-                }
-            },
-        });
-*/
+        try {
+            const u = await this.app.models.user.save(user, password);
+            this.clear();
+            // list is cached array. so we don't need to add
+            this.ractive.set("userList", await this.app.models.user.getAll());
+            this.app.addSnack("ユーザーを作成しました！");
+        } catch (e) {
+            handleError(this.app, e, "ユーザー作成に失敗しました");
+        }
     }
 
     private async deleteUser(user: IUser) {
@@ -105,25 +78,13 @@ export class UserListDialog implements IDialog {
             return;
         }
 
-        await this.app.models.user.deleteUser(user);
-        this.ractive.set("userList", await this.app.models.user.getAll());
-        //app.addSnack("担当者を削除しました");
-
-        /*        
-        app.client.deleteUser(user.id, {
-            success: () => {
-                app.deleteUser(user);
-                this.ractive.set("userList", app.users);
-                app.addSnack("担当者を削除しました");
-            },
-            error: (status: number, msg: string) => {
-                switch (status) {
-                    default:
-                        app.addSnack("削除に失敗しました");
-                }
-            },
-        });
-*/
+        try {
+            await this.app.models.user.deleteUser(user);
+            this.ractive.set("userList", await this.app.models.user.getAll());
+            this.app.addSnack("担当者を削除しました");
+        } catch (e) {
+            handleError(this.app, e, "削除に失敗しました");
+        }
     }
 
     private clear() {

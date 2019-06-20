@@ -101,9 +101,7 @@ export class TopPage implements IPage {
                     return false;
                 },
                 showUserList: () =>
-                    this.app.showDialog(
-                        new UserListDialog(this.app, (result: IUser) => {})
-                    ),
+                    this.app.showDialog(new UserListDialog(this.app)),
                 showCompanyList: () =>
                     this.app.showDialog(new CompanyListDialog(this.app)),
                 showSetting: () =>
