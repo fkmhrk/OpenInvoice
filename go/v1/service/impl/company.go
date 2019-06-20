@@ -1,8 +1,8 @@
 package impl
 
 import (
-	s "../"
-	m "../../model"
+	m "github.com/fkmhrk/OpenInvoice/v1/model"
+	s "github.com/fkmhrk/OpenInvoice/v1/service"
 )
 
 type companyService struct {

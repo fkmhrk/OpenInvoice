@@ -1,8 +1,9 @@
 package impl
 
 import (
-	m "../"
 	"errors"
+
+	m "github.com/fkmhrk/OpenInvoice/v1/model"
 	"github.com/go-sql-driver/mysql"
 )
 

@@ -1,10 +1,11 @@
 package rest
 
 import (
-	m "../model"
 	"fmt"
-	"github.com/mokelab-go/hop"
 	"net/http"
+
+	m "github.com/fkmhrk/OpenInvoice/v1/model"
+	"github.com/mokelab-go/hop"
 )
 
 func getSession(sessionDAO m.SessionDAO) hop.Op {

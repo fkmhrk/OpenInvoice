@@ -1,10 +1,11 @@
 package rest
 
 import (
-	s "../service"
-	rj "github.com/fkmhrk-go/rawjson"
-	"github.com/mokelab-go/hop"
 	"net/http"
+
+	rj "github.com/fkmhrk-go/rawjson"
+	s "github.com/fkmhrk/OpenInvoice/v1/service"
+	"github.com/mokelab-go/hop"
 )
 
 func getUsers(user s.UserService) http.HandlerFunc {

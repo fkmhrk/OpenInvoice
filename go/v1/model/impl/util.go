@@ -1,12 +1,13 @@
 package impl
 
 import (
-	"code.google.com/p/go-uuid/uuid"
 	"crypto/sha1"
 	"errors"
 	"fmt"
-	"github.com/go-sql-driver/mysql"
 	"strings"
+
+	"github.com/go-sql-driver/mysql"
+	"github.com/pborman/uuid"
 )
 
 func generateUUID(length int) string {

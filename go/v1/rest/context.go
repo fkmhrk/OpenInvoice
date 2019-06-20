@@ -1,8 +1,9 @@
 package rest
 
 import (
-	m "../model"
 	"context"
+
+	m "github.com/fkmhrk/OpenInvoice/v1/model"
 )
 
 type contextKey string

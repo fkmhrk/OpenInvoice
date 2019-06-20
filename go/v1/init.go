@@ -1,11 +1,11 @@
 package v1
 
 import (
-	m "./model"
-	mi "./model/impl"
-	"./rest"
-	s "./service"
-	si "./service/impl"
+	m "github.com/fkmhrk/OpenInvoice/v1/model"
+	mi "github.com/fkmhrk/OpenInvoice/v1/model/impl"
+	"github.com/fkmhrk/OpenInvoice/v1/rest"
+	s "github.com/fkmhrk/OpenInvoice/v1/service"
+	si "github.com/fkmhrk/OpenInvoice/v1/service/impl"
 
 	"database/sql"
 

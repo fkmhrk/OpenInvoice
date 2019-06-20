@@ -3,9 +3,9 @@ package rest
 import (
 	"net/http"
 
-	m "../model"
-	s "../service"
 	rj "github.com/fkmhrk-go/rawjson"
+	m "github.com/fkmhrk/OpenInvoice/v1/model"
+	s "github.com/fkmhrk/OpenInvoice/v1/service"
 	"github.com/mokelab-go/hop"
 )
 

@@ -1,0 +1,13 @@
+github.com/fkmhrk-go/rawjson v0.0.0-20150202185032-857fafa0503d h1:8lJ7dx3oUBC59LED0QTlm5Cbfh7WxErXFKMZzLnfv/U=
+github.com/fkmhrk-go/rawjson v0.0.0-20150202185032-857fafa0503d/go.mod h1:uYvYMJ/FEs/sosn51SE3lrwdydYnMA27DWrraePyOIA=
+github.com/fkmhrk/OpenInvoice v0.0.0-20161016041330-b3f7182020ed h1:LOiYF2m4Pv4fUCqJ07C1VNNwlWsgEV4ZY+al8Yh/JT8=
+github.com/go-sql-driver/mysql v1.4.1 h1:g24URVg0OFbNUTx9qqY1IRZ9D9z3iPyi5zKhQZpNwpA=
+github.com/go-sql-driver/mysql v1.4.1/go.mod h1:zAC/RDZ24gD3HViQzih4MyKcchzm+sOG5ZlKdlhCg5w=
+github.com/google/uuid v1.0.0 h1:b4Gk+7WdP/d3HZH8EJsZpvV7EtDOgaZLtnaNGIu1adA=
+github.com/google/uuid v1.0.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
+github.com/gorilla/mux v1.7.2 h1:zoNxOV7WjqXptQOVngLmcSQgXmgk4NMz1HibBchjl/I=
+github.com/gorilla/mux v1.7.2/go.mod h1:1lud6UwP+6orDFRuTfBEV8e9/aOM/c4fVVCaMa2zaAs=
+github.com/mokelab-go/hop v0.0.0-20161016031025-3f57d8333436 h1:TbZej6107D2Nb3IS/MbhrxdJgtLbYf/bVK256UczAa4=
+github.com/mokelab-go/hop v0.0.0-20161016031025-3f57d8333436/go.mod h1:2CDV2n5w3VHIh5/aIwg5zfo4tqGpevHr7cLg1ZsGgOs=
+github.com/pborman/uuid v1.2.0 h1:J7Q5mO4ysT1dv8hyrUGHb9+ooztCXu1D8MY8DZYsu3g=
+github.com/pborman/uuid v1.2.0/go.mod h1:X/NO0urCmaxf9VXbdlT7C2Yzkj2IKimNn4k+gtPdI/k=

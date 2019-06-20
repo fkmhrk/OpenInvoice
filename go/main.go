@@ -1,12 +1,13 @@
 package main
 
 import (
-	"./v1"
 	"flag"
 	"fmt"
-	"github.com/gorilla/mux"
 	"net"
 	"net/http"
+
+	"github.com/fkmhrk/OpenInvoice/v1"
+	"github.com/gorilla/mux"
 )
 
 func main() {

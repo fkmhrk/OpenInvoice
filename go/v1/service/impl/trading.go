@@ -4,8 +4,8 @@ import (
 	"strconv"
 	"time"
 
-	s "../"
-	m "../../model"
+	m "github.com/fkmhrk/OpenInvoice/v1/model"
+	s "github.com/fkmhrk/OpenInvoice/v1/service"
 )
 
 type tradingService struct {
