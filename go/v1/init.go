@@ -1,19 +1,20 @@
 package v1
 
 import (
-	m "./model"
-	mi "./model/impl"
-	"./rest"
-	s "./service"
-	si "./service/impl"
+	m "github.com/fkmhrk/OpenInvoice/v1/model"
+	mi "github.com/fkmhrk/OpenInvoice/v1/model/impl"
+	"github.com/fkmhrk/OpenInvoice/v1/rest"
+	s "github.com/fkmhrk/OpenInvoice/v1/service"
+	si "github.com/fkmhrk/OpenInvoice/v1/service/impl"
 
 	"database/sql"
+
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/gorilla/mux"
 )
 
 func InitRouter(r *mux.Router) error {
-	db, err := sql.Open("mysql", "openinvoice_test:openinvoice@/openinvoice")
+	db, err := sql.Open("mysql", "openinvoice_test:openinvoice@tcp(db:3306)/openinvoice")
 	if err != nil {
 		return err
 	}

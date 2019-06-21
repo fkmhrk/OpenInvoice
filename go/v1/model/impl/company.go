@@ -1,10 +1,11 @@
 package impl
 
 import (
-	m "../"
 	"database/sql"
 	"errors"
 	_ "fmt"
+
+	m "github.com/fkmhrk/OpenInvoice/v1/model"
 	"github.com/go-sql-driver/mysql"
 )
 

@@ -358,10 +358,10 @@ class TQPDFViewImpl implements PDFView {
         $this->pdf->SetTextColor($this->accColorR, $this->accColorG, $this->accColorB);
         $this->pdf->SetLineWidth(0.2);
         $this->pdf->Cell($w0, $hBank, s(''), 0, 0, 'C', 0);
-        $this->pdf->Cell($w3, $hBank, s('お振込先'), LTB, 0, 'C', 0);
+        $this->pdf->Cell($w3, $hBank, s('お振込先'), 'LTB', 0, 'C', 0);
         $this->pdf->SetTextColor(0, 0, 0);
         $this->pdf->Cell($w1+$w2+$w4+$w5, $hBank, s($info['company_bankname']. ' '. $bankType.
-                                                    ' '. $info['company_bank_num']. '　'. $info['company_bank_name']), RTB, 0, 'L', 0);
+                                                    ' '. $info['company_bank_num']. '　'. $info['company_bank_name']), 'RTB', 0, 'L', 0);
         
         $this->pdf->Cell($w0, $mM, s(''), 0, 1, 'L', 0);  // 行の余白用        
     }    

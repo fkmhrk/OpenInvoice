@@ -1,8 +1,10 @@
 package rest
 
 import (
-	m "../model"
-	s "../service"
+	"net/http"
+
+	m "github.com/fkmhrk/OpenInvoice/v1/model"
+	s "github.com/fkmhrk/OpenInvoice/v1/service"
 	"github.com/gorilla/mux"
 	"github.com/mokelab-go/hop"
 )
@@ -52,6 +54,9 @@ func SetHandlers(r *mux.Router, services s.Services, u s.UserService, t s.Tradin
 	r.HandleFunc("/tradings",
 		authBody(createTrading(t))).
 		Methods(method_POST)
+	r.HandleFunc("/tradings/{tradingId}",
+		auth(getTrading(t))).
+		Methods(http.MethodGet)
 	r.HandleFunc("/tradings/{tradingId}",
 		authBody(updateTrading(t))).
 		Methods(method_PUT)

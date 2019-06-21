@@ -1,7 +1,7 @@
 package impl
 
 import (
-	m "../"
+	m "github.com/fkmhrk/OpenInvoice/v1/model"
 )
 
 func NewModels(connection *Connection) *m.Models {

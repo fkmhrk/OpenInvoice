@@ -1,11 +1,12 @@
 package service
 
 import (
-	m "../model"
+	m "github.com/fkmhrk/OpenInvoice/v1/model"
 )
 
 type TradingService interface {
 	GetListByUser() Result
+	GetTradingByID(id string) Result
 	Create(session *m.Session, companyId, subject, product, memo string, titleType int, workFrom, workTo, total, quotationDate, billDate, deliveryDate int64, taxRate float32) Result
 	Update(trading Trading) Result
 

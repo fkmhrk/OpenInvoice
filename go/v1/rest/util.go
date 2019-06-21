@@ -1,12 +1,13 @@
 package rest
 
 import (
-	s "../service"
 	"bytes"
 	"fmt"
-	rj "github.com/fkmhrk-go/rawjson"
 	"net/http"
 	"strings"
+
+	rj "github.com/fkmhrk-go/rawjson"
+	s "github.com/fkmhrk/OpenInvoice/v1/service"
 )
 
 func readBody(req *http.Request) string {
