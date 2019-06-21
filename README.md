@@ -3,11 +3,11 @@ OpenInvoice
 
 Invoice system. You can create a Quotation and Invoice PDF with this system.
 
-* Requirements
+## Requirements
 
 Docker and Docker compose(and internet connection).
 
-* How to build docker image and run containers
+## How to build docker image and run containers
 
 step 1. build api server and web front.
 
@@ -34,7 +34,7 @@ step 5. Login with admin/admin (default password)
 
 step 6(important!). update admin password!
 
-* Use another port
+## Use another port
 
 modify `docker-compose.yaml`
 
