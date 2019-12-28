@@ -112,6 +112,7 @@ export default class TradingRepository implements ITradingRepository {
             delivery_date: item.delivery_date,
             delivery_number: item.delivery_number,
             tax_rate: item.tax_rate,
+            assignee: item.assignee,
             product: item.product,
             memo: item.memo,
         };
@@ -144,6 +145,7 @@ export default class TradingRepository implements ITradingRepository {
             delivery_date: item.delivery_date,
             delivery_number: item.delivery_number,
             tax_rate: item.tax_rate,
+            assignee: item.assignee,
             product: item.product,
             memo: item.memo,
         };
