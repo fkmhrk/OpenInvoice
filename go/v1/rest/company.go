@@ -5,17 +5,19 @@ import (
 
 	rj "github.com/fkmhrk-go/rawjson"
 	s "github.com/fkmhrk/OpenInvoice/v1/service"
+	"github.com/fkmhrk/OpenInvoice/v1/service/company"
 	"github.com/mokelab-go/hop"
 )
 
-func getCompanies(company s.CompanyService) http.HandlerFunc {
-	return makeBaseHandler(func(req *http.Request) s.Result {
-		return company.GetList()
-	})
+func getCompanies(company company.Service) http.HandlerFunc {
+	return func(w http.ResponseWriter, req *http.Request) {
+		resp := company.GetList()
+		resp.Write(w)
+	}
 }
 
-func createCompany(company s.CompanyService) http.HandlerFunc {
-	return makeBaseHandler(func(req *http.Request) s.Result {
+func createCompany(company company.Service) http.HandlerFunc {
+	return func(w http.ResponseWriter, req *http.Request) {
 		// read input
 		json := rj.RawJsonObject(hop.BodyJSON(req.Context()))
 
@@ -25,12 +27,13 @@ func createCompany(company s.CompanyService) http.HandlerFunc {
 		phone, _ := json.String("phone")
 		unit, _ := json.String("unit")
 
-		return company.Create(name, zip, address, phone, unit)
-	})
+		resp := company.Create(name, zip, address, phone, unit)
+		resp.Write(w)
+	}
 }
 
-func updateCompany(company s.CompanyService) http.HandlerFunc {
-	return makeBaseHandler(func(req *http.Request) s.Result {
+func updateCompany(company company.Service) http.HandlerFunc {
+	return func(w http.ResponseWriter, req *http.Request) {
 		c := req.Context()
 		id := hop.PathString(c, "companyId")
 		json := rj.RawJsonObject(hop.BodyJSON(c))
@@ -42,21 +45,24 @@ func updateCompany(company s.CompanyService) http.HandlerFunc {
 		phone, _ := json.String("phone")
 		unit, _ := json.String("unit")
 
-		return company.Update(id, name, zip,
+		resp := company.Update(id, name, zip,
 			address, phone, unit)
-	})
+		resp.Write(w)
+
+	}
 }
 
 func deleteCompany(services s.Services) http.HandlerFunc {
-	return makeBaseHandler(func(req *http.Request) s.Result {
+	return func(w http.ResponseWriter, req *http.Request) {
 		id := hop.PathString(req.Context(), "companyId")
 
-		return services.Company.Delete(id)
-	})
+		resp := services.Company.Delete(id)
+		resp.Write(w)
+	}
 }
 
 func getNextNumber(services s.Services) http.HandlerFunc {
-	return makeBaseHandler(func(req *http.Request) s.Result {
+	return func(w http.ResponseWriter, req *http.Request) {
 		c := req.Context()
 		seqType := hop.PathString(c, "seqType")
 		json := rj.RawJsonObject(hop.BodyJSON(c))
@@ -64,6 +70,8 @@ func getNextNumber(services s.Services) http.HandlerFunc {
 		// read input
 		date, _ := json.Long("date")
 
-		return services.Trading.GetNextNumber(seqType, date)
-	})
+		resp := services.Trading.GetNextNumber(seqType, date)
+		//resp.Write(w)
+		_ = resp
+	}
 }

@@ -5,6 +5,7 @@ import (
 
 	m "github.com/fkmhrk/OpenInvoice/v1/model"
 	s "github.com/fkmhrk/OpenInvoice/v1/service"
+	"github.com/fkmhrk/OpenInvoice/v1/service/company"
 	"github.com/fkmhrk/OpenInvoice/v1/service/user"
 	"github.com/gorilla/mux"
 	"github.com/mokelab-go/hop"
@@ -17,7 +18,7 @@ const (
 	method_DELETE = "DELETE"
 )
 
-func SetHandlers(r *mux.Router, services s.Services, u user.Service, t s.TradingService, c s.CompanyService, models *m.Models) {
+func SetHandlers(r *mux.Router, services s.Services, u user.Service, t s.TradingService, c company.Service, models *m.Models) {
 	auth := hop.Operations(
 		hop.GetPathParams,
 		hop.GetCredential,

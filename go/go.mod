@@ -7,5 +7,6 @@ require (
 	github.com/go-sql-driver/mysql v1.4.1
 	github.com/gorilla/mux v1.7.2
 	github.com/mokelab-go/hop v0.0.0-20161016031025-3f57d8333436
+	github.com/mokelab-go/server v0.0.0-20190823082941-c34045379e65
 	github.com/pborman/uuid v1.2.0
 )

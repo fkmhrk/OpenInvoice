@@ -1,8 +1,11 @@
 package impl
 
 import (
+	"net/http"
+
 	m "github.com/fkmhrk/OpenInvoice/v1/model"
-	s "github.com/fkmhrk/OpenInvoice/v1/service"
+	"github.com/fkmhrk/OpenInvoice/v1/model/response"
+	"github.com/mokelab-go/server/entity"
 )
 
 type companyService struct {
@@ -10,18 +13,18 @@ type companyService struct {
 	companyDAO m.CompanyDAO
 }
 
-func NewCompanySerivce(models *m.Models) *companyService {
+func New(models *m.Models) *companyService {
 	return &companyService{
 		sessionDAO: models.Session,
 		companyDAO: models.Company,
 	}
 }
 
-func (s *companyService) GetList() s.Result {
+func (s *companyService) GetList() entity.Response {
 	// get item
 	companies, err := s.companyDAO.GetList()
 	if err != nil {
-		return errorResult(500, MSG_SERVER_ERROR)
+		return response.Error(http.StatusInternalServerError, response.MSG_SERVER_ERROR)
 	}
 	list := make([]interface{}, 0)
 	for _, c := range companies {
@@ -30,42 +33,50 @@ func (s *companyService) GetList() s.Result {
 	body := map[string]interface{}{
 		"companies": list,
 	}
-	return jsonResult(200, body)
+	return entity.Response{
+		Status: http.StatusOK,
+		Body:   body,
+	}
 }
 
-func (s *companyService) Create(name, zip, address, phone, unit string) s.Result {
+func (s *companyService) Create(name, zip, address, phone, unit string) entity.Response {
 	// create
 	company, err := s.companyDAO.Create(name, zip, address, phone, unit)
 	if err != nil {
-		return errorResult(500, MSG_SERVER_ERROR)
+		return response.Error(http.StatusInternalServerError, response.MSG_SERVER_ERROR)
 	}
 	body := map[string]interface{}{
 		"id": company.Id,
 	}
-	return jsonResult(201, body)
+	return entity.Response{
+		Status: http.StatusCreated,
+		Body:   body,
+	}
 }
 
-func (s *companyService) Update(id, name, zip, address, phone, unit string) s.Result {
+func (s *companyService) Update(id, name, zip, address, phone, unit string) entity.Response {
 	// create
 	company, err := s.companyDAO.Update(id, name, zip, address, phone, unit)
 	if err != nil {
-		return errorResult(500, MSG_SERVER_ERROR)
+		return response.Error(http.StatusInternalServerError, response.MSG_SERVER_ERROR)
 	}
 	body := map[string]interface{}{
 		"id": company.Id,
 	}
-	return jsonResult(200, body)
+	return entity.Response{
+		Status: http.StatusOK,
+		Body:   body,
+	}
 }
 
-func (o *companyService) Delete(id string) s.Result {
+func (o *companyService) Delete(id string) entity.Response {
 	// delete
 	err := o.companyDAO.Delete(id)
 	if err != nil {
-		return errorResult(500, s.ERR_SERVER_ERROR)
+		return response.Error(http.StatusInternalServerError, response.MSG_SERVER_ERROR)
 	}
-	return &result{
-		status: 204,
-		body:   "",
+	return entity.Response{
+		Status: http.StatusNoContent,
 	}
 }
 
