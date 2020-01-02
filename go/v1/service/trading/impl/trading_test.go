@@ -1,11 +1,13 @@
 package impl
 
 import (
-	s "../"
-	m "../../model"
-	mock "../../model/mock"
 	"fmt"
 	"testing"
+
+	m "github.com/fkmhrk/OpenInvoice/v1/model"
+	mock "github.com/fkmhrk/OpenInvoice/v1/model/mock"
+	"github.com/fkmhrk/OpenInvoice/v1/model/test"
+	s "github.com/fkmhrk/OpenInvoice/v1/service/trading"
 )
 
 func TestTrading0000_GetListByUser(t *testing.T) {
@@ -38,25 +40,20 @@ func TestTrading0000_GetListByUser(t *testing.T) {
 	tradingDAO, _ := models.Trading.(*mock.TradingDAO)
 	tradingDAO.GetListResult = list
 
-	service := NewTradingSerivce(sessionDAO, tradingDAO, models)
+	service := New(sessionDAO, tradingDAO, models)
 
 	r := service.GetListByUser()
-	if r == nil {
-		t.Errorf("Result must not be nil")
-		return
-	}
-	if r.Status() != 200 {
-		t.Errorf("Wrong status : %d", r.Status())
+	if r.Status != 200 {
+		t.Errorf("Wrong status : %d", r.Status)
 		return
 	}
 
-	json := json(r)
-	tradings, _ := json.Array("tradings")
+	tradings, _ := r.Body["tradings"].([]interface{})
 	if len(tradings) != 2 {
 		t.Errorf("Wrong length : %d", len(tradings))
 		return
 	}
-	item, _ := tradings.Object(0)
+	item, _ := tradings[0].(map[string]interface{})
 	assertTrading(t, item, "trade1111", "company2233",
 		"subject3344", 1, 1122, 3344, 1980,
 		100, "A100",
@@ -82,7 +79,7 @@ func TestTrading0100_Create(t *testing.T) {
 		Product:    "product",
 	}
 
-	service := NewTradingSerivce(sessionDAO, tradingDAO, models)
+	service := New(sessionDAO, tradingDAO, models)
 
 	// params
 	session := &m.Session{
@@ -104,17 +101,12 @@ func TestTrading0100_Create(t *testing.T) {
 	taxRate := float32(8)
 
 	r := service.Create(session, companyId, subject, product, memo, titleType, workFrom, workTo, total, quotationDate, billDate, deliveryDate, taxRate)
-	if r == nil {
-		t.Errorf("Result must not be nil")
-		return
-	}
-	if r.Status() != 201 {
-		t.Errorf("Wrong status : %d", r.Status())
+	if r.Status != 201 {
+		t.Errorf("Wrong status : %d", r.Status)
 		return
 	}
 
-	json := json(r)
-	if v, _ := json.String("id"); v != "trade1111" {
+	if v, _ := r.Body["id"].(string); v != "trade1111" {
 		t.Errorf("Wrong id : %s", v)
 	}
 }
@@ -143,7 +135,7 @@ func TestTrading0200_Update(t *testing.T) {
 		Product:    "product",
 	}
 
-	service := NewTradingSerivce(sessionDAO, tradingDAO, models)
+	service := New(sessionDAO, tradingDAO, models)
 
 	// params
 	id := "20150203"
@@ -173,17 +165,12 @@ func TestTrading0200_Update(t *testing.T) {
 			TaxRate:       taxRate,
 		},
 	})
-	if r == nil {
-		t.Errorf("Result must not be nil")
-		return
-	}
-	if r.Status() != 200 {
-		t.Errorf("Wrong status : %d", r.Status())
+	if r.Status != 200 {
+		t.Errorf("Wrong status : %d", r.Status)
 		return
 	}
 
-	json := json(r)
-	if v, _ := json.String("id"); v != "trade1111" {
+	if v, _ := r.Body["id"].(string); v != "trade1111" {
 		t.Errorf("Wrong id : %s", v)
 	}
 }
@@ -206,45 +193,40 @@ func TestTrading0200_GetItemsByTradingId(t *testing.T) {
 	tradingDAO, _ := models.Trading.(*mock.TradingDAO)
 	tradingDAO.GetItemsByIdResult = list
 
-	s := NewTradingSerivce(sessionDAO, tradingDAO, models)
+	s := New(sessionDAO, tradingDAO, models)
 
 	tradingId := "tradingId1"
 	r := s.GetItemListByTradingId(tradingId)
-	if r == nil {
-		t.Errorf("Result must not be nil")
-		return
-	}
-	if r.Status() != 200 {
-		t.Errorf("Wrong status : %d", r.Status())
+	if r.Status != 200 {
+		t.Errorf("Wrong status : %d", r.Status)
 		return
 	}
 
-	json := json(r)
-	items, _ := json.Array("items")
+	items, _ := r.Body["items"].([]interface{})
 	if len(items) != 2 {
 		t.Errorf("Wrong length : %d", len(items))
 		return
 	}
-	item, _ := items.Object(0)
-	if v, _ := item.String("id"); v != "trade0" {
+	item, _ := items[0].(map[string]interface{})
+	if v, _ := item["id"].(string); v != "trade0" {
 		t.Errorf("Wrong id : %s", v)
 	}
-	if v, _ := item.String("subject"); v != "subject0" {
+	if v, _ := item["subject"].(string); v != "subject0" {
 		t.Errorf("Wrong subject : %s", v)
 	}
-	if v, _ := item.Int("unit_price"); v != 100 {
+	if v, _ := item["unit_price"].(int); v != 100 {
 		t.Errorf("Wrong unit_price : %d", v)
 	}
-	if v, _ := item.Int("amount"); v != 3 {
-		t.Errorf("Wrong amount : %d", v)
+	if v, _ := item["amount"].(float64); v != 3 {
+		t.Errorf("Wrong amount : %f", v)
 	}
-	if v, _ := item.String("degree"); v != "D0" {
+	if v, _ := item["degree"].(string); v != "D0" {
 		t.Errorf("Wrong degree : %s", v)
 	}
-	if v, _ := item.Int("tax_type"); v != 1 {
+	if v, _ := item["tax_type"].(int); v != 1 {
 		t.Errorf("Wrong tax_type : %d", v)
 	}
-	if v, _ := item.String("memo"); v != "memo0" {
+	if v, _ := item["memo"].(string); v != "memo0" {
 		t.Errorf("Wrong memo : %s", v)
 	}
 }
@@ -257,22 +239,17 @@ func TestTrading0300_CreateItem(t *testing.T) {
 		Id: "item2233",
 	}
 
-	s := NewTradingSerivce(sessionDAO, tradingDAO, models)
+	s := New(sessionDAO, tradingDAO, models)
 
 	tradingId := "tradingId1"
 	r := s.CreateItem(tradingId, "subject", "M/M", "Memo",
 		1, 100, 2, 1)
-	if r == nil {
-		t.Errorf("Result must not be nil")
-		return
-	}
-	if r.Status() != 201 {
-		t.Errorf("Wrong status : %d", r.Status())
+	if r.Status != 201 {
+		t.Errorf("Wrong status : %d", r.Status)
 		return
 	}
 
-	json := json(r)
-	if v, _ := json.String("id"); v != "item2233" {
+	if v, _ := r.Body["id"].(string); v != "item2233" {
 		t.Errorf("Wrong id : %s", v)
 	}
 }
@@ -285,23 +262,18 @@ func TestTrading0400_UpdateItem(t *testing.T) {
 		Id: "item2233",
 	}
 
-	s := NewTradingSerivce(sessionDAO, tradingDAO, models)
+	s := New(sessionDAO, tradingDAO, models)
 
 	id := "item1122"
 	tradingId := "tradingId1"
 	r := s.UpdateItem(id, tradingId, "subject", "M/M", "Memo",
 		1, 100, 2, 1)
-	if r == nil {
-		t.Errorf("Result must not be nil")
-		return
-	}
-	if r.Status() != 200 {
-		t.Errorf("Wrong status : %d", r.Status())
+	if r.Status != 200 {
+		t.Errorf("Wrong status : %d", r.Status)
 		return
 	}
 
-	json := json(r)
-	if v, _ := json.String("id"); v != "item2233" {
+	if v, _ := r.Body["id"].(string); v != "item2233" {
 		t.Errorf("Wrong id : %s", v)
 	}
 }
@@ -312,17 +284,13 @@ func TestTrading0500_DeleteItem(t *testing.T) {
 	tradingDAO, _ := models.Trading.(*mock.TradingDAO)
 	tradingDAO.SoftDeleteItemResult = nil
 
-	s := NewTradingSerivce(sessionDAO, tradingDAO, models)
+	s := New(sessionDAO, tradingDAO, models)
 
 	id := "item1122"
 	tradingId := "tradingId1"
 	r := s.DeleteItem(id, tradingId)
-	if r == nil {
-		t.Errorf("Result must not be nil")
-		return
-	}
-	if r.Status() != 204 {
-		t.Errorf("Wrong status : %d", r.Status())
+	if r.Status != 204 {
+		t.Errorf("Wrong status : %d", r.Status)
 		return
 	}
 }
@@ -342,7 +310,7 @@ func TestTrading0600_GetNextNumber(t *testing.T) {
 	seqDAO.NextResult = m.Seq{
 		Value: 4,
 	}
-	s := NewTradingSerivce(sessionDAO, tradingDAO, models)
+	s := New(sessionDAO, tradingDAO, models)
 
 	table := []struct {
 		Arg      string
@@ -357,16 +325,11 @@ func TestTrading0600_GetNextNumber(t *testing.T) {
 	for _, item := range table {
 		date := int64(1434162098716) // 2015-6-13
 		r := s.GetNextNumber(item.Arg, date)
-		if r == nil {
-			t.Errorf("Result must not be nil")
+		if r.Status != 200 {
+			t.Errorf("Wrong status : %d", r.Status)
 			return
 		}
-		if r.Status() != 200 {
-			t.Errorf("Wrong status : %d", r.Status())
-			return
-		}
-		body := json(r)
-		assertInt(t, body, "number", 20150004)
+		test.AssertInt(t, r.Body, "number", 20150004)
 		// args check
 		if seqDAO.NextSeqType != item.Expected {
 			t.Errorf("SeqType must be %s but %d", item.Label, seqDAO.NextSeqType)
@@ -380,17 +343,38 @@ func TestTrading0700_Delete(t *testing.T) {
 	tradingDAO, _ := models.Trading.(*mock.TradingDAO)
 	tradingDAO.DeleteResult = nil
 
-	s := NewTradingSerivce(sessionDAO, tradingDAO, models)
+	s := New(sessionDAO, tradingDAO, models)
 	r := s.Delete("trade1122")
-	if r == nil {
-		t.Errorf("Result must not be nil")
+	if r.Status != 204 {
+		t.Errorf("Wrong status : %d", r.Status)
 		return
 	}
-	if r.Status() != 204 {
-		t.Errorf("Wrong status : %d", r.Status())
-		return
+	if r.Body != nil {
+		t.Errorf("Body must be empty but %s", r.Body)
 	}
-	if r.Body() != "" {
-		t.Errorf("Body must be empty but %s", r.Body())
-	}
+}
+
+func assertTrading(t *testing.T, item map[string]interface{},
+	id, companyId, subject string, titleType int,
+	workFrom, workTo, total, quotationDate int64, quotationNumber string,
+	billDate int64, billNumber string,
+	deliveryDate int64, deliveryNumber string,
+	taxRate float32, assignee, product, memo string) {
+	test.AssertString(t, item, "id", id)
+	test.AssertString(t, item, "company_id", companyId)
+	test.AssertString(t, item, "subject", subject)
+	test.AssertInt(t, item, "title_type", titleType)
+	test.AssertLong(t, item, "work_from", workFrom)
+	test.AssertLong(t, item, "work_to", workTo)
+	test.AssertLong(t, item, "total", total)
+	test.AssertLong(t, item, "quotation_date", quotationDate)
+	test.AssertString(t, item, "quotation_number", quotationNumber)
+	test.AssertLong(t, item, "bill_date", billDate)
+	test.AssertString(t, item, "bill_number", billNumber)
+	test.AssertLong(t, item, "delivery_date", deliveryDate)
+	test.AssertString(t, item, "delivery_number", deliveryNumber)
+	test.AssertFloat(t, item, "tax_rate", taxRate)
+	test.AssertString(t, item, "assignee", assignee)
+	test.AssertString(t, item, "product", product)
+	test.AssertString(t, item, "memo", memo)
 }

@@ -71,7 +71,6 @@ func getNextNumber(services s.Services) http.HandlerFunc {
 		date, _ := json.Long("date")
 
 		resp := services.Trading.GetNextNumber(seqType, date)
-		//resp.Write(w)
-		_ = resp
+		resp.Write(w)
 	}
 }

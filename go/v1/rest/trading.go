@@ -6,25 +6,28 @@ import (
 	rj "github.com/fkmhrk-go/rawjson"
 	m "github.com/fkmhrk/OpenInvoice/v1/model"
 	s "github.com/fkmhrk/OpenInvoice/v1/service"
+	"github.com/fkmhrk/OpenInvoice/v1/service/trading"
 	"github.com/mokelab-go/hop"
 )
 
-func getTradings(trading s.TradingService) http.HandlerFunc {
-	return makeBaseHandler(func(req *http.Request) s.Result {
-		return trading.GetListByUser()
-	})
+func getTradings(trading trading.Service) http.HandlerFunc {
+	return func(w http.ResponseWriter, req *http.Request) {
+		resp := trading.GetListByUser()
+		resp.Write(w)
+	}
 }
 
-func getTrading(trading s.TradingService) http.HandlerFunc {
-	return makeBaseHandler(func(req *http.Request) s.Result {
+func getTrading(trading trading.Service) http.HandlerFunc {
+	return func(w http.ResponseWriter, req *http.Request) {
 		c := req.Context()
 		tradingId := hop.PathString(c, "tradingId")
-		return trading.GetTradingByID(tradingId)
-	})
+		resp := trading.GetTradingByID(tradingId)
+		resp.Write(w)
+	}
 }
 
-func createTrading(trading s.TradingService) http.HandlerFunc {
-	return makeBaseHandler(func(req *http.Request) s.Result {
+func createTrading(trading trading.Service) http.HandlerFunc {
+	return func(w http.ResponseWriter, req *http.Request) {
 		// read input
 		c := req.Context()
 		session := session(c)
@@ -43,14 +46,16 @@ func createTrading(trading s.TradingService) http.HandlerFunc {
 		product, _ := json.String("product")
 		memo, _ := json.String("memo")
 
-		return trading.Create(session, companyId,
+		resp := trading.Create(session, companyId,
 			subject, product, memo, titleType, workFrom, workTo,
 			total, quotationDate, billDate, deliveryDate, float32(taxRate))
-	})
+		resp.Write(w)
+
+	}
 }
 
-func updateTrading(trading s.TradingService) http.HandlerFunc {
-	return makeBaseHandler(func(req *http.Request) s.Result {
+func updateTrading(tradingService trading.Service) http.HandlerFunc {
+	return func(w http.ResponseWriter, req *http.Request) {
 		c := req.Context()
 		tradingId := hop.PathString(c, "tradingId")
 
@@ -75,7 +80,7 @@ func updateTrading(trading s.TradingService) http.HandlerFunc {
 		product, _ := json.String("product")
 		memo, _ := json.String("memo")
 
-		return trading.Update(s.Trading{
+		resp := tradingService.Update(trading.Trading{
 			m.Trading{
 				Id:              tradingId,
 				CompanyId:       companyId,
@@ -96,29 +101,33 @@ func updateTrading(trading s.TradingService) http.HandlerFunc {
 				Total:           total,
 			},
 		})
-	})
+		resp.Write(w)
+	}
+
 }
 
 func deleteTrading(services s.Services) http.HandlerFunc {
-	return makeBaseHandler(func(req *http.Request) s.Result {
+	return func(w http.ResponseWriter, req *http.Request) {
 		// read path param
 		tradingId := hop.PathString(req.Context(), "tradingId")
 
-		return services.Trading.Delete(tradingId)
-	})
+		resp := services.Trading.Delete(tradingId)
+		resp.Write(w)
+	}
 }
 
-func getTradingItems(trading s.TradingService) http.HandlerFunc {
-	return makeBaseHandler(func(req *http.Request) s.Result {
+func getTradingItems(trading trading.Service) http.HandlerFunc {
+	return func(w http.ResponseWriter, req *http.Request) {
 		// read path param
 		tradingId := hop.PathString(req.Context(), "tradingId")
 
-		return trading.GetItemListByTradingId(tradingId)
-	})
+		resp := trading.GetItemListByTradingId(tradingId)
+		resp.Write(w)
+	}
 }
 
-func createTradingItem(trading s.TradingService) http.HandlerFunc {
-	return makeBaseHandler(func(req *http.Request) s.Result {
+func createTradingItem(trading trading.Service) http.HandlerFunc {
+	return func(w http.ResponseWriter, req *http.Request) {
 		c := req.Context()
 		tradingId := hop.PathString(c, "tradingId")
 
@@ -134,12 +143,13 @@ func createTradingItem(trading s.TradingService) http.HandlerFunc {
 		taxType, _ := json.Int("tax_type")
 		memo, _ := json.String("memo")
 
-		return trading.CreateItem(tradingId, subject, degree, memo, sortOrder, unitPrice, amount, taxType)
-	})
+		resp := trading.CreateItem(tradingId, subject, degree, memo, sortOrder, unitPrice, amount, taxType)
+		resp.Write(w)
+	}
 }
 
-func updateTradingItem(trading s.TradingService) http.HandlerFunc {
-	return makeBaseHandler(func(req *http.Request) s.Result {
+func updateTradingItem(trading trading.Service) http.HandlerFunc {
+	return func(w http.ResponseWriter, req *http.Request) {
 		// read path param
 		c := req.Context()
 		tradingId := hop.PathString(c, "tradingId")
@@ -157,17 +167,19 @@ func updateTradingItem(trading s.TradingService) http.HandlerFunc {
 		taxType, _ := json.Int("tax_type")
 		memo, _ := json.String("memo")
 
-		return trading.UpdateItem(id, tradingId, subject, degree, memo, sortOrder, unitPrice, amount, taxType)
-	})
+		resp := trading.UpdateItem(id, tradingId, subject, degree, memo, sortOrder, unitPrice, amount, taxType)
+		resp.Write(w)
+	}
 }
 
-func deleteTradingItem(trading s.TradingService) http.HandlerFunc {
-	return makeBaseHandler(func(req *http.Request) s.Result {
+func deleteTradingItem(trading trading.Service) http.HandlerFunc {
+	return func(w http.ResponseWriter, req *http.Request) {
 		// read path param
 		c := req.Context()
 		tradingId := hop.PathString(c, "tradingId")
 		id := hop.PathString(c, "itemId")
 
-		return trading.DeleteItem(id, tradingId)
-	})
+		resp := trading.DeleteItem(id, tradingId)
+		resp.Write(w)
+	}
 }
