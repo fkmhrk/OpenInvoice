@@ -5,7 +5,6 @@ import (
 
 	m "github.com/fkmhrk/OpenInvoice/v1/model"
 	"github.com/fkmhrk/OpenInvoice/v1/model/response"
-	"github.com/fkmhrk/OpenInvoice/v1/service"
 	s "github.com/fkmhrk/OpenInvoice/v1/service/user"
 	"github.com/mokelab-go/server/entity"
 )
@@ -70,7 +69,7 @@ func (o *userService) GetToken(name, pass string) entity.Response {
 func (o *userService) RefreshToken(token string) entity.Response {
 	// input check
 	if isEmpty(token) {
-		return response.Error(http.StatusBadRequest, service.ERR_TOKEN_EMPTY)
+		return response.Error(http.StatusBadRequest, response.MSG_TOKEN_EMPTY)
 	}
 	// get refresh token
 	sessionRefresh, err := o.sessionRefreshDAO.Get(token)

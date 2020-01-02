@@ -26,4 +26,7 @@ const (
 	MSG_WRONG_TOKEN    = "Wrong token."
 	MSG_NOT_AUTHORIZED = "User not authorized."
 	MSG_SERVER_ERROR   = "Server error."
+
+	MSG_INVALID_SEQUENCE_TYPE = "Sequence type must be quotation/delivery/bill."
+	MSG_TOKEN_EMPTY           = "token must not be empty."
 )

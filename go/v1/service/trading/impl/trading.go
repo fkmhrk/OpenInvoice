@@ -7,7 +7,6 @@ import (
 
 	m "github.com/fkmhrk/OpenInvoice/v1/model"
 	"github.com/fkmhrk/OpenInvoice/v1/model/response"
-	s "github.com/fkmhrk/OpenInvoice/v1/service"
 	ss "github.com/fkmhrk/OpenInvoice/v1/service/trading"
 	"github.com/mokelab-go/server/entity"
 )
@@ -218,7 +217,7 @@ func (o *tradingService) GetNextNumber(seqType string, date int64) entity.Respon
 		seqTypeInt = m.SeqType_Bill
 		break
 	default:
-		return response.Error(http.StatusBadRequest, s.ERR_INVALID_SEQUENCE_TYPE)
+		return response.Error(http.StatusBadRequest, response.MSG_INVALID_SEQUENCE_TYPE)
 	}
 	// determine year
 	t := time.Unix(date/1000, 0)
