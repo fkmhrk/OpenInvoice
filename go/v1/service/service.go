@@ -1,8 +1,12 @@
 package service
 
+import (
+	user "github.com/fkmhrk/OpenInvoice/v1/service/user"
+)
+
 type Services struct {
 	Admin   AdminService
-	User    UserService
+	User    user.Service
 	Trading TradingService
 	Company CompanyService
 }

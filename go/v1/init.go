@@ -6,6 +6,8 @@ import (
 	"github.com/fkmhrk/OpenInvoice/v1/rest"
 	s "github.com/fkmhrk/OpenInvoice/v1/service"
 	si "github.com/fkmhrk/OpenInvoice/v1/service/impl"
+	user "github.com/fkmhrk/OpenInvoice/v1/service/user"
+	userImpl "github.com/fkmhrk/OpenInvoice/v1/service/user/impl"
 
 	"database/sql"
 
@@ -22,14 +24,14 @@ func InitRouter(r *mux.Router) error {
 	models := mi.NewModels(c)
 	services := si.NewServices(models)
 
-	userService := si.NewUserSerivce(models.User, models.Session, models)
+	userService := userImpl.New(models.User, models.Session, models)
 	tradingService := si.NewTradingSerivce(models.Session, models.Trading, models)
 	companyService := si.NewCompanySerivce(models)
 	initRouter(r, services, userService, tradingService, companyService, models)
 	return nil
 }
 
-func initRouter(r *mux.Router, services s.Services, u s.UserService, t s.TradingService, c s.CompanyService, models *m.Models) {
+func initRouter(r *mux.Router, services s.Services, u user.Service, t s.TradingService, c s.CompanyService, models *m.Models) {
 	r1 := r.PathPrefix("/api/v1").Subrouter()
 	rest.SetHandlers(r1, services, u, t, c, models)
 }

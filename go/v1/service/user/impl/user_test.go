@@ -1,10 +1,13 @@
 package impl
 
 import (
-	m "../../model"
-	mock "../../model/mock"
 	"fmt"
 	"testing"
+
+	m "github.com/fkmhrk/OpenInvoice/v1/model"
+	mock "github.com/fkmhrk/OpenInvoice/v1/model/mock"
+	"github.com/fkmhrk/OpenInvoice/v1/model/response"
+	"github.com/fkmhrk/OpenInvoice/v1/model/test"
 )
 
 func TestUser0000_GetToken(t *testing.T) {
@@ -23,25 +26,20 @@ func TestUser0000_GetToken(t *testing.T) {
 		Token: "tokenRefresh",
 	}
 
-	s := NewUserSerivce(userDAO, sessionDAO, models)
+	s := New(userDAO, sessionDAO, models)
 
 	name := "user1122"
 	pass := "pass2233"
 	r := s.GetToken(name, pass)
-	if r == nil {
-		t.Errorf("Result must not be nil")
+	if r.Status != 200 {
+		t.Errorf("Wrong status : %d", r.Status)
 		return
 	}
-	if r.Status() != 200 {
-		t.Errorf("Wrong status : %d", r.Status())
-		return
-	}
-	json := json(r)
-	assertString(t, json, "id", "testUser")
-	assertString(t, json, "token_type", "bearer")
-	assertString(t, json, "access_token", "testToken")
-	assertString(t, json, "refresh_token", "tokenRefresh")
-	assertBool(t, json, "isAdmin", false)
+	test.AssertString(t, r.Body, "id", "testUser")
+	test.AssertString(t, r.Body, "token_type", "bearer")
+	test.AssertString(t, r.Body, "access_token", "testToken")
+	test.AssertString(t, r.Body, "refresh_token", "tokenRefresh")
+	test.AssertBool(t, r.Body, "is_admin", false)
 }
 
 func TestUser0001_GetToken_Admin(t *testing.T) {
@@ -60,25 +58,20 @@ func TestUser0001_GetToken_Admin(t *testing.T) {
 		Token: "tokenRefresh",
 	}
 
-	s := NewUserSerivce(userDAO, sessionDAO, models)
+	s := New(userDAO, sessionDAO, models)
 
 	name := "user1122"
 	pass := "pass2233"
 	r := s.GetToken(name, pass)
-	if r == nil {
-		t.Errorf("Result must not be nil")
+	if r.Status != 200 {
+		t.Errorf("Wrong status : %d", r.Status)
 		return
 	}
-	if r.Status() != 200 {
-		t.Errorf("Wrong status : %d", r.Status())
-		return
-	}
-	json := json(r)
-	assertString(t, json, "id", "testUser")
-	assertString(t, json, "token_type", "bearer")
-	assertString(t, json, "access_token", "testToken")
-	assertString(t, json, "refresh_token", "tokenRefresh")
-	assertBool(t, json, "is_admin", true)
+	test.AssertString(t, r.Body, "id", "testUser")
+	test.AssertString(t, r.Body, "token_type", "bearer")
+	test.AssertString(t, r.Body, "access_token", "testToken")
+	test.AssertString(t, r.Body, "refresh_token", "tokenRefresh")
+	test.AssertBool(t, r.Body, "is_admin", true)
 }
 
 func TestUser0100_RefreshToken(t *testing.T) {
@@ -94,23 +87,18 @@ func TestUser0100_RefreshToken(t *testing.T) {
 		Token: "testToken",
 	}
 
-	service := NewUserSerivce(models.User, sessionDAO, models)
+	service := New(models.User, sessionDAO, models)
 
 	token := "token1122"
 	r := service.RefreshToken(token)
-	if r == nil {
-		t.Errorf("Result must not be nil")
+	if r.Status != 200 {
+		t.Errorf("Wrong status : %d", r.Status)
 		return
 	}
-	if r.Status() != 200 {
-		t.Errorf("Wrong status : %d", r.Status())
-		return
-	}
-	json := json(r)
-	assertString(t, json, "id", "user1122")
-	assertString(t, json, "token_type", "bearer")
-	assertString(t, json, "access_token", "testToken")
-	assertBool(t, json, "is_admin", true)
+	test.AssertString(t, r.Body, "id", "user1122")
+	test.AssertString(t, r.Body, "token_type", "bearer")
+	test.AssertString(t, r.Body, "access_token", "testToken")
+	test.AssertBool(t, r.Body, "is_admin", true)
 }
 
 func TestUser0100_GetList(t *testing.T) {
@@ -127,28 +115,23 @@ func TestUser0100_GetList(t *testing.T) {
 	userDAO.GetListResult = list
 	sessionDAO, _ := models.Session.(*mock.SessionDAO)
 
-	s := NewUserSerivce(userDAO, sessionDAO, models)
+	s := New(userDAO, sessionDAO, models)
 
 	r := s.GetUsers()
-	if r == nil {
-		t.Errorf("Result must not be nil")
+	if r.Status != 200 {
+		t.Errorf("Wrong status : %d", r.Status)
 		return
 	}
-	if r.Status() != 200 {
-		t.Errorf("Wrong status : %d", r.Status())
-		return
-	}
-	json := json(r)
-	userList, _ := json.Array("users")
+	userList, _ := r.Body["users"].([]interface{})
 	if len(userList) != 2 {
 		t.Errorf("Wrong length : %d", len(userList))
 	}
-	item, _ := userList.Object(0)
-	assertString(t, item, "id", "user0")
-	assertString(t, item, "display_name", "name0")
-	item, _ = userList.Object(1)
-	assertString(t, item, "id", "user1")
-	assertString(t, item, "display_name", "name1")
+	item, _ := userList[0].(map[string]interface{})
+	test.AssertString(t, item, "id", "user0")
+	test.AssertString(t, item, "display_name", "name0")
+	item, _ = userList[1].(map[string]interface{})
+	test.AssertString(t, item, "id", "user1")
+	test.AssertString(t, item, "display_name", "name1")
 }
 
 func TestUser0200_Create(t *testing.T) {
@@ -164,20 +147,15 @@ func TestUser0200_Create(t *testing.T) {
 		Token: "testToken",
 		Role:  m.Role("Admin"),
 	}
-	s := NewUserSerivce(userDAO, sessionDAO, models)
+	s := New(userDAO, sessionDAO, models)
 
 	r := s.Create(session, "loginName", "disp", "08011112222", "pass1122")
-	if r == nil {
-		t.Errorf("Result must not be nil")
+	if r.Status != 201 {
+		t.Errorf("Wrong status : %d", r.Status)
 		return
 	}
-	if r.Status() != 201 {
-		t.Errorf("Wrong status : %d", r.Status())
-		return
-	}
-	json := json(r)
-	assertString(t, json, "id", "id1234")
-	assertString(t, json, "display_name", "loginName")
+	test.AssertString(t, r.Body, "id", "id1234")
+	test.AssertString(t, r.Body, "display_name", "loginName")
 }
 
 func TestUser0201_Create_Not_Admin(t *testing.T) {
@@ -188,23 +166,18 @@ func TestUser0201_Create_Not_Admin(t *testing.T) {
 		Id: "id1234",
 	}
 
-	s := NewUserSerivce(userDAO, sessionDAO, models)
+	s := New(userDAO, sessionDAO, models)
 
 	session := &m.Session{
 		Token: "testToken",
 		Role:  m.Role("Read,Write"),
 	}
 	r := s.Create(session, "loginName", "disp", "08011112222", "pass1122")
-	if r == nil {
-		t.Errorf("Result must not be nil")
+	if r.Status != 403 {
+		t.Errorf("Wrong status : %d", r.Status)
 		return
 	}
-	if r.Status() != 403 {
-		t.Errorf("Wrong status : %d", r.Status())
-		return
-	}
-	json := json(r)
-	if v, _ := json.String("msg"); v != MSG_NOT_AUTHORIZED {
+	if v, _ := r.Body["msg"].(string); v != response.MSG_NOT_AUTHORIZED {
 		t.Errorf("Wrong msg : %s", v)
 	}
 }
@@ -217,26 +190,21 @@ func TestUser0300_Update(t *testing.T) {
 		Id: "id1234",
 	}
 
-	s := NewUserSerivce(userDAO, sessionDAO, models)
+	s := New(userDAO, sessionDAO, models)
 
 	session := &m.Session{
 		Token: "testToken",
 		Role:  m.Role("Admin,Read,Write"),
 	}
 	r := s.Update(session, "user1111", "loginName", "disp", "08011112222", "pass1122")
-	if r == nil {
-		t.Errorf("Result must not be nil")
+	if r.Status != 200 {
+		t.Errorf("Wrong status : %d", r.Status)
 		return
 	}
-	if r.Status() != 200 {
-		t.Errorf("Wrong status : %d", r.Status())
-		return
-	}
-	json := json(r)
-	assertString(t, json, "id", "user1111")
-	assertString(t, json, "login_name", "loginName")
-	assertString(t, json, "display_name", "disp")
-	assertString(t, json, "tel", "08011112222")
+	test.AssertString(t, r.Body, "id", "user1111")
+	test.AssertString(t, r.Body, "login_name", "loginName")
+	test.AssertString(t, r.Body, "display_name", "disp")
+	test.AssertString(t, r.Body, "tel", "08011112222")
 }
 
 func TestUser0301_Update_Not_Admin(t *testing.T) {
@@ -247,7 +215,7 @@ func TestUser0301_Update_Not_Admin(t *testing.T) {
 		Id: "id1234",
 	}
 
-	s := NewUserSerivce(userDAO, sessionDAO, models)
+	s := New(userDAO, sessionDAO, models)
 
 	session := &m.Session{
 		Token:  "testToken",
@@ -255,19 +223,14 @@ func TestUser0301_Update_Not_Admin(t *testing.T) {
 		Role:   m.Role("Read,Write"),
 	}
 	r := s.Update(session, "user1111", "loginName", "disp", "08011112222", "pass1122")
-	if r == nil {
-		t.Errorf("Result must not be nil")
+	if r.Status != 200 {
+		t.Errorf("Wrong status : %d", r.Status)
 		return
 	}
-	if r.Status() != 200 {
-		t.Errorf("Wrong status : %d", r.Status())
-		return
-	}
-	json := json(r)
-	assertString(t, json, "id", "user1111")
-	assertString(t, json, "login_name", "loginName")
-	assertString(t, json, "display_name", "disp")
-	assertString(t, json, "tel", "08011112222")
+	test.AssertString(t, r.Body, "id", "user1111")
+	test.AssertString(t, r.Body, "login_name", "loginName")
+	test.AssertString(t, r.Body, "display_name", "disp")
+	test.AssertString(t, r.Body, "tel", "08011112222")
 }
 
 func TestUser0302_Update_Not_Admin_Other(t *testing.T) {
@@ -278,7 +241,7 @@ func TestUser0302_Update_Not_Admin_Other(t *testing.T) {
 		Id: "id1234",
 	}
 
-	service := NewUserSerivce(userDAO, sessionDAO, models)
+	service := New(userDAO, sessionDAO, models)
 
 	session := &m.Session{
 		Token:  "testToken",
@@ -286,16 +249,11 @@ func TestUser0302_Update_Not_Admin_Other(t *testing.T) {
 		Role:   m.Role("Read,Write"),
 	}
 	r := service.Update(session, "user1111", "loginName", "disp", "08011112222", "pass1122")
-	if r == nil {
-		t.Errorf("Result must not be nil")
+	if r.Status != 403 {
+		t.Errorf("Wrong status : %d", r.Status)
 		return
 	}
-	if r.Status() != 403 {
-		t.Errorf("Wrong status : %d", r.Status())
-		return
-	}
-	json := json(r)
-	assertString(t, json, "msg", MSG_NOT_AUTHORIZED)
+	test.AssertString(t, r.Body, "msg", response.MSG_NOT_AUTHORIZED)
 }
 
 func TestUser0400_Delete(t *testing.T) {
@@ -308,23 +266,19 @@ func TestUser0400_Delete(t *testing.T) {
 	}
 	userDAO.DeleteResult = nil
 
-	service := NewUserSerivce(userDAO, sessionDAO, models)
+	service := New(userDAO, sessionDAO, models)
 
 	session := &m.Session{
 		Token: "testToken",
 		Role:  m.Role("Admin,Read,Write"),
 	}
 	r := service.Delete(session, "user1111")
-	if r == nil {
-		t.Errorf("Result must not be nil")
+	if r.Status != 204 {
+		t.Errorf("Wrong status : %d", r.Status)
 		return
 	}
-	if r.Status() != 204 {
-		t.Errorf("Wrong status : %d", r.Status())
-		return
-	}
-	if len(r.Body()) != 0 {
-		t.Errorf("Body must be empty but %s", r.Body())
+	if len(r.Body) != 0 {
+		t.Errorf("Body must be empty but %s", r.Body)
 		return
 	}
 }
@@ -339,23 +293,18 @@ func TestUser0401_Delete_Not_Admin(t *testing.T) {
 	}
 	userDAO.DeleteResult = nil
 
-	service := NewUserSerivce(userDAO, sessionDAO, models)
+	service := New(userDAO, sessionDAO, models)
 
 	session := &m.Session{
 		Token: "testToken",
 		Role:  m.Role("Read,Write"),
 	}
 	r := service.Delete(session, "user1111")
-	if r == nil {
-		t.Errorf("Result must not be nil")
+	if r.Status != 403 {
+		t.Errorf("Wrong status : %d", r.Status)
 		return
 	}
-	if r.Status() != 403 {
-		t.Errorf("Wrong status : %d", r.Status())
-		return
-	}
-	json := json(r)
-	assertString(t, json, "msg", MSG_NOT_AUTHORIZED)
+	test.AssertString(t, r.Body, "msg", response.MSG_NOT_AUTHORIZED)
 }
 
 func TestUser0402_Delete_Target_Admin(t *testing.T) {
@@ -368,21 +317,16 @@ func TestUser0402_Delete_Target_Admin(t *testing.T) {
 	}
 	userDAO.DeleteResult = nil
 
-	service := NewUserSerivce(userDAO, sessionDAO, models)
+	service := New(userDAO, sessionDAO, models)
 
 	session := &m.Session{
 		Token: "testToken",
 		Role:  m.Role("Admin,Read,Write"),
 	}
 	r := service.Delete(session, "user1111")
-	if r == nil {
-		t.Errorf("Result must not be nil")
+	if r.Status != 403 {
+		t.Errorf("Wrong status : %d", r.Status)
 		return
 	}
-	if r.Status() != 403 {
-		t.Errorf("Wrong status : %d", r.Status())
-		return
-	}
-	json := json(r)
-	assertString(t, json, "msg", MSG_NOT_AUTHORIZED)
+	test.AssertString(t, r.Body, "msg", response.MSG_NOT_AUTHORIZED)
 }
