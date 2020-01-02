@@ -10,16 +10,18 @@ import (
 )
 
 func getEnvironment(services s.Services) http.HandlerFunc {
-	return makeBaseHandler(func(req *http.Request) s.Result {
-		return services.Admin.GetEnvironment()
-	})
+	return func(w http.ResponseWriter, req *http.Request) {
+		resp := services.Admin.GetEnvironment()
+		resp.Write(w)
+	}
 }
 
 func saveEnvironment(services s.Services) http.HandlerFunc {
-	return makeBaseHandler(func(req *http.Request) s.Result {
+	return func(w http.ResponseWriter, req *http.Request) {
 		json := rj.RawJsonObject(hop.BodyJSON(req.Context()))
-		return services.Admin.SaveEnvironment(toEnvList(json))
-	})
+		resp := services.Admin.SaveEnvironment(toEnvList(json))
+		resp.Write(w)
+	}
 }
 
 func toEnvList(json rj.RawJsonObject) []*m.Env {
@@ -36,7 +38,8 @@ func toEnvList(json rj.RawJsonObject) []*m.Env {
 }
 
 func getMyCompanyName(services s.Services) http.HandlerFunc {
-	return makeBaseHandler(func(req *http.Request) s.Result {
-		return services.Admin.GetMyCompanyname()
-	})
+	return func(w http.ResponseWriter, req *http.Request) {
+		resp := services.Admin.GetMyCompanyname()
+		resp.Write(w)
+	}
 }
