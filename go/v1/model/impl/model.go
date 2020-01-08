@@ -4,13 +4,14 @@ import (
 	m "github.com/fkmhrk/OpenInvoice/v1/model"
 	company "github.com/fkmhrk/OpenInvoice/v1/model/company/mysql"
 	"github.com/fkmhrk/OpenInvoice/v1/model/db"
+	"github.com/fkmhrk/OpenInvoice/v1/model/logger"
 	session "github.com/fkmhrk/OpenInvoice/v1/model/session/mysql"
 	user "github.com/fkmhrk/OpenInvoice/v1/model/user/mysql"
 )
 
 // NewModels creates instance
 func NewModels(connection *db.Connection) *m.Models {
-	logger := NewLogger()
+	logger := logger.New()
 	return &m.Models{
 		User:           user.New(connection),
 		Session:        session.NewSessionDAO(connection),

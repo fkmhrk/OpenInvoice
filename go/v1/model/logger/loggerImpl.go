@@ -1,4 +1,4 @@
-package impl
+package logger
 
 import (
 	"fmt"
@@ -12,7 +12,8 @@ type logger struct {
 	logger *log.Logger
 }
 
-func NewLogger() *logger {
+// New creates instance
+func New() Logger {
 	return &logger{
 		logger: log.New(os.Stdout, "", 0),
 	}

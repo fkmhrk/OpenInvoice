@@ -7,6 +7,7 @@ import (
 
 	m "github.com/fkmhrk/OpenInvoice/v1/model"
 	"github.com/fkmhrk/OpenInvoice/v1/model/db"
+	"github.com/fkmhrk/OpenInvoice/v1/model/logger"
 	"github.com/go-sql-driver/mysql"
 )
 
@@ -22,10 +23,10 @@ const (
 
 type tradingDAO struct {
 	connection *db.Connection
-	logger     m.Logger
+	logger     logger.Logger
 }
 
-func NewTradingDAO(connection *db.Connection, logger m.Logger) *tradingDAO {
+func NewTradingDAO(connection *db.Connection, logger logger.Logger) *tradingDAO {
 	return &tradingDAO{
 		connection: connection,
 		logger:     logger,

@@ -2,6 +2,7 @@ package model
 
 import (
 	"github.com/fkmhrk/OpenInvoice/v1/model/company"
+	"github.com/fkmhrk/OpenInvoice/v1/model/logger"
 	"github.com/fkmhrk/OpenInvoice/v1/model/session"
 	"github.com/fkmhrk/OpenInvoice/v1/model/user"
 )
@@ -15,5 +16,5 @@ type Models struct {
 	Trading        TradingDAO
 	Env            EnvDAO
 	Seq            SeqDAO
-	Logger         Logger
+	Logger         logger.Logger
 }
