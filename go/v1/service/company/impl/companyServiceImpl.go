@@ -4,17 +4,20 @@ import (
 	"net/http"
 
 	m "github.com/fkmhrk/OpenInvoice/v1/model"
+	"github.com/fkmhrk/OpenInvoice/v1/model/company"
 	"github.com/fkmhrk/OpenInvoice/v1/model/response"
 	"github.com/fkmhrk/OpenInvoice/v1/model/session"
+	s "github.com/fkmhrk/OpenInvoice/v1/service/company"
 	"github.com/mokelab-go/server/entity"
 )
 
 type companyService struct {
 	sessionDAO session.SessionDAO
-	companyDAO m.CompanyDAO
+	companyDAO company.DAO
 }
 
-func New(models *m.Models) *companyService {
+// New creates instance
+func New(models *m.Models) s.Service {
 	return &companyService{
 		sessionDAO: models.Session,
 		companyDAO: models.Company,
@@ -81,7 +84,7 @@ func (o *companyService) Delete(id string) entity.Response {
 	}
 }
 
-func (s *companyService) toJson(c *m.Company) map[string]interface{} {
+func (s *companyService) toJson(c *company.Company) map[string]interface{} {
 	return map[string]interface{}{
 		"id":      c.Id,
 		"name":    c.Name,

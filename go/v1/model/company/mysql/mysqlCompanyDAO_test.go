@@ -2,19 +2,39 @@ package impl
 
 import (
 	"database/sql"
-	_ "github.com/go-sql-driver/mysql"
+	"fmt"
+	"runtime"
+	"strings"
 	"testing"
+
+	"github.com/fkmhrk/OpenInvoice/v1/model/company"
+	"github.com/fkmhrk/OpenInvoice/v1/model/db"
+	testdb "github.com/fkmhrk/OpenInvoice/v1/model/db/test"
+	_ "github.com/go-sql-driver/mysql"
 )
 
-func createCompanyDAO(db *sql.DB) *companyDAO {
-	c := NewConnection(db)
-	return NewCompanyDAO(c)
+/*
+func createTradingDAO(sqlDB *sql.DB) *tradingDAO {
+	c := db.NewConnection(sqlDB)
+	return NewTradingDAO(c, NewLogger())
+}
+*/
+
+func createCompanyDAO(sqlDB *sql.DB) company.DAO {
+	c := db.NewConnection(sqlDB)
+	return New(c)
 }
 
 func deleteCompanyByName(db *sql.DB, name string) {
 	s, _ := db.Prepare("DELETE FROM company WHERE name=?")
 	defer s.Close()
 	s.Exec(name)
+}
+
+func deleteTradingByUser(db *sql.DB, userId string) {
+	s, _ := db.Prepare("DELETE FROM trading WHERE assignee=?")
+	defer s.Close()
+	s.Exec(userId)
 }
 
 func insertCompany(db *sql.DB, id, name, zip, address, phone, unit string) {
@@ -26,7 +46,7 @@ func insertCompany(db *sql.DB, id, name, zip, address, phone, unit string) {
 }
 
 func TestCompany0000_GetList(t *testing.T) {
-	db, err := connect()
+	db, err := testdb.Connect()
 	if err != nil {
 		t.Errorf("Failed to connect")
 		return
@@ -53,7 +73,7 @@ func TestCompany0000_GetList(t *testing.T) {
 }
 
 func TestCompany0100_GetById(t *testing.T) {
-	db, err := connect()
+	db, err := testdb.Connect()
 	if err != nil {
 		t.Errorf("Failed to connect")
 		return
@@ -77,7 +97,7 @@ func TestCompany0100_GetById(t *testing.T) {
 }
 
 func TestCompany0200_Create(t *testing.T) {
-	db, err := connect()
+	db, err := testdb.Connect()
 	if err != nil {
 		t.Errorf("Failed to connect")
 		return
@@ -108,7 +128,7 @@ func TestCompany0200_Create(t *testing.T) {
 }
 
 func TestCompany0300_Update(t *testing.T) {
-	db, err := connect()
+	db, err := testdb.Connect()
 	if err != nil {
 		t.Errorf("Failed to connect")
 		return
@@ -145,8 +165,9 @@ func TestCompany0300_Update(t *testing.T) {
 	assertCompany(t, item3, item.Id, "name3", "zip3", "address3", "phone3", "unit3")
 }
 
+/*
 func TestCompany0400_Delete(t *testing.T) {
-	db, err := connect()
+	db, err := testdb.Connect()
 	if err != nil {
 		t.Errorf("Failed to connect")
 		return
@@ -205,4 +226,33 @@ func TestCompany0400_Delete(t *testing.T) {
 		t.Errorf("Company ID must be empty but %s", trading2.CompanyId)
 		return
 	}
+}
+*/
+
+func assertCompany(t *testing.T, item *company.Company,
+	id, name, zip, address, phone, unit string) {
+	caller := getCaller()
+	if item.Id != id {
+		t.Errorf("%s Id must be %s but %s", caller, id, item.Id)
+	}
+	if item.Name != name {
+		t.Errorf("%s Name must be %s but %s", caller, name, item.Name)
+	}
+	if item.Zip != zip {
+		t.Errorf("%s Zip must be %s but %s", caller, zip, item.Zip)
+	}
+	if item.Address != address {
+		t.Errorf("%s Address must be %s but %s", caller, address, item.Address)
+	}
+	if item.Phone != phone {
+		t.Errorf("%s Phone must be %s but %s", caller, phone, item.Phone)
+	}
+	if item.Unit != unit {
+		t.Errorf("%s Unit must be %s but %s", caller, unit, item.Unit)
+	}
+}
+func getCaller() string {
+	_, caller, line, _ := runtime.Caller(2)
+	path := strings.SplitN(caller, "/", -1)
+	return fmt.Sprintf("%s:%d", path[len(path)-1], line)
 }

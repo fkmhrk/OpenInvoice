@@ -1,6 +1,7 @@
-package model
+package company
 
-type CompanyDAO interface {
+// DAO is interface
+type DAO interface {
 	// Gets all company
 	GetList() ([]*Company, error)
 	GetById(id string) (*Company, error)
@@ -9,6 +10,7 @@ type CompanyDAO interface {
 	Delete(id string) error
 }
 
+// Company is copmany
 type Company struct {
 	Id      string
 	Name    string
