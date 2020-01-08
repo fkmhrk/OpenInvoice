@@ -6,6 +6,7 @@ import (
 
 	m "github.com/fkmhrk/OpenInvoice/v1/model"
 	mock "github.com/fkmhrk/OpenInvoice/v1/model/mock"
+	"github.com/fkmhrk/OpenInvoice/v1/model/session"
 	"github.com/fkmhrk/OpenInvoice/v1/model/test"
 	s "github.com/fkmhrk/OpenInvoice/v1/service/trading"
 )
@@ -65,7 +66,7 @@ func TestTrading0000_GetListByUser(t *testing.T) {
 func TestTrading0100_Create(t *testing.T) {
 	models := mock.NewMock()
 	sessionDAO, _ := models.Session.(*mock.SessionDAO)
-	sessionDAO.GetByTokenResult = &m.Session{
+	sessionDAO.GetByTokenResult = &session.Session{
 		Token: "testToken",
 	}
 	tradingDAO, _ := models.Trading.(*mock.TradingDAO)
@@ -82,7 +83,7 @@ func TestTrading0100_Create(t *testing.T) {
 	service := New(sessionDAO, tradingDAO, models)
 
 	// params
-	session := &m.Session{
+	session := &session.Session{
 		Token:  "testToken",
 		UserId: "user2233",
 	}
@@ -298,7 +299,7 @@ func TestTrading0500_DeleteItem(t *testing.T) {
 func TestTrading0600_GetNextNumber(t *testing.T) {
 	models := mock.NewMock()
 	sessionDAO, _ := models.Session.(*mock.SessionDAO)
-	sessionDAO.GetByTokenResult = &m.Session{
+	sessionDAO.GetByTokenResult = &session.Session{
 		Token: "testToken",
 	}
 	envDAO, _ := models.Env.(*mock.EnvDAO)
