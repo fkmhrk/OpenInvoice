@@ -4,25 +4,26 @@ import (
 	"fmt"
 	"testing"
 
-	m "github.com/fkmhrk/OpenInvoice/v1/model"
 	mock "github.com/fkmhrk/OpenInvoice/v1/model/mock"
 	"github.com/fkmhrk/OpenInvoice/v1/model/response"
+	"github.com/fkmhrk/OpenInvoice/v1/model/session"
 	"github.com/fkmhrk/OpenInvoice/v1/model/test"
+	"github.com/fkmhrk/OpenInvoice/v1/model/user"
 )
 
 func TestUser0000_GetToken(t *testing.T) {
 	models := mock.NewMock()
 	userDAO, _ := models.User.(*mock.UserDAO)
-	userDAO.GetByNamePasswordResult = &m.User{
+	userDAO.GetByNamePasswordResult = &user.User{
 		Id:   "testUser",
-		Role: m.Role("Read,Write"),
+		Role: user.Role("Read,Write"),
 	}
 	sessionDAO, _ := models.Session.(*mock.SessionDAO)
-	sessionDAO.CreateResult = &m.Session{
+	sessionDAO.CreateResult = &session.Session{
 		Token: "testToken",
 	}
 	sessionRefreshDAO, _ := models.SessionRefresh.(*mock.SessionRefreshDAO)
-	sessionRefreshDAO.CreateResult = m.SessionRefresh{
+	sessionRefreshDAO.CreateResult = session.SessionRefresh{
 		Token: "tokenRefresh",
 	}
 
@@ -45,16 +46,16 @@ func TestUser0000_GetToken(t *testing.T) {
 func TestUser0001_GetToken_Admin(t *testing.T) {
 	models := mock.NewMock()
 	userDAO, _ := models.User.(*mock.UserDAO)
-	userDAO.GetByNamePasswordResult = &m.User{
+	userDAO.GetByNamePasswordResult = &user.User{
 		Id:   "testUser",
-		Role: m.Role("Admin,Read,Write"),
+		Role: user.Role("Admin,Read,Write"),
 	}
 	sessionDAO, _ := models.Session.(*mock.SessionDAO)
-	sessionDAO.CreateResult = &m.Session{
+	sessionDAO.CreateResult = &session.Session{
 		Token: "testToken",
 	}
 	sessionRefreshDAO, _ := models.SessionRefresh.(*mock.SessionRefreshDAO)
-	sessionRefreshDAO.CreateResult = m.SessionRefresh{
+	sessionRefreshDAO.CreateResult = session.SessionRefresh{
 		Token: "tokenRefresh",
 	}
 
@@ -77,13 +78,13 @@ func TestUser0001_GetToken_Admin(t *testing.T) {
 func TestUser0100_RefreshToken(t *testing.T) {
 	models := mock.NewMock()
 	sessionRefreshDAO, _ := models.SessionRefresh.(*mock.SessionRefreshDAO)
-	sessionRefreshDAO.GetResult = m.SessionRefresh{
+	sessionRefreshDAO.GetResult = session.SessionRefresh{
 		Token:  "tokenRefresh",
 		Role:   "Admin",
 		UserId: "user1122",
 	}
 	sessionDAO, _ := models.Session.(*mock.SessionDAO)
-	sessionDAO.CreateResult = &m.Session{
+	sessionDAO.CreateResult = &session.Session{
 		Token: "testToken",
 	}
 
@@ -103,9 +104,9 @@ func TestUser0100_RefreshToken(t *testing.T) {
 
 func TestUser0100_GetList(t *testing.T) {
 	models := mock.NewMock()
-	var list []*m.User
+	var list []*user.User
 	for i := 0; i < 2; i++ {
-		list = append(list, &m.User{
+		list = append(list, &user.User{
 			Id:          fmt.Sprintf("user%d", i),
 			LoginName:   fmt.Sprintf("login%d", i),
 			DisplayName: fmt.Sprintf("name%d", i),
@@ -138,14 +139,14 @@ func TestUser0200_Create(t *testing.T) {
 	models := mock.NewMock()
 	sessionDAO, _ := models.Session.(*mock.SessionDAO)
 	userDAO, _ := models.User.(*mock.UserDAO)
-	userDAO.CreateResult = &m.User{
+	userDAO.CreateResult = &user.User{
 		Id:          "id1234",
 		DisplayName: "loginName",
 	}
 
-	session := &m.Session{
+	session := &session.Session{
 		Token: "testToken",
-		Role:  m.Role("Admin"),
+		Role:  user.Role("Admin"),
 	}
 	s := New(userDAO, sessionDAO, models)
 
@@ -162,15 +163,15 @@ func TestUser0201_Create_Not_Admin(t *testing.T) {
 	models := mock.NewMock()
 	sessionDAO, _ := models.Session.(*mock.SessionDAO)
 	userDAO, _ := models.User.(*mock.UserDAO)
-	userDAO.CreateResult = &m.User{
+	userDAO.CreateResult = &user.User{
 		Id: "id1234",
 	}
 
 	s := New(userDAO, sessionDAO, models)
 
-	session := &m.Session{
+	session := &session.Session{
 		Token: "testToken",
-		Role:  m.Role("Read,Write"),
+		Role:  user.Role("Read,Write"),
 	}
 	r := s.Create(session, "loginName", "disp", "08011112222", "pass1122")
 	if r.Status != 403 {
@@ -186,15 +187,15 @@ func TestUser0300_Update(t *testing.T) {
 	models := mock.NewMock()
 	sessionDAO, _ := models.Session.(*mock.SessionDAO)
 	userDAO, _ := models.User.(*mock.UserDAO)
-	userDAO.UpdateResult = &m.User{
+	userDAO.UpdateResult = &user.User{
 		Id: "id1234",
 	}
 
 	s := New(userDAO, sessionDAO, models)
 
-	session := &m.Session{
+	session := &session.Session{
 		Token: "testToken",
-		Role:  m.Role("Admin,Read,Write"),
+		Role:  user.Role("Admin,Read,Write"),
 	}
 	r := s.Update(session, "user1111", "loginName", "disp", "08011112222", "pass1122")
 	if r.Status != 200 {
@@ -211,16 +212,16 @@ func TestUser0301_Update_Not_Admin(t *testing.T) {
 	models := mock.NewMock()
 	sessionDAO, _ := models.Session.(*mock.SessionDAO)
 	userDAO, _ := models.User.(*mock.UserDAO)
-	userDAO.UpdateResult = &m.User{
+	userDAO.UpdateResult = &user.User{
 		Id: "id1234",
 	}
 
 	s := New(userDAO, sessionDAO, models)
 
-	session := &m.Session{
+	session := &session.Session{
 		Token:  "testToken",
 		UserId: "user1111",
-		Role:   m.Role("Read,Write"),
+		Role:   user.Role("Read,Write"),
 	}
 	r := s.Update(session, "user1111", "loginName", "disp", "08011112222", "pass1122")
 	if r.Status != 200 {
@@ -237,16 +238,16 @@ func TestUser0302_Update_Not_Admin_Other(t *testing.T) {
 	models := mock.NewMock()
 	sessionDAO, _ := models.Session.(*mock.SessionDAO)
 	userDAO, _ := models.User.(*mock.UserDAO)
-	userDAO.UpdateResult = &m.User{
+	userDAO.UpdateResult = &user.User{
 		Id: "id1234",
 	}
 
 	service := New(userDAO, sessionDAO, models)
 
-	session := &m.Session{
+	session := &session.Session{
 		Token:  "testToken",
 		UserId: "user2222",
-		Role:   m.Role("Read,Write"),
+		Role:   user.Role("Read,Write"),
 	}
 	r := service.Update(session, "user1111", "loginName", "disp", "08011112222", "pass1122")
 	if r.Status != 403 {
@@ -260,17 +261,17 @@ func TestUser0400_Delete(t *testing.T) {
 	models := mock.NewMock()
 	sessionDAO, _ := models.Session.(*mock.SessionDAO)
 	userDAO, _ := models.User.(*mock.UserDAO)
-	userDAO.GetByIdResult = &m.User{
+	userDAO.GetByIdResult = &user.User{
 		Id:   "id1234",
-		Role: m.Role("Read"),
+		Role: user.Role("Read"),
 	}
 	userDAO.DeleteResult = nil
 
 	service := New(userDAO, sessionDAO, models)
 
-	session := &m.Session{
+	session := &session.Session{
 		Token: "testToken",
-		Role:  m.Role("Admin,Read,Write"),
+		Role:  user.Role("Admin,Read,Write"),
 	}
 	r := service.Delete(session, "user1111")
 	if r.Status != 204 {
@@ -287,17 +288,17 @@ func TestUser0401_Delete_Not_Admin(t *testing.T) {
 	models := mock.NewMock()
 	sessionDAO, _ := models.Session.(*mock.SessionDAO)
 	userDAO, _ := models.User.(*mock.UserDAO)
-	userDAO.GetByIdResult = &m.User{
+	userDAO.GetByIdResult = &user.User{
 		Id:   "id1234",
-		Role: m.Role("Read"),
+		Role: user.Role("Read"),
 	}
 	userDAO.DeleteResult = nil
 
 	service := New(userDAO, sessionDAO, models)
 
-	session := &m.Session{
+	session := &session.Session{
 		Token: "testToken",
-		Role:  m.Role("Read,Write"),
+		Role:  user.Role("Read,Write"),
 	}
 	r := service.Delete(session, "user1111")
 	if r.Status != 403 {
@@ -311,17 +312,17 @@ func TestUser0402_Delete_Target_Admin(t *testing.T) {
 	models := mock.NewMock()
 	sessionDAO, _ := models.Session.(*mock.SessionDAO)
 	userDAO, _ := models.User.(*mock.UserDAO)
-	userDAO.GetByIdResult = &m.User{
+	userDAO.GetByIdResult = &user.User{
 		Id:   "id1234",
-		Role: m.Role("Admin,Read"),
+		Role: user.Role("Admin,Read"),
 	}
 	userDAO.DeleteResult = nil
 
 	service := New(userDAO, sessionDAO, models)
 
-	session := &m.Session{
+	session := &session.Session{
 		Token: "testToken",
-		Role:  m.Role("Admin,Read,Write"),
+		Role:  user.Role("Admin,Read,Write"),
 	}
 	r := service.Delete(session, "user1111")
 	if r.Status != 403 {
