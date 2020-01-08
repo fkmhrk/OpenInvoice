@@ -1,17 +1,19 @@
-package impl
+package mysql
 
 import (
 	"database/sql"
 	"testing"
 
-	m "github.com/fkmhrk/OpenInvoice/v1/model"
+	"github.com/fkmhrk/OpenInvoice/v1/model/db"
+	testdb "github.com/fkmhrk/OpenInvoice/v1/model/db/test"
+	"github.com/fkmhrk/OpenInvoice/v1/model/env"
 )
 
-func createEnvDAO(db *sql.DB) *envDAO {
-	return NewEnvDAO(NewConnection(db))
+func createEnvDAO(sqlDB *sql.DB) env.DAO {
+	return New(db.NewConnection(sqlDB))
 }
 
-func assertEnv(t *testing.T, item *m.Env, key, value string) {
+func assertEnv(t *testing.T, item *env.Env, key, value string) {
 	if item.Key != key {
 		t.Errorf("key must be %s but %s", key, item.Key)
 	}
@@ -27,7 +29,7 @@ func hardDeleteEnv(db *sql.DB, key string) {
 }
 
 func TestEnv_All(t *testing.T) {
-	db, err := connect()
+	db, err := testdb.Connect()
 	if err != nil {
 		t.Errorf("Failed to connect")
 		return
@@ -89,7 +91,7 @@ func TestEnv_All(t *testing.T) {
 }
 
 func TestEnv_GetList(t *testing.T) {
-	db, err := connect()
+	db, err := testdb.Connect()
 	if err != nil {
 		t.Errorf("Failed to connect")
 		return
@@ -143,7 +145,7 @@ func TestEnv_GetList(t *testing.T) {
 }
 
 func TestEnv_Save(t *testing.T) {
-	db, err := connect()
+	db, err := testdb.Connect()
 	if err != nil {
 		t.Errorf("Failed to connect")
 		return
@@ -156,12 +158,12 @@ func TestEnv_Save(t *testing.T) {
 	hardDeleteEnv(db, "key2")
 	hardDeleteEnv(db, "key3")
 
-	list := []*m.Env{
-		&m.Env{
+	list := []*env.Env{
+		&env.Env{
 			Key:   "key1",
 			Value: "value1",
 		},
-		&m.Env{
+		&env.Env{
 			Key:   "key2",
 			Value: "value2",
 		},
@@ -179,17 +181,17 @@ func TestEnv_Save(t *testing.T) {
 		t.Errorf("Failed to Get List : %s", err)
 		return
 	}
-	if len(list2) != 15 {
-		t.Errorf("List must be 15 but %d", len(list2))
+	if len(list2) != 2 {
+		t.Errorf("List must be 2 but %d", len(list2))
 		return
 	}
 
-	list = []*m.Env{
-		&m.Env{
+	list = []*env.Env{
+		&env.Env{
 			Key:   "key1",
 			Value: "value3",
 		},
-		&m.Env{
+		&env.Env{
 			Key:   "key3",
 			Value: "value4",
 		},
@@ -214,8 +216,8 @@ func TestEnv_Save(t *testing.T) {
 		t.Errorf("Failed to Get List : %s", err)
 		return
 	}
-	if len(list3) != 16 {
-		t.Errorf("List must be 16 but %d", len(list3))
+	if len(list3) != 3 {
+		t.Errorf("List must be 3 but %d", len(list3))
 		return
 	}
 }

@@ -6,6 +6,7 @@ import (
 	"time"
 
 	m "github.com/fkmhrk/OpenInvoice/v1/model"
+	"github.com/fkmhrk/OpenInvoice/v1/model/env"
 	"github.com/fkmhrk/OpenInvoice/v1/model/response"
 	"github.com/fkmhrk/OpenInvoice/v1/model/session"
 	ss "github.com/fkmhrk/OpenInvoice/v1/service/trading"
@@ -15,7 +16,7 @@ import (
 type tradingService struct {
 	sessionDAO session.SessionDAO
 	tradingDAO m.TradingDAO
-	envDAO     m.EnvDAO
+	envDAO     env.DAO
 	seqDAO     m.SeqDAO
 }
 

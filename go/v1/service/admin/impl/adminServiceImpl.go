@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	m "github.com/fkmhrk/OpenInvoice/v1/model"
+	"github.com/fkmhrk/OpenInvoice/v1/model/env"
 	"github.com/fkmhrk/OpenInvoice/v1/model/response"
 	"github.com/fkmhrk/OpenInvoice/v1/model/session"
 	"github.com/mokelab-go/server/entity"
@@ -11,9 +12,10 @@ import (
 
 type adminService struct {
 	sessionDAO session.SessionDAO
-	envDAO     m.EnvDAO
+	envDAO     env.DAO
 }
 
+// New creates instance
 func New(models *m.Models) *adminService {
 	return &adminService{
 		sessionDAO: models.Session,
@@ -39,7 +41,7 @@ func (o *adminService) GetEnvironment() entity.Response {
 	}
 }
 
-func (o *adminService) SaveEnvironment(list []*m.Env) entity.Response {
+func (o *adminService) SaveEnvironment(list []*env.Env) entity.Response {
 	// saves
 	err := o.envDAO.Save(list)
 	if err != nil {

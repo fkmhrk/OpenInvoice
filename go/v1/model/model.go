@@ -2,6 +2,7 @@ package model
 
 import (
 	"github.com/fkmhrk/OpenInvoice/v1/model/company"
+	"github.com/fkmhrk/OpenInvoice/v1/model/env"
 	"github.com/fkmhrk/OpenInvoice/v1/model/logger"
 	"github.com/fkmhrk/OpenInvoice/v1/model/session"
 	"github.com/fkmhrk/OpenInvoice/v1/model/user"
@@ -14,7 +15,7 @@ type Models struct {
 	SessionRefresh session.SessionRefreshDAO
 	Company        company.DAO
 	Trading        TradingDAO
-	Env            EnvDAO
+	Env            env.DAO
 	Seq            SeqDAO
 	Logger         logger.Logger
 }
