@@ -3,18 +3,25 @@ package mysql
 import (
 	"database/sql"
 	"fmt"
+	"runtime"
+	"strings"
 	"testing"
 
-	_ "github.com/go-sql-driver/mysql"
+	"github.com/fkmhrk/OpenInvoice/v1/model/db"
+	testdb "github.com/fkmhrk/OpenInvoice/v1/model/db/test"
+	"github.com/fkmhrk/OpenInvoice/v1/model/user"
 )
 
-func createUserDAO(db *sql.DB) *userDAO {
-	c := NewConnection(db)
-	return NewUserDAO(c)
+func createUserDAO(sqlDB *sql.DB) *userDAO {
+	c := db.NewConnection(sqlDB)
+	return New(c)
 }
 
 func deleteByID(db *sql.DB, id string) {
-	s, _ := db.Prepare("DELETE FROM user WHERE id=?")
+	s, err := db.Prepare("DELETE FROM user WHERE id=?")
+	if err != nil {
+		fmt.Printf("Failed to prepare %s", err)
+	}
 	defer s.Close()
 	s.Exec(id)
 }
@@ -38,7 +45,7 @@ func insertUser(db *sql.DB, id, name, password string) {
 }
 
 func TestUserDAO_0000_GetByNamePassword(t *testing.T) {
-	db, err := connect()
+	db, err := testdb.Connect()
 	if err != nil {
 		t.Errorf("Failed to connect")
 		return
@@ -64,7 +71,7 @@ func TestUserDAO_0000_GetByNamePassword(t *testing.T) {
 }
 
 func TestUserDAO_0001_GetByNamePassword_wrongPass(t *testing.T) {
-	db, err := connect()
+	db, err := testdb.Connect()
 	if err != nil {
 		t.Errorf("Failed to connect")
 		return
@@ -90,7 +97,7 @@ func TestUserDAO_0001_GetByNamePassword_wrongPass(t *testing.T) {
 }
 
 func TestUserDAO_0002_GetByNamePassword_notFound(t *testing.T) {
-	db, err := connect()
+	db, err := testdb.Connect()
 	if err != nil {
 		t.Errorf("Failed to connect")
 		return
@@ -109,13 +116,13 @@ func TestUserDAO_0002_GetByNamePassword_notFound(t *testing.T) {
 		return
 	}
 	if user != nil {
-		t.Errorf("User must be nil : id=", user.Id)
+		t.Errorf("User must be nil : id=%s", user.Id)
 		return
 	}
 }
 
 func TestUserDAO_0100_GetList(t *testing.T) {
-	db, err := connect()
+	db, err := testdb.Connect()
 	if err != nil {
 		t.Errorf("Failed to connect")
 		return
@@ -147,7 +154,7 @@ func TestUserDAO_0100_GetList(t *testing.T) {
 }
 
 func TestUserDAO_0200_Create(t *testing.T) {
-	db, err := connect()
+	db, err := testdb.Connect()
 	if err != nil {
 		t.Errorf("Failed to connect")
 		return
@@ -182,7 +189,7 @@ func TestUserDAO_0200_Create(t *testing.T) {
 }
 
 func TestUserDAO_0300_Update(t *testing.T) {
-	db, err := connect()
+	db, err := testdb.Connect()
 	if err != nil {
 		t.Errorf("Failed to connect")
 		return
@@ -238,7 +245,7 @@ func TestUserDAO_0300_Update(t *testing.T) {
 }
 
 func TestUserDAO_0400_Delete(t *testing.T) {
-	db, err := connect()
+	db, err := testdb.Connect()
 	if err != nil {
 		t.Errorf("Failed to connect")
 		return
@@ -284,4 +291,31 @@ func TestUserDAO_0400_Delete(t *testing.T) {
 		t.Errorf("User must be empty but id=%s", user3.Id)
 		return
 	}
+}
+
+func assertUser(t *testing.T, item *user.User, id, loginName, displayName, role, tel string) {
+	caller := getCaller()
+	if item.Id != id {
+		t.Errorf("%s Id must be %s but %s", caller, id, item.Id)
+	}
+	if item.LoginName != loginName {
+		t.Errorf("%s LoginName must be %s but %s", caller, loginName, item.LoginName)
+	}
+	if item.DisplayName != displayName {
+		t.Errorf("%s DisplayName must be %s but %s", caller,
+			displayName, item.DisplayName)
+	}
+	if string(item.Role) != role {
+		t.Errorf("%s Role must be %s but %s", caller,
+			role, string(item.Role))
+	}
+	if item.Tel != tel {
+		t.Errorf("[%s] Tel must be %s but %s", caller, tel, item.Tel)
+	}
+}
+
+func getCaller() string {
+	_, caller, line, _ := runtime.Caller(2)
+	path := strings.SplitN(caller, "/", -1)
+	return fmt.Sprintf("%s:%d", path[len(path)-1], line)
 }
