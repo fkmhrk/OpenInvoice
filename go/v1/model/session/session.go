@@ -1,6 +1,8 @@
 // Copyright 2014 Mokelab Inc.  All rights reserved.
 
-package model
+package session
+
+import "github.com/fkmhrk/OpenInvoice/v1/model/user"
 
 // DAO for session table.
 type SessionDAO interface {
@@ -15,7 +17,7 @@ type SessionDAO interface {
 type Session struct {
 	Token       string
 	UserId      string
-	Role        Role
+	Role        user.Role
 	CreatedTime int64
 	ExpireTime  int64
 }

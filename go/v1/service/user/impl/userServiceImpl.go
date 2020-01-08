@@ -5,21 +5,23 @@ import (
 
 	m "github.com/fkmhrk/OpenInvoice/v1/model"
 	"github.com/fkmhrk/OpenInvoice/v1/model/response"
+	"github.com/fkmhrk/OpenInvoice/v1/model/session"
+	"github.com/fkmhrk/OpenInvoice/v1/model/user"
 	s "github.com/fkmhrk/OpenInvoice/v1/service/user"
 	"github.com/mokelab-go/server/entity"
 )
 
 type userService struct {
-	userDAO           m.UserDAO
-	sessionDAO        m.SessionDAO
-	sessionRefreshDAO m.SessionRefreshDAO
+	userDAO           user.DAO
+	sessionDAO        session.SessionDAO
+	sessionRefreshDAO session.SessionRefreshDAO
 }
 
 const (
 	TIME_30MIN = 30 * 60
 )
 
-func New(u m.UserDAO, s m.SessionDAO, models *m.Models) s.Service {
+func New(u user.DAO, s session.SessionDAO, models *m.Models) s.Service {
 	return &userService{
 		userDAO:           u,
 		sessionDAO:        s,
@@ -119,7 +121,7 @@ func (s *userService) GetUsers() entity.Response {
 	}
 }
 
-func (s *userService) Create(session *m.Session, loginName, displayName, tel, password string) entity.Response {
+func (s *userService) Create(session *session.Session, loginName, displayName, tel, password string) entity.Response {
 	if !session.Role.IsAdmin() {
 		return response.Error(http.StatusForbidden, response.MSG_NOT_AUTHORIZED)
 	}
@@ -141,7 +143,7 @@ func (s *userService) Create(session *m.Session, loginName, displayName, tel, pa
 	}
 }
 
-func (s *userService) Update(session *m.Session, id, loginName, displayName, tel, password string) entity.Response {
+func (s *userService) Update(session *session.Session, id, loginName, displayName, tel, password string) entity.Response {
 	if !session.Role.IsAdmin() {
 		if session.UserId != id {
 			return response.Error(http.StatusForbidden, response.MSG_NOT_AUTHORIZED)
@@ -165,7 +167,7 @@ func (s *userService) Update(session *m.Session, id, loginName, displayName, tel
 	}
 }
 
-func (o *userService) Delete(session *m.Session, id string) entity.Response {
+func (o *userService) Delete(session *session.Session, id string) entity.Response {
 	if !session.Role.IsAdmin() {
 		return response.Error(http.StatusForbidden, response.MSG_NOT_AUTHORIZED)
 	}

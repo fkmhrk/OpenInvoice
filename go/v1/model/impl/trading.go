@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	m "github.com/fkmhrk/OpenInvoice/v1/model"
+	"github.com/fkmhrk/OpenInvoice/v1/model/db"
 	"github.com/go-sql-driver/mysql"
 )
 
@@ -20,11 +21,11 @@ const (
 )
 
 type tradingDAO struct {
-	connection *Connection
+	connection *db.Connection
 	logger     m.Logger
 }
 
-func NewTradingDAO(connection *Connection, logger m.Logger) *tradingDAO {
+func NewTradingDAO(connection *db.Connection, logger m.Logger) *tradingDAO {
 	return &tradingDAO{
 		connection: connection,
 		logger:     logger,
@@ -128,7 +129,7 @@ func (d *tradingDAO) Create(companyId, subject string, titleType int, workFrom, 
 	}
 	defer st.Close()
 
-	id, err := insertWithUUID(32, func(id string) error {
+	id, err := InsertWithUUID(32, func(id string) error {
 		_, err = st.Exec(id, companyId, subject, titleType,
 			workFrom, workTo, total,
 			quotationDate,
@@ -279,7 +280,7 @@ func (d *tradingDAO) CreateItem(tradingId, subject, degree, memo string, sortOrd
 	// generate ID
 	var id string
 	for i := 0; i < 10; i++ {
-		id = generateId(32)
+		id = generateUUID(32)
 		_, err = st.Exec(id, tradingId, sortOrder, subject, unitPrice, amount,
 			degree, taxType, memo)
 		if err == nil {

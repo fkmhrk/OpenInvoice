@@ -2,14 +2,17 @@ package impl
 
 import (
 	m "github.com/fkmhrk/OpenInvoice/v1/model"
+	"github.com/fkmhrk/OpenInvoice/v1/model/db"
+	user "github.com/fkmhrk/OpenInvoice/v1/model/user/mysql"
+	session "github.com/fkmhrk/OpenInvoice/v1/model/session/mysql"
 )
 
-func NewModels(connection *Connection) *m.Models {
+func NewModels(connection *db.Connection) *m.Models {
 	logger := NewLogger()
 	return &m.Models{
-		User:           NewUserDAO(connection),
-		Session:        NewSessionDAO(connection),
-		SessionRefresh: NewSessionRefreshDAO(connection),
+		User:           user.New(connection),
+		Session:        session.NewSessionDAO(connection),
+		SessionRefresh: session.NewSessionRefreshDAO(connection),
 		Company:        NewCompanyDAO(connection),
 		Trading:        NewTradingDAO(connection, logger),
 		Env:            NewEnvDAO(connection),

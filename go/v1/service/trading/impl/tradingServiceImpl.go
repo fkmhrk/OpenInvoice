@@ -7,18 +7,19 @@ import (
 
 	m "github.com/fkmhrk/OpenInvoice/v1/model"
 	"github.com/fkmhrk/OpenInvoice/v1/model/response"
+	"github.com/fkmhrk/OpenInvoice/v1/model/session"
 	ss "github.com/fkmhrk/OpenInvoice/v1/service/trading"
 	"github.com/mokelab-go/server/entity"
 )
 
 type tradingService struct {
-	sessionDAO m.SessionDAO
+	sessionDAO session.SessionDAO
 	tradingDAO m.TradingDAO
 	envDAO     m.EnvDAO
 	seqDAO     m.SeqDAO
 }
 
-func New(s m.SessionDAO, t m.TradingDAO, models *m.Models) *tradingService {
+func New(s session.SessionDAO, t m.TradingDAO, models *m.Models) *tradingService {
 	return &tradingService{
 		sessionDAO: s,
 		tradingDAO: t,
@@ -59,7 +60,7 @@ func (s *tradingService) GetTradingByID(id string) entity.Response {
 	}
 }
 
-func (s *tradingService) Create(session *m.Session, companyId, subject, product, memo string, titleType int, workFrom, workTo, total, quotationDate, billDate, deliveryDate int64, taxRate float32) entity.Response {
+func (s *tradingService) Create(session *session.Session, companyId, subject, product, memo string, titleType int, workFrom, workTo, total, quotationDate, billDate, deliveryDate int64, taxRate float32) entity.Response {
 	// input check
 	if len(companyId) == 0 {
 		return response.Error(http.StatusBadRequest, response.MSG_ERR_COMPANY_ID_EMPTY)

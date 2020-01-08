@@ -6,14 +6,15 @@ import (
 	_ "fmt"
 
 	m "github.com/fkmhrk/OpenInvoice/v1/model"
+	"github.com/fkmhrk/OpenInvoice/v1/model/db"
 	"github.com/go-sql-driver/mysql"
 )
 
 type companyDAO struct {
-	connection *Connection
+	connection *db.Connection
 }
 
-func NewCompanyDAO(connection *Connection) *companyDAO {
+func NewCompanyDAO(connection *db.Connection) *companyDAO {
 	return &companyDAO{
 		connection: connection,
 	}

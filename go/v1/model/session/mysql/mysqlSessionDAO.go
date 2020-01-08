@@ -1,23 +1,27 @@
-package impl
+package mysql
 
 import (
 	"errors"
+	"strings"
 
-	m "github.com/fkmhrk/OpenInvoice/v1/model"
+	"github.com/fkmhrk/OpenInvoice/v1/model/db"
+	"github.com/fkmhrk/OpenInvoice/v1/model/session"
+	"github.com/fkmhrk/OpenInvoice/v1/model/user"
 	"github.com/go-sql-driver/mysql"
+	"github.com/google/uuid"
 )
 
 type sessionDAO struct {
-	connection *Connection
+	connection *db.Connection
 }
 
-func NewSessionDAO(connection *Connection) *sessionDAO {
+func NewSessionDAO(connection *db.Connection) *sessionDAO {
 	return &sessionDAO{
 		connection: connection,
 	}
 }
 
-func (d *sessionDAO) GetByToken(token string) (*m.Session, error) {
+func (d *sessionDAO) GetByToken(token string) (*session.Session, error) {
 	db := d.connection.Connect()
 	st, err := db.Prepare("SELECT user_id,role,expire_time " +
 		"FROM session " +
@@ -41,15 +45,15 @@ func (d *sessionDAO) GetByToken(token string) (*m.Session, error) {
 	var userId, role string
 	var expire int64
 	rows.Scan(&userId, &role, &expire)
-	return &m.Session{
+	return &session.Session{
 		Token:      token,
-		Role:       m.Role(role),
+		Role:       user.Role(role),
 		UserId:     userId,
 		ExpireTime: expire,
 	}, nil
 }
 
-func (d *sessionDAO) Create(userId, role string, expireIn int64) (*m.Session, error) {
+func (d *sessionDAO) Create(userId, role string, expireIn int64) (*session.Session, error) {
 	tr, err := d.connection.Begin()
 	if err != nil {
 		return nil, err
@@ -68,7 +72,7 @@ func (d *sessionDAO) Create(userId, role string, expireIn int64) (*m.Session, er
 
 	var token string
 	for i := 0; i < 10; i++ {
-		token = generateSessionId()
+		token = generateSessionID()
 		_, err = st.Exec(token, userId, role, expireIn)
 		if err == nil {
 			tr.Commit()
@@ -86,9 +90,16 @@ func (d *sessionDAO) Create(userId, role string, expireIn int64) (*m.Session, er
 	if len(token) == 0 {
 		return nil, errors.New("Failed to create session")
 	}
-	return &m.Session{
+	return &session.Session{
 		Token:  token,
 		UserId: userId,
-		Role:   m.Role(role),
+		Role:   user.Role(role),
 	}, nil
+}
+
+func generateSessionID() string {
+	id1 := uuid.New().String()
+	id2 := uuid.New().String()
+	id := strings.Replace(id1+id2, "-", "", -1)
+	return id[:48]
 }

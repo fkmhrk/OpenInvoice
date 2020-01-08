@@ -5,11 +5,12 @@ import (
 
 	m "github.com/fkmhrk/OpenInvoice/v1/model"
 	"github.com/fkmhrk/OpenInvoice/v1/model/response"
+	"github.com/fkmhrk/OpenInvoice/v1/model/session"
 	"github.com/mokelab-go/server/entity"
 )
 
 type adminService struct {
-	sessionDAO m.SessionDAO
+	sessionDAO session.SessionDAO
 	envDAO     m.EnvDAO
 }
 

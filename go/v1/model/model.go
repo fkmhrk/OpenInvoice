@@ -1,9 +1,14 @@
 package model
 
+import (
+	"github.com/fkmhrk/OpenInvoice/v1/model/session"
+	"github.com/fkmhrk/OpenInvoice/v1/model/user"
+)
+
 type Models struct {
-	User           UserDAO
-	Session        SessionDAO
-	SessionRefresh SessionRefreshDAO
+	User           user.DAO
+	Session        session.SessionDAO
+	SessionRefresh session.SessionRefreshDAO
 	Company        CompanyDAO
 	Trading        TradingDAO
 	Env            EnvDAO

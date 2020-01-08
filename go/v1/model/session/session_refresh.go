@@ -1,4 +1,6 @@
-package model
+package session
+
+import "github.com/fkmhrk/OpenInvoice/v1/model/user"
 
 type SessionRefreshDAO interface {
 	Create(userId, role string) (SessionRefresh, error)
@@ -10,10 +12,10 @@ type SessionRefreshDAO interface {
 type SessionRefresh struct {
 	Token      string
 	UserId     string
-	Role       Role
+	Role       user.Role
 	ExpireTime int64
 }
 
-func (o SessionRefresh) IsEmpty() bool {
+func (o *SessionRefresh) IsEmpty() bool {
 	return len(o.Token) == 0
 }

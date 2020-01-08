@@ -4,13 +4,14 @@ import (
 	"database/sql"
 
 	m "github.com/fkmhrk/OpenInvoice/v1/model"
+	"github.com/fkmhrk/OpenInvoice/v1/model/db"
 )
 
 type seqDAO struct {
-	connection *Connection
+	connection *db.Connection
 }
 
-func NewSeqDAO(connection *Connection) *seqDAO {
+func NewSeqDAO(connection *db.Connection) *seqDAO {
 	return &seqDAO{
 		connection: connection,
 	}

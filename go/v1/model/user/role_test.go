@@ -1,4 +1,4 @@
-package model
+package user
 
 import (
 	"testing"
@@ -49,18 +49,6 @@ func TestRole0101_NoCanRead(t *testing.T) {
 	r = Role("Admin,Write")
 	if r.CanRead() {
 		t.Errorf("r must not be able to read : %s", string(r))
-	}
-}
-
-func TestRole0200_CanWrite(t *testing.T) {
-	r := Role("Write")
-	if !r.CanWrite() {
-		t.Errorf("r must be able to write : %s", string(r))
-	}
-
-	r = Role("Read,Write")
-	if !r.CanWrite() {
-		t.Errorf("r must be able to write : %s", string(r))
 	}
 }
 

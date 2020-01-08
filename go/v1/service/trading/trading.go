@@ -2,13 +2,14 @@ package trading
 
 import (
 	m "github.com/fkmhrk/OpenInvoice/v1/model"
+	"github.com/fkmhrk/OpenInvoice/v1/model/session"
 	"github.com/mokelab-go/server/entity"
 )
 
 type Service interface {
 	GetListByUser() entity.Response
 	GetTradingByID(id string) entity.Response
-	Create(session *m.Session, companyId, subject, product, memo string, titleType int, workFrom, workTo, total, quotationDate, billDate, deliveryDate int64, taxRate float32) entity.Response
+	Create(session *session.Session, companyId, subject, product, memo string, titleType int, workFrom, workTo, total, quotationDate, billDate, deliveryDate int64, taxRate float32) entity.Response
 	Update(trading Trading) entity.Response
 
 	// Deletes trading and child items

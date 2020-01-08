@@ -4,6 +4,7 @@ import (
 	"database/sql"
 
 	m "github.com/fkmhrk/OpenInvoice/v1/model"
+	"github.com/fkmhrk/OpenInvoice/v1/model/db"
 )
 
 const (
@@ -11,10 +12,10 @@ const (
 )
 
 type envDAO struct {
-	connection *Connection
+	connection *db.Connection
 }
 
-func NewEnvDAO(connection *Connection) *envDAO {
+func NewEnvDAO(connection *db.Connection) *envDAO {
 	return &envDAO{
 		connection: connection,
 	}

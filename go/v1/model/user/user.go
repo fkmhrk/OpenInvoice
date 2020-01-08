@@ -1,6 +1,6 @@
-package model
+package user
 
-type UserDAO interface {
+type DAO interface {
 	GetByNamePassword(name, password string) (*User, error)
 	GetList() ([]*User, error)
 	GetById(id string) (*User, error)

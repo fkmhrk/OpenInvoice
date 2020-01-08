@@ -1,10 +1,11 @@
-package impl
+package mysql
 
 import (
 	"database/sql"
 	"fmt"
-	_ "github.com/go-sql-driver/mysql"
 	"testing"
+
+	_ "github.com/go-sql-driver/mysql"
 )
 
 func createSessionDAO(db *sql.DB) *sessionDAO {
