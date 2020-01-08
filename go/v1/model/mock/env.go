@@ -1,38 +1,38 @@
 package mock
 
 import (
-	m "github.com/fkmhrk/OpenInvoice/v1/model"
+	"github.com/fkmhrk/OpenInvoice/v1/model/env"
 )
 
 type EnvDAO struct {
-	CreateResult  m.Env
-	GetResult     m.Env
-	GetListResult []*m.Env
+	CreateResult  env.Env
+	GetResult     env.Env
+	GetListResult []*env.Env
 	SaveResult    error
-	UpdateResult  m.Env
-	DeleteResult  m.Env
+	UpdateResult  env.Env
+	DeleteResult  env.Env
 }
 
-func (d *EnvDAO) Create(key, value string) (m.Env, error) {
+func (d *EnvDAO) Create(key, value string) (env.Env, error) {
 	return d.CreateResult, nil
 }
 
-func (d *EnvDAO) Get(key string) (m.Env, error) {
+func (d *EnvDAO) Get(key string) (env.Env, error) {
 	return d.GetResult, nil
 }
 
-func (d *EnvDAO) GetList() ([]*m.Env, error) {
+func (d *EnvDAO) GetList() ([]*env.Env, error) {
 	return d.GetListResult, nil
 }
 
-func (d *EnvDAO) Save(list []*m.Env) error {
+func (d *EnvDAO) Save(list []*env.Env) error {
 	return d.SaveResult
 }
 
-func (d *EnvDAO) Update(key, value string) (m.Env, error) {
+func (d *EnvDAO) Update(key, value string) (env.Env, error) {
 	return d.UpdateResult, nil
 }
 
-func (d *EnvDAO) Delete(key string) (m.Env, error) {
+func (d *EnvDAO) Delete(key string) (env.Env, error) {
 	return d.DeleteResult, nil
 }

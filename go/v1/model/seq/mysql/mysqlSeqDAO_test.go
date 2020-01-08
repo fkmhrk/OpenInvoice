@@ -1,16 +1,22 @@
-package impl
+package mysql
 
 import (
-	m "../"
 	"database/sql"
+	"fmt"
+	"runtime"
+	"strings"
 	"testing"
+
+	"github.com/fkmhrk/OpenInvoice/v1/model/db"
+	testdb "github.com/fkmhrk/OpenInvoice/v1/model/db/test"
+	"github.com/fkmhrk/OpenInvoice/v1/model/seq"
 )
 
-func createSeqDAO(db *sql.DB) *seqDAO {
-	return NewSeqDAO(NewConnection(db))
+func createSeqDAO(sqlDB *sql.DB) seq.DAO {
+	return New(db.NewConnection(sqlDB))
 }
 
-func assertSeq(t *testing.T, item *m.Seq, seqType m.SeqType, year, value int) {
+func assertSeq(t *testing.T, item *seq.Seq, seqType seq.SeqType, year, value int) {
 	caller := getCaller()
 	if item.SeqType != seqType {
 		t.Errorf("[%s] seqType must be %d but %d", caller, seqType, item.SeqType)
@@ -23,14 +29,14 @@ func assertSeq(t *testing.T, item *m.Seq, seqType m.SeqType, year, value int) {
 	}
 }
 
-func hardDeleteSeq(db *sql.DB, seqType m.SeqType, year int) {
+func hardDeleteSeq(db *sql.DB, seqType seq.SeqType, year int) {
 	s, _ := db.Prepare("DELETE FROM seq WHERE seq_type=? AND year=?")
 	defer s.Close()
 	s.Exec(seqType, year)
 }
 
 func TestSeq_All(t *testing.T) {
-	db, err := connect()
+	db, err := testdb.Connect()
 	if err != nil {
 		t.Errorf("Failed to connect")
 		return
@@ -39,7 +45,7 @@ func TestSeq_All(t *testing.T) {
 
 	dao := createSeqDAO(db)
 
-	var seqType m.SeqType = 10
+	var seqType seq.SeqType = 10
 	var year int = 100
 	var value int = 100
 	hardDeleteSeq(db, seqType, year)
@@ -93,7 +99,7 @@ func TestSeq_All(t *testing.T) {
 }
 
 func TestSeq_Next(t *testing.T) {
-	db, err := connect()
+	db, err := testdb.Connect()
 	if err != nil {
 		t.Errorf("Failed to connect")
 		return
@@ -102,7 +108,7 @@ func TestSeq_Next(t *testing.T) {
 
 	dao := createSeqDAO(db)
 
-	var seqType m.SeqType = 11
+	var seqType seq.SeqType = 11
 	var year int = 100
 	hardDeleteSeq(db, seqType, year)
 	item, err := dao.Next(seqType, year)
@@ -125,4 +131,10 @@ func TestSeq_Next(t *testing.T) {
 		return
 	}
 	assertSeq(t, &item3, 11, 100, 2)
+}
+
+func getCaller() string {
+	_, caller, line, _ := runtime.Caller(2)
+	path := strings.SplitN(caller, "/", -1)
+	return fmt.Sprintf("%s:%d", path[len(path)-1], line)
 }

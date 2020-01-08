@@ -8,6 +8,7 @@ import (
 	m "github.com/fkmhrk/OpenInvoice/v1/model"
 	"github.com/fkmhrk/OpenInvoice/v1/model/env"
 	"github.com/fkmhrk/OpenInvoice/v1/model/response"
+	"github.com/fkmhrk/OpenInvoice/v1/model/seq"
 	"github.com/fkmhrk/OpenInvoice/v1/model/session"
 	ss "github.com/fkmhrk/OpenInvoice/v1/service/trading"
 	"github.com/mokelab-go/server/entity"
@@ -17,7 +18,7 @@ type tradingService struct {
 	sessionDAO session.SessionDAO
 	tradingDAO m.TradingDAO
 	envDAO     env.DAO
-	seqDAO     m.SeqDAO
+	seqDAO     seq.DAO
 }
 
 func New(s session.SessionDAO, t m.TradingDAO, models *m.Models) *tradingService {
@@ -207,16 +208,16 @@ func (s *tradingService) DeleteItem(id, tradingId string) entity.Response {
 }
 
 func (o *tradingService) GetNextNumber(seqType string, date int64) entity.Response {
-	var seqTypeInt m.SeqType
+	var seqTypeInt seq.SeqType
 	switch seqType {
 	case "quotation":
-		seqTypeInt = m.SeqType_Quotation
+		seqTypeInt = seq.SeqType_Quotation
 		break
 	case "delivery":
-		seqTypeInt = m.SeqType_Delivery
+		seqTypeInt = seq.SeqType_Delivery
 		break
 	case "bill":
-		seqTypeInt = m.SeqType_Bill
+		seqTypeInt = seq.SeqType_Bill
 		break
 	default:
 		return response.Error(http.StatusBadRequest, response.MSG_INVALID_SEQUENCE_TYPE)
