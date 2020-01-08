@@ -5,11 +5,13 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/fkmhrk/OpenInvoice/v1/model/db"
+	testdb "github.com/fkmhrk/OpenInvoice/v1/model/db/test"
 	_ "github.com/go-sql-driver/mysql"
 )
 
-func createSessionDAO(db *sql.DB) *sessionDAO {
-	c := NewConnection(db)
+func createSessionDAO(sqlDB *sql.DB) *sessionDAO {
+	c := db.NewConnection(sqlDB)
 	return NewSessionDAO(c)
 }
 
@@ -38,7 +40,7 @@ func insertSession(db *sql.DB, token, id string, expire int64) {
 }
 
 func TestSessionDAO_0000_GetByToken(t *testing.T) {
-	db, err := connect()
+	db, err := testdb.Connect()
 	if err != nil {
 		t.Errorf("Failed to connect")
 		return
@@ -64,7 +66,7 @@ func TestSessionDAO_0000_GetByToken(t *testing.T) {
 }
 
 func TestSessionDAO_0100_Create_Get(t *testing.T) {
-	db, err := connect()
+	db, err := testdb.Connect()
 	if err != nil {
 		t.Errorf("Failed to connect")
 		return
