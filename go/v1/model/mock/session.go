@@ -1,18 +1,18 @@
 package mock
 
 import (
-	m "../"
+	"github.com/fkmhrk/OpenInvoice/v1/model/session"
 )
 
 type SessionDAO struct {
-	GetByTokenResult *m.Session
-	CreateResult     *m.Session
+	GetByTokenResult *session.Session
+	CreateResult     *session.Session
 }
 
-func (d *SessionDAO) GetByToken(token string) (*m.Session, error) {
+func (d *SessionDAO) GetByToken(token string) (*session.Session, error) {
 	return d.GetByTokenResult, nil
 }
 
-func (d *SessionDAO) Create(userId, scope string, expireIn int64) (*m.Session, error) {
+func (d *SessionDAO) Create(userId, scope string, expireIn int64) (*session.Session, error) {
 	return d.CreateResult, nil
 }

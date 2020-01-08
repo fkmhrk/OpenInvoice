@@ -9,5 +9,7 @@ github.com/gorilla/mux v1.7.2 h1:zoNxOV7WjqXptQOVngLmcSQgXmgk4NMz1HibBchjl/I=
 github.com/gorilla/mux v1.7.2/go.mod h1:1lud6UwP+6orDFRuTfBEV8e9/aOM/c4fVVCaMa2zaAs=
 github.com/mokelab-go/hop v0.0.0-20161016031025-3f57d8333436 h1:TbZej6107D2Nb3IS/MbhrxdJgtLbYf/bVK256UczAa4=
 github.com/mokelab-go/hop v0.0.0-20161016031025-3f57d8333436/go.mod h1:2CDV2n5w3VHIh5/aIwg5zfo4tqGpevHr7cLg1ZsGgOs=
+github.com/mokelab-go/server v0.0.0-20190823082941-c34045379e65 h1:k9fi6OqqTMGWyj+Q/vKGLddMwgWavSBHVZ4EVIbu4AM=
+github.com/mokelab-go/server v0.0.0-20190823082941-c34045379e65/go.mod h1:tFJ6RhysYTGXhwHfXazgAr/wIrQO+8/GiXgjI9aGd7s=
 github.com/pborman/uuid v1.2.0 h1:J7Q5mO4ysT1dv8hyrUGHb9+ooztCXu1D8MY8DZYsu3g=
 github.com/pborman/uuid v1.2.0/go.mod h1:X/NO0urCmaxf9VXbdlT7C2Yzkj2IKimNn4k+gtPdI/k=

@@ -1,7 +1,7 @@
 package mock
 
 import (
-	m "../"
+	m "github.com/fkmhrk/OpenInvoice/v1/model"
 )
 
 func NewMock() *m.Models {

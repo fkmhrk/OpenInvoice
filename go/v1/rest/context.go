@@ -3,7 +3,7 @@ package rest
 import (
 	"context"
 
-	m "github.com/fkmhrk/OpenInvoice/v1/model"
+	ses "github.com/fkmhrk/OpenInvoice/v1/model/session"
 )
 
 type contextKey string
@@ -12,12 +12,12 @@ const (
 	keySession contextKey = "app.session"
 )
 
-func setSession(c context.Context, session *m.Session) context.Context {
+func setSession(c context.Context, session *ses.Session) context.Context {
 	return context.WithValue(c, keySession, session)
 }
 
-func session(c context.Context) *m.Session {
-	if v, ok := c.Value(keySession).(*m.Session); ok {
+func session(c context.Context) *ses.Session {
+	if v, ok := c.Value(keySession).(*ses.Session); ok {
 		return v
 	}
 	return nil
