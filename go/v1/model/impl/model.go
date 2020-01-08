@@ -8,6 +8,7 @@ import (
 	"github.com/fkmhrk/OpenInvoice/v1/model/logger"
 	seq "github.com/fkmhrk/OpenInvoice/v1/model/seq/mysql"
 	session "github.com/fkmhrk/OpenInvoice/v1/model/session/mysql"
+	trading "github.com/fkmhrk/OpenInvoice/v1/model/trading/mysql"
 	user "github.com/fkmhrk/OpenInvoice/v1/model/user/mysql"
 )
 
@@ -19,7 +20,7 @@ func NewModels(connection *db.Connection) *m.Models {
 		Session:        session.NewSessionDAO(connection),
 		SessionRefresh: session.NewSessionRefreshDAO(connection),
 		Company:        company.New(connection),
-		Trading:        NewTradingDAO(connection, logger),
+		Trading:        trading.New(connection, logger),
 		Env:            env.New(connection),
 		Seq:            seq.New(connection),
 		Logger:         logger,

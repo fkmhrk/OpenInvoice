@@ -1,6 +1,7 @@
-package model
+package trading
 
-type TradingDAO interface {
+// DAO is interface
+type DAO interface {
 	GetList() ([]*Trading, error)
 	GetListByUser(userId string) ([]*Trading, error)
 	GetById(id string) (*Trading, error)
@@ -20,6 +21,7 @@ type TradingDAO interface {
 	SoftDeleteItem(id, tradingId string) error
 }
 
+// Trading is entity
 type Trading struct {
 	Id              string
 	CompanyId       string
@@ -42,6 +44,7 @@ type Trading struct {
 	ModifiedTime    int64
 }
 
+// TradingItem is entity
 type TradingItem struct {
 	Id        string
 	TradingId string

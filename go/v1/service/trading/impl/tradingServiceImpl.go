@@ -10,18 +10,19 @@ import (
 	"github.com/fkmhrk/OpenInvoice/v1/model/response"
 	"github.com/fkmhrk/OpenInvoice/v1/model/seq"
 	"github.com/fkmhrk/OpenInvoice/v1/model/session"
+	"github.com/fkmhrk/OpenInvoice/v1/model/trading"
 	ss "github.com/fkmhrk/OpenInvoice/v1/service/trading"
 	"github.com/mokelab-go/server/entity"
 )
 
 type tradingService struct {
 	sessionDAO session.SessionDAO
-	tradingDAO m.TradingDAO
+	tradingDAO trading.DAO
 	envDAO     env.DAO
 	seqDAO     seq.DAO
 }
 
-func New(s session.SessionDAO, t m.TradingDAO, models *m.Models) *tradingService {
+func New(s session.SessionDAO, t trading.DAO, models *m.Models) *tradingService {
 	return &tradingService{
 		sessionDAO: s,
 		tradingDAO: t,
@@ -249,7 +250,7 @@ func (o *tradingService) GetNextNumber(seqType string, date int64) entity.Respon
 	}
 }
 
-func (s *tradingService) toJson(t *m.Trading) map[string]interface{} {
+func (s *tradingService) toJson(t *trading.Trading) map[string]interface{} {
 	return map[string]interface{}{
 		"id":               t.Id,
 		"company_id":       t.CompanyId,

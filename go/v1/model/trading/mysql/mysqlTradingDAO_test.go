@@ -1,15 +1,23 @@
-package impl
+package mysql
 
 import (
-	m "../"
 	"database/sql"
-	_ "github.com/go-sql-driver/mysql"
+	"fmt"
+	"math"
+	"runtime"
+	"strings"
 	"testing"
+
+	"github.com/fkmhrk/OpenInvoice/v1/model/db"
+	testdb "github.com/fkmhrk/OpenInvoice/v1/model/db/test"
+	"github.com/fkmhrk/OpenInvoice/v1/model/logger"
+	"github.com/fkmhrk/OpenInvoice/v1/model/trading"
+	_ "github.com/go-sql-driver/mysql"
 )
 
-func createTradingDAO(db *sql.DB) *tradingDAO {
-	c := NewConnection(db)
-	return NewTradingDAO(c, NewLogger())
+func createTradingDAO(sqlDB *sql.DB) *tradingDAO {
+	c := db.NewConnection(sqlDB)
+	return New(c, logger.New())
 }
 
 func deleteTradingByUser(db *sql.DB, userId string) {
@@ -43,7 +51,7 @@ func insertTrading(db *sql.DB, id, user, subject, product string) {
 }
 
 func TestTrading0000_GetListByUser(t *testing.T) {
-	db, err := connect()
+	db, err := testdb.Connect()
 	if err != nil {
 		t.Errorf("Failed to connect")
 		return
@@ -73,7 +81,7 @@ func TestTrading0000_GetListByUser(t *testing.T) {
 }
 
 func TestTrading0001_GetListByUser_0(t *testing.T) {
-	db, err := connect()
+	db, err := testdb.Connect()
 	if err != nil {
 		t.Errorf("Failed to connect")
 		return
@@ -96,7 +104,7 @@ func TestTrading0001_GetListByUser_0(t *testing.T) {
 }
 
 func TestTrading0100_GetById(t *testing.T) {
-	db, err := connect()
+	db, err := testdb.Connect()
 	if err != nil {
 		t.Errorf("Failed to connect")
 		return
@@ -120,7 +128,7 @@ func TestTrading0100_GetById(t *testing.T) {
 }
 
 func TestTrading0101_GetById_noId(t *testing.T) {
-	db, err := connect()
+	db, err := testdb.Connect()
 	if err != nil {
 		t.Errorf("Failed to connect")
 		return
@@ -145,7 +153,7 @@ func TestTrading0101_GetById_noId(t *testing.T) {
 }
 
 func TestTrading0100_Create(t *testing.T) {
-	db, err := connect()
+	db, err := testdb.Connect()
 	if err != nil {
 		t.Errorf("Failed to connect")
 		return
@@ -171,7 +179,7 @@ func TestTrading0100_Create(t *testing.T) {
 }
 
 func TestTrading0101_Create_2(t *testing.T) {
-	db, err := connect()
+	db, err := testdb.Connect()
 	if err != nil {
 		t.Errorf("Failed to connect")
 		return
@@ -212,7 +220,7 @@ func TestTrading0101_Create_2(t *testing.T) {
 }
 
 func TestTrading0300_Update(t *testing.T) {
-	db, err := connect()
+	db, err := testdb.Connect()
 	if err != nil {
 		t.Errorf("Failed to connect")
 		return
@@ -236,7 +244,7 @@ func TestTrading0300_Update(t *testing.T) {
 
 	// update
 	var total int64 = 3333
-	item2, err := dao.Update(m.Trading{
+	item2, err := dao.Update(trading.Trading{
 		Id:            item.Id,
 		CompanyId:     "company2222",
 		Subject:       "subject3333",
@@ -288,7 +296,7 @@ func TestTrading0300_Update(t *testing.T) {
 }
 
 func TestTrading0400_Delete(t *testing.T) {
-	db, err := connect()
+	db, err := testdb.Connect()
 	if err != nil {
 		t.Errorf("Failed to connect")
 		return
@@ -352,4 +360,51 @@ func TestTrading0400_Delete(t *testing.T) {
 		t.Errorf("Trading is not deleted...")
 		return
 	}
+}
+
+func assertTrading(t *testing.T, item *trading.Trading,
+	id, companyId, subject string, titleType int,
+	workFrom, workTo, quotationDate, billDate int64,
+	taxRate float32, assignee, product string) {
+	caller := getCaller()
+	if item.Id != id {
+		t.Errorf("%s Id must be %s but %s", caller, id, item.Id)
+	}
+	if item.CompanyId != companyId {
+		t.Errorf("%s CompanyId must be %s but %s", caller, companyId, item.CompanyId)
+	}
+	if item.Subject != subject {
+		t.Errorf("%s Subject must be %s but %s", caller, subject, item.Subject)
+	}
+	if item.TitleType != titleType {
+		t.Errorf("%s TitleType must be %d but %d", caller, titleType, item.TitleType)
+	}
+	if item.WorkFrom != workFrom {
+		t.Errorf("%s WorkFrom must be %d but %d", caller, workFrom, item.WorkFrom)
+	}
+	if item.WorkTo != workTo {
+		t.Errorf("%s WorkTo must be %d but %d", caller, workTo, item.WorkTo)
+	}
+	if item.QuotationDate != quotationDate {
+		t.Errorf("%s QuotationDate must be %d but %d", caller, quotationDate, item.QuotationDate)
+	}
+	if item.BillDate != billDate {
+		t.Errorf("%s BillDate must be %d but %d", caller, billDate, item.BillDate)
+	}
+	if math.Abs(float64(item.TaxRate-taxRate)) > 0.1 {
+		t.Errorf("%s TaxRate must be %f but %f", caller, taxRate, item.TaxRate)
+	}
+	if item.AssigneeId != assignee {
+		t.Errorf("%s AssigneeId must be %s but %s", caller, assignee, item.AssigneeId)
+	}
+	if item.Product != product {
+		t.Errorf("%s Product must be %s but %s", caller, product, item.Product)
+	}
+
+}
+
+func getCaller() string {
+	_, caller, line, _ := runtime.Caller(2)
+	path := strings.SplitN(caller, "/", -1)
+	return fmt.Sprintf("%s:%d", path[len(path)-1], line)
 }

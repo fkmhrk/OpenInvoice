@@ -1,14 +1,16 @@
-package impl
+package mysql
 
 import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"strings"
 
-	m "github.com/fkmhrk/OpenInvoice/v1/model"
 	"github.com/fkmhrk/OpenInvoice/v1/model/db"
 	"github.com/fkmhrk/OpenInvoice/v1/model/logger"
+	"github.com/fkmhrk/OpenInvoice/v1/model/trading"
 	"github.com/go-sql-driver/mysql"
+	"github.com/google/uuid"
 )
 
 const (
@@ -26,14 +28,15 @@ type tradingDAO struct {
 	logger     logger.Logger
 }
 
-func NewTradingDAO(connection *db.Connection, logger logger.Logger) *tradingDAO {
+// New creates instance
+func New(connection *db.Connection, logger logger.Logger) *tradingDAO {
 	return &tradingDAO{
 		connection: connection,
 		logger:     logger,
 	}
 }
 
-func (o *tradingDAO) GetList() ([]*m.Trading, error) {
+func (o *tradingDAO) GetList() ([]*trading.Trading, error) {
 	db := o.connection.Connect()
 	st, err := db.Prepare(select_trading +
 		" WHERE deleted <> 1 ORDER BY modified_time DESC")
@@ -48,7 +51,7 @@ func (o *tradingDAO) GetList() ([]*m.Trading, error) {
 	}
 	defer rows.Close()
 
-	var list []*m.Trading
+	var list []*trading.Trading
 	for rows.Next() {
 		item := o.scanTrading(rows)
 		list = append(list, &item)
@@ -56,7 +59,7 @@ func (o *tradingDAO) GetList() ([]*m.Trading, error) {
 	return list, nil
 }
 
-func (d *tradingDAO) GetListByUser(userId string) ([]*m.Trading, error) {
+func (d *tradingDAO) GetListByUser(userId string) ([]*trading.Trading, error) {
 	db := d.connection.Connect()
 	st, err := db.Prepare(select_trading +
 		" WHERE assignee=? AND deleted <> 1 ORDER BY id ASC")
@@ -71,7 +74,7 @@ func (d *tradingDAO) GetListByUser(userId string) ([]*m.Trading, error) {
 	}
 	defer rows.Close()
 
-	var list []*m.Trading
+	var list []*trading.Trading
 	for rows.Next() {
 		item := d.scanTrading(rows)
 		list = append(list, &item)
@@ -80,7 +83,7 @@ func (d *tradingDAO) GetListByUser(userId string) ([]*m.Trading, error) {
 
 }
 
-func (d *tradingDAO) GetById(id string) (*m.Trading, error) {
+func (d *tradingDAO) GetById(id string) (*trading.Trading, error) {
 	db := d.connection.Connect()
 	st, err := db.Prepare(select_trading +
 		" WHERE id=? AND deleted <> 1 LIMIT 1")
@@ -103,7 +106,7 @@ func (d *tradingDAO) GetById(id string) (*m.Trading, error) {
 	return &item, nil
 }
 
-func (d *tradingDAO) Create(companyId, subject string, titleType int, workFrom, workTo, total, quotationDate, billDate, deliveryDate int64, taxRate float32, assignee, product, memo string) (*m.Trading, error) {
+func (d *tradingDAO) Create(companyId, subject string, titleType int, workFrom, workTo, total, quotationDate, billDate, deliveryDate int64, taxRate float32, assignee, product, memo string) (*trading.Trading, error) {
 	tr, err := d.connection.Begin()
 	if err != nil {
 		return nil, err
@@ -145,7 +148,7 @@ func (d *tradingDAO) Create(companyId, subject string, titleType int, workFrom, 
 
 	tr.Commit()
 
-	return &m.Trading{
+	return &trading.Trading{
 		Id:            id,
 		CompanyId:     companyId,
 		Subject:       subject,
@@ -160,7 +163,7 @@ func (d *tradingDAO) Create(companyId, subject string, titleType int, workFrom, 
 	}, nil
 }
 
-func (d *tradingDAO) Update(trading m.Trading) (*m.Trading, error) {
+func (d *tradingDAO) Update(trading trading.Trading) (*trading.Trading, error) {
 	tr, err := d.connection.Begin()
 	if err != nil {
 		return nil, err
@@ -217,7 +220,7 @@ func (d *tradingDAO) Delete(id string) error {
 	return nil
 }
 
-func (d *tradingDAO) GetItemsById(tradingId string) ([]*m.TradingItem, error) {
+func (d *tradingDAO) GetItemsById(tradingId string) ([]*trading.TradingItem, error) {
 	db := d.connection.Connect()
 	st, err := db.Prepare("SELECT id,sort_order,subject,unit_price,amount," +
 		"degree,tax_type,memo FROM trading_item " +
@@ -233,7 +236,7 @@ func (d *tradingDAO) GetItemsById(tradingId string) ([]*m.TradingItem, error) {
 	}
 	defer rows.Close()
 
-	var list []*m.TradingItem
+	var list []*trading.TradingItem
 	var id, subject, degree, memo string
 	var sortOrder, unitPrice, taxType int
 	var amount float64
@@ -241,7 +244,7 @@ func (d *tradingDAO) GetItemsById(tradingId string) ([]*m.TradingItem, error) {
 		rows.Scan(&id, &sortOrder, &subject, &unitPrice, &amount,
 			&degree, &taxType, &memo)
 
-		list = append(list, &m.TradingItem{
+		list = append(list, &trading.TradingItem{
 			Id:        id,
 			TradingId: tradingId,
 			SortOrder: sortOrder,
@@ -257,7 +260,7 @@ func (d *tradingDAO) GetItemsById(tradingId string) ([]*m.TradingItem, error) {
 
 }
 
-func (d *tradingDAO) CreateItem(tradingId, subject, degree, memo string, sortOrder, unitPrice int, amount float64, taxType int) (*m.TradingItem, error) {
+func (d *tradingDAO) CreateItem(tradingId, subject, degree, memo string, sortOrder, unitPrice int, amount float64, taxType int) (*trading.TradingItem, error) {
 	tr, err := d.connection.Begin()
 	if err != nil {
 		return nil, err
@@ -302,7 +305,7 @@ func (d *tradingDAO) CreateItem(tradingId, subject, degree, memo string, sortOrd
 
 	tr.Commit()
 
-	return &m.TradingItem{
+	return &trading.TradingItem{
 		Id:        id,
 		TradingId: tradingId,
 		SortOrder: sortOrder,
@@ -315,7 +318,7 @@ func (d *tradingDAO) CreateItem(tradingId, subject, degree, memo string, sortOrd
 	}, nil
 }
 
-func (d *tradingDAO) UpdateItem(id, tradingId, subject, degree, memo string, sortOrder, unitPrice int, amount float64, taxType int) (*m.TradingItem, error) {
+func (d *tradingDAO) UpdateItem(id, tradingId, subject, degree, memo string, sortOrder, unitPrice int, amount float64, taxType int) (*trading.TradingItem, error) {
 	tr, err := d.connection.Begin()
 	if err != nil {
 		return nil, err
@@ -342,7 +345,7 @@ func (d *tradingDAO) UpdateItem(id, tradingId, subject, degree, memo string, sor
 
 	tr.Commit()
 
-	return &m.TradingItem{
+	return &trading.TradingItem{
 		Id:        id,
 		TradingId: tradingId,
 		SortOrder: sortOrder,
@@ -448,7 +451,7 @@ func (d *tradingDAO) updateId(tr *sql.Tx, date string, num int) error {
 	return err
 }
 
-func (d *tradingDAO) scanTrading(rows *sql.Rows) m.Trading {
+func (d *tradingDAO) scanTrading(rows *sql.Rows) trading.Trading {
 	var id, companyId, subject, product string
 	var titleType int
 	var taxRate float32
@@ -466,7 +469,7 @@ func (d *tradingDAO) scanTrading(rows *sql.Rows) m.Trading {
 		d.logger.Errorf("Failed to scan trading :%s", err)
 	}
 
-	return m.Trading{
+	return trading.Trading{
 		Id:              id,
 		CompanyId:       companyId,
 		TitleType:       titleType,
@@ -521,4 +524,30 @@ func (d *tradingDAO) softAllDeleteItem(tr *sql.Tx, tradingId string) error {
 		return err
 	}
 	return nil
+}
+
+func generateUUID(length int) string {
+	id1 := uuid.New().String()
+	id2 := uuid.New().String()
+	id := strings.Replace(id1+id2, "-", "", -1)
+	return id[:length]
+}
+
+func InsertWithUUID(l int, f func(id string) error) (string, error) {
+	for i := 0; i < 10; i++ {
+		id := generateUUID(l)
+		err := f(id)
+		if err == nil {
+			return id, nil
+		}
+		if err2, ok := err.(*mysql.MySQLError); ok {
+			if err2.Number != 1062 {
+				return "", err2
+			}
+		} else {
+			return "", err
+		}
+
+	}
+	return "", errors.New("Failed to insert 10 times.")
 }

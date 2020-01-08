@@ -1,8 +1,8 @@
 package trading
 
 import (
-	m "github.com/fkmhrk/OpenInvoice/v1/model"
 	"github.com/fkmhrk/OpenInvoice/v1/model/session"
+	"github.com/fkmhrk/OpenInvoice/v1/model/trading"
 	"github.com/mokelab-go/server/entity"
 )
 
@@ -29,5 +29,5 @@ type Service interface {
 }
 
 type Trading struct {
-	m.Trading
+	trading.Trading
 }

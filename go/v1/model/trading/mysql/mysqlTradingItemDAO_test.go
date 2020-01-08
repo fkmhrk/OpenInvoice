@@ -1,9 +1,12 @@
-package impl
+package mysql
 
 import (
 	"database/sql"
-	_ "github.com/go-sql-driver/mysql"
 	"testing"
+
+	testdb "github.com/fkmhrk/OpenInvoice/v1/model/db/test"
+	"github.com/fkmhrk/OpenInvoice/v1/model/trading"
+	_ "github.com/go-sql-driver/mysql"
 )
 
 func deleteTradingItemByTradingId(db *sql.DB, tradingId string) {
@@ -22,7 +25,7 @@ func insertTradingItem(db *sql.DB, id string, sortOrder int, tradingId, subject 
 }
 
 func TestTradingItem0000_GetItemsById(t *testing.T) {
-	db, err := connect()
+	db, err := testdb.Connect()
 	if err != nil {
 		t.Errorf("Failed to connect")
 		return
@@ -58,7 +61,7 @@ func TestTradingItem0000_GetItemsById(t *testing.T) {
 		t.Errorf("Wrong UnitPrice : %d", item.UnitPrice)
 	}
 	if item.Amount != 2 {
-		t.Errorf("Wrong Amount : %d", item.Amount)
+		t.Errorf("Wrong Amount : %f", item.Amount)
 	}
 	if item.Degree != "Yen" {
 		t.Errorf("Wrong Degree : %s", item.Degree)
@@ -72,7 +75,7 @@ func TestTradingItem0000_GetItemsById(t *testing.T) {
 }
 
 func TestTradingItem0001_GetItemsById_0(t *testing.T) {
-	db, err := connect()
+	db, err := testdb.Connect()
 	if err != nil {
 		t.Errorf("Failed to connect")
 		return
@@ -95,7 +98,7 @@ func TestTradingItem0001_GetItemsById_0(t *testing.T) {
 }
 
 func TestTradingItem0100_CreateItem(t *testing.T) {
-	db, err := connect()
+	db, err := testdb.Connect()
 	if err != nil {
 		t.Errorf("Failed to connect")
 		return
@@ -131,7 +134,7 @@ func TestTradingItem0100_CreateItem(t *testing.T) {
 }
 
 func TestTradingItem0101_CreateItem_2(t *testing.T) {
-	db, err := connect()
+	db, err := testdb.Connect()
 	if err != nil {
 		t.Errorf("Failed to connect")
 		return
@@ -163,7 +166,7 @@ func TestTradingItem0101_CreateItem_2(t *testing.T) {
 	}
 }
 func TestTradingItem0200_UpdateItem(t *testing.T) {
-	db, err := connect()
+	db, err := testdb.Connect()
 	if err != nil {
 		t.Errorf("Failed to connect")
 		return
@@ -209,7 +212,7 @@ func TestTradingItem0200_UpdateItem(t *testing.T) {
 }
 
 func TestTradingItem0300_DeleteItem(t *testing.T) {
-	db, err := connect()
+	db, err := testdb.Connect()
 	if err != nil {
 		t.Errorf("Failed to connect")
 		return
@@ -243,5 +246,37 @@ func TestTradingItem0300_DeleteItem(t *testing.T) {
 	if len(list) != 0 {
 		t.Errorf("Unexpected list length : %d", len(list))
 		return
+	}
+}
+func assertTradingItem(t *testing.T, item *trading.TradingItem,
+	id, tradingId, subject string, sortOrder, unitPrice int, amount float64,
+	degree string, taxType int, memo string) {
+	caller := getCaller()
+	if item.Id != id {
+		t.Errorf("%s Id must be %s but %s", caller, id, item.Id)
+	}
+	if item.TradingId != tradingId {
+		t.Errorf("%s TradingId must be %s but %s", caller, tradingId, item.TradingId)
+	}
+	if item.Subject != subject {
+		t.Errorf("%s Subject must be %s but %s", caller, subject, item.Subject)
+	}
+	if item.SortOrder != sortOrder {
+		t.Errorf("%s SortOrder must be %d but %d", caller, sortOrder, item.SortOrder)
+	}
+	if item.UnitPrice != unitPrice {
+		t.Errorf("%s UnitPrice must be %d but %d", caller, unitPrice, item.UnitPrice)
+	}
+	if item.Amount != amount {
+		t.Errorf("%s Amount must be %f but %f", caller, amount, item.Amount)
+	}
+	if item.Degree != degree {
+		t.Errorf("%s Degree must be %s but %s", caller, degree, item.Degree)
+	}
+	if item.TaxType != taxType {
+		t.Errorf("%s TaxType must be %d but %d", caller, taxType, item.TaxType)
+	}
+	if item.Memo != memo {
+		t.Errorf("%s Memo must be %s but %s", caller, memo, item.Memo)
 	}
 }
