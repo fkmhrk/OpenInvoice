@@ -7,6 +7,26 @@ import (
 	"github.com/fkmhrk/OpenInvoice/v1/model/seq"
 )
 
+const (
+	tableName    = "seq"
+	sqlSelectAll = "SELECT seq_type,year,value " +
+		"FROM " + tableName + " "
+	sqlSelectByTypeAndYear = sqlSelectAll +
+		"WHERE seq_type=? AND year=? AND deleted <> 1"
+	sqlInsert = "INSERT INTO " + tableName +
+		"(seq_type,year,value,created_time,modified_time,deleted) " +
+		"VALUES(?,?,?,unix_timestamp(),unix_timestamp(),0)"
+	sqlUpdate = "UPDATE " + tableName + " " +
+		"SET seq_type=?, year=?, value=?,modified_time=unix_timestamp() " +
+		"WHERE seq_type=? AND year=? AND deleted <> 1"
+	sqlNext = "UPDATE " + tableName + " " +
+		"SET value=value+1,modified_time=unix_timestamp() " +
+		"WHERE seq_type=? AND year=? AND deleted <> 1"
+	sqlSoftDelete = "UPDATE " + tableName + " " +
+		"SET modified_time=unix_timestamp(),deleted=1 " +
+		"WHERE seq_type=? AND year=? AND deleted <> 1"
+)
+
 type seqDAO struct {
 	connection *db.Connection
 }
@@ -25,7 +45,7 @@ func (d *seqDAO) Create(seqType seq.SeqType, year, value int) (seq.Seq, error) {
 	}
 	defer tr.Rollback()
 
-	st, err := tr.Prepare("INSERT INTO seq(seq_type,year,value,created_time,modified_time,deleted) VALUES(?,?,?,unix_timestamp(now()),unix_timestamp(now()),0)")
+	st, err := tr.Prepare(sqlInsert)
 	if err != nil {
 		return seq.Seq{}, err
 	}
@@ -47,7 +67,7 @@ func (d *seqDAO) Create(seqType seq.SeqType, year, value int) (seq.Seq, error) {
 
 func (d *seqDAO) Get(seqType seq.SeqType, year int) (seq.Seq, error) {
 	db := d.connection.Connect()
-	st, err := db.Prepare("SELECT seq_type,year,value FROM seq WHERE seq_type=? AND year=? AND deleted <> 1")
+	st, err := db.Prepare(sqlSelectByTypeAndYear)
 	if err != nil {
 		return seq.Seq{}, err
 	}
@@ -68,7 +88,7 @@ func (d *seqDAO) Get(seqType seq.SeqType, year int) (seq.Seq, error) {
 
 func (d *seqDAO) Update(seqType seq.SeqType, year, value int) (seq.Seq, error) {
 	db := d.connection.Connect()
-	st, err := db.Prepare("UPDATE seq SET seq_type=?, year=?, value=?,modified_time=unix_timestamp(now()) WHERE seq_type=? AND year=? AND deleted <> 1")
+	st, err := db.Prepare(sqlUpdate)
 	if err != nil {
 		return seq.Seq{}, err
 	}
@@ -104,7 +124,7 @@ func (d *seqDAO) Next(seqType seq.SeqType, year int) (seq.Seq, error) {
 
 func (d *seqDAO) doNext(tx *sql.Tx, seqType seq.SeqType, year int) (seq.Seq, error) {
 	// update
-	st, err := tx.Prepare("UPDATE seq SET value=value+1,modified_time=unix_timestamp(now()) WHERE seq_type=? AND year=? AND deleted <> 1")
+	st, err := tx.Prepare(sqlNext)
 	if err != nil {
 		return seq.Seq{}, err
 	}
@@ -120,7 +140,7 @@ func (d *seqDAO) doNext(tx *sql.Tx, seqType seq.SeqType, year int) (seq.Seq, err
 	}
 	if rowCount == 0 {
 		// create
-		st2, err := tx.Prepare("INSERT INTO seq(seq_type,year,value,created_time,modified_time,deleted) VALUES(?,?,?,unix_timestamp(now()),unix_timestamp(now()),0)")
+		st2, err := tx.Prepare(sqlInsert)
 		if err != nil {
 			return seq.Seq{}, err
 		}
@@ -138,7 +158,7 @@ func (d *seqDAO) doNext(tx *sql.Tx, seqType seq.SeqType, year int) (seq.Seq, err
 	}
 
 	// get
-	st2, err := tx.Prepare("SELECT seq_type,year,value FROM seq WHERE seq_type=? AND year=? AND deleted <> 1")
+	st2, err := tx.Prepare(sqlSelectByTypeAndYear)
 	if err != nil {
 		return seq.Seq{}, err
 	}
@@ -158,7 +178,7 @@ func (d *seqDAO) doNext(tx *sql.Tx, seqType seq.SeqType, year int) (seq.Seq, err
 
 func (d *seqDAO) Delete(seqType seq.SeqType, year int) (seq.Seq, error) {
 	db := d.connection.Connect()
-	st, err := db.Prepare("UPDATE seq SET modified_time=unix_timestamp(now()),deleted=1 WHERE seq_type=? AND year=? AND deleted <> 1")
+	st, err := db.Prepare(sqlSoftDelete)
 	if err != nil {
 		return seq.Seq{}, err
 	}
