@@ -9,7 +9,33 @@ import (
 )
 
 const (
-	select_user = "SELECT id,login_name,display_name,role,tel,password,created_time,modified_time FROM user "
+	tableName    = "user"
+	sqlSelectAll = "SELECT id,login_name,display_name,role,tel,password,created_time,modified_time " +
+		"FROM " + tableName + " "
+	sqlSelectByNamePassword = sqlSelectAll +
+		"WHERE login_name=? AND deleted <> 1 LIMIT 1"
+	sqlSelectList = sqlSelectAll +
+		"WHERE deleted <> 1"
+	sqlSelectByID = sqlSelectAll + "WHERE id=? AND deleted <> 1"
+	sqlInsert     = "INSERT INTO " + tableName +
+		"(id,login_name,display_name,role,tel,password," +
+		"created_time,modified_time,deleted)" +
+		"VALUES(?,?,?,?,?,?," +
+		"unix_timestamp(),unix_timestamp(),0)"
+	sqlUpdateWithoutPassword = "UPDATE " + tableName + " " +
+		"SET login_name=?,display_name=?,tel=?," +
+		"modified_time=unix_timestamp() " +
+		"WHERE id=? AND deleted<>1"
+	sqlUpdateWithPassword = "UPDATE " + tableName + " " +
+		"SET login_name=?,display_name=?,tel=?,password=?," +
+		"modified_time=unix_timestamp() " +
+		"WHERE id=? AND deleted<>1"
+	sqlUpdateTradingAssignee = "UPDATE trading " +
+		"SET assignee='empty',modified_time=unix_timestamp() " +
+		"WHERE assignee=?"
+	sqlSoftDelete = "UPDATE " + tableName + " " +
+		"SET deleted=1,modified_time=unix_timestamp() " +
+		"WHERE id=?"
 )
 
 type userDAO struct {
@@ -24,7 +50,7 @@ func New(connection *db.Connection) *userDAO {
 
 func (d *userDAO) GetByNamePassword(name, password string) (*user.User, error) {
 	db := d.connection.Connect()
-	st, err := db.Prepare(select_user + "WHERE login_name=? AND deleted <> 1 LIMIT 1")
+	st, err := db.Prepare(sqlSelectByNamePassword)
 	if err != nil {
 		return nil, err
 	}
@@ -46,7 +72,6 @@ func (d *userDAO) GetByNamePassword(name, password string) (*user.User, error) {
 	}
 	if hashPassword(password) != passwordDB {
 		return nil, nil
-		// return nil, errors.New("Invalid Name / Password")
 	}
 
 	return user, nil
@@ -54,7 +79,7 @@ func (d *userDAO) GetByNamePassword(name, password string) (*user.User, error) {
 
 func (d *userDAO) GetList() ([]*user.User, error) {
 	db := d.connection.Connect()
-	st, err := db.Prepare(select_user + "WHERE deleted <> 1")
+	st, err := db.Prepare(sqlSelectList)
 	if err != nil {
 		return nil, err
 	}
@@ -79,7 +104,7 @@ func (d *userDAO) GetList() ([]*user.User, error) {
 
 func (d *userDAO) GetById(id string) (*user.User, error) {
 	db := d.connection.Connect()
-	st, err := db.Prepare(select_user + "WHERE id=? AND deleted <> 1")
+	st, err := db.Prepare(sqlSelectByID)
 	if err != nil {
 		return nil, err
 	}
@@ -106,11 +131,7 @@ func (d *userDAO) Create(loginName, displayName, role, tel, password string) (*u
 	}
 	defer tr.Rollback()
 
-	st, err := tr.Prepare("INSERT INTO user(" +
-		"id,login_name,display_name,role,tel,password," +
-		"created_time,modified_time,deleted)" +
-		"VALUES(?,?,?,?,?,?," +
-		"unix_timestamp(now()),unix_timestamp(now()),0)")
+	st, err := tr.Prepare(sqlInsert)
 	if err != nil {
 		return nil, err
 	}
@@ -173,10 +194,7 @@ func (o *userDAO) updateWithoutPassword(id, loginName, displayName, role, tel st
 	}
 	defer tr.Rollback()
 
-	st, err := tr.Prepare("UPDATE user SET " +
-		"login_name=?,display_name=?,tel=?," +
-		"modified_time=unix_timestamp(now()) " +
-		"WHERE id=? AND deleted<>1")
+	st, err := tr.Prepare(sqlUpdateWithoutPassword)
 	if err != nil {
 		return nil, err
 	}
@@ -205,10 +223,7 @@ func (o *userDAO) updateWithPassword(id, loginName, displayName, role, tel, pass
 	}
 	defer tr.Rollback()
 
-	st, err := tr.Prepare("UPDATE user SET " +
-		"login_name=?,display_name=?,tel=?,password=?," +
-		"modified_time=unix_timestamp(now()) " +
-		"WHERE id=? AND deleted<>1")
+	st, err := tr.Prepare(sqlUpdateWithPassword)
 	if err != nil {
 		return nil, err
 	}
@@ -232,9 +247,7 @@ func (o *userDAO) updateWithPassword(id, loginName, displayName, role, tel, pass
 }
 
 func (o *userDAO) updateTradingAssignee(tr *sql.Tx, id string) error {
-	st, err := tr.Prepare("UPDATE trading SET " +
-		"assignee='empty',modified_time=unix_timestamp(now()) " +
-		"WHERE assignee=?")
+	st, err := tr.Prepare(sqlUpdateTradingAssignee)
 	if err != nil {
 		return err
 	}
@@ -245,9 +258,7 @@ func (o *userDAO) updateTradingAssignee(tr *sql.Tx, id string) error {
 }
 
 func (o *userDAO) deleteUser(tr *sql.Tx, id string) error {
-	st, err := tr.Prepare("UPDATE user SET " +
-		"deleted=1,modified_time=unix_timestamp(now()) " +
-		"WHERE id=?")
+	st, err := tr.Prepare(sqlSoftDelete)
 	if err != nil {
 		return err
 	}
