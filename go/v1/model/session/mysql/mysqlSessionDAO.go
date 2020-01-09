@@ -11,11 +11,26 @@ import (
 	"github.com/google/uuid"
 )
 
+const (
+	sessionTableName = "session"
+	sqlSelectAll     = "SELECT user_id,role,expire_time " +
+		"FROM " + sessionTableName + " "
+	sqlSelectSessionByToken = sqlSelectAll +
+		"WHERE access_token=? AND deleted <> 1 " +
+		"AND unix_timestamp()<expire_time LIMIT 1"
+	sqlInsertSession = "INSERT INTO " + sessionTableName +
+		"(access_token,user_id,role,expire_time," +
+		"created_time,modified_time,deleted)" +
+		"VALUES(?,?,?,unix_timestamp()+?," +
+		"unix_timestamp(),unix_timestamp(),0)"
+)
+
 type sessionDAO struct {
 	connection *db.Connection
 }
 
-func NewSessionDAO(connection *db.Connection) *sessionDAO {
+// NewSessionDAO creates instance
+func NewSessionDAO(connection *db.Connection) session.SessionDAO {
 	return &sessionDAO{
 		connection: connection,
 	}
@@ -23,10 +38,7 @@ func NewSessionDAO(connection *db.Connection) *sessionDAO {
 
 func (d *sessionDAO) GetByToken(token string) (*session.Session, error) {
 	db := d.connection.Connect()
-	st, err := db.Prepare("SELECT user_id,role,expire_time " +
-		"FROM session " +
-		"WHERE access_token=? AND deleted <> 1 " +
-		"AND unix_timestamp(now())<expire_time LIMIT 1")
+	st, err := db.Prepare(sqlSelectSessionByToken)
 	if err != nil {
 		return nil, err
 	}
@@ -60,11 +72,7 @@ func (d *sessionDAO) Create(userId, role string, expireIn int64) (*session.Sessi
 	}
 	defer tr.Rollback()
 
-	st, err := tr.Prepare("INSERT INTO session(" +
-		"access_token,user_id,role,expire_time," +
-		"created_time,modified_time,deleted)" +
-		"VALUES(?,?,?,unix_timestamp(now())+?," +
-		"unix_timestamp(now()),unix_timestamp(now()),0)")
+	st, err := tr.Prepare(sqlInsertSession)
 	if err != nil {
 		return nil, err
 	}
