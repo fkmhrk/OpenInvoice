@@ -15,7 +15,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-func createTradingDAO(sqlDB *sql.DB) *tradingDAO {
+func createTradingDAO(sqlDB *sql.DB) trading.DAO {
 	c := db.NewConnection(sqlDB)
 	return New(c, logger.New())
 }

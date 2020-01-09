@@ -14,13 +14,81 @@ import (
 )
 
 const (
-	select_trading = "SELECT id,company_id,title_type,subject," +
+	tradingTableName     = "trading"
+	sqlSelectAllTradings = "SELECT id,company_id,title_type,subject," +
 		"work_from,work_to,total," +
 		"quotation_date,quotation_number," +
 		"bill_date,bill_number," +
 		"delivery_date,delivery_number," +
 		"tax_rate,assignee,product,memo," +
-		"created_time, modified_time FROM trading"
+		"created_time, modified_time " +
+		"FROM " + tradingTableName + " "
+	sqlSelectTradingsByUser = sqlSelectAllTradings +
+		"WHERE assignee=? AND deleted <> 1 ORDER BY id ASC"
+	sqlSelectTradingList = sqlSelectAllTradings +
+		"WHERE deleted <> 1 ORDER BY modified_time DESC"
+	sqlSelectTradingByID = sqlSelectAllTradings +
+		"WHERE id=? AND deleted <> 1 LIMIT 1"
+	sqlInsertTrading = "INSERT INTO " + tradingTableName +
+		"(id,company_id,subject,title_type," +
+		"work_from,work_to,total," +
+		"quotation_date,quotation_number," +
+		"bill_date,bill_number," +
+		"delivery_date,delivery_number," +
+		"tax_rate,assignee,product,memo," +
+		"created_time,modified_time,deleted)" +
+		"VALUES(?,?,?,?," +
+		"?,?,?," +
+		"?,''," +
+		"?,''," +
+		"?,''," +
+		"?,?,?,?," +
+		"unix_timestamp(),unix_timestamp(),0)"
+	sqlUpdateTrading = "UPDATE " + tradingTableName + " " +
+		"SET company_id=?,title_type=?,subject=?," +
+		"work_from=?,work_to=?,total=?," +
+		"quotation_date=?,quotation_number=?," +
+		"bill_date=?,bill_number=?," +
+		"delivery_date=?,delivery_number=?," +
+		"tax_rate=?,assignee=?,product=?,memo=?," +
+		"modified_time=unix_timestamp() " +
+		"WHERE id=? AND deleted <> 1"
+	sqlSoftDeleteTrading = "UPDATE " + tradingTableName + " " +
+		"SET deleted=1 " +
+		"WHERE id=? AND deleted <> 1"
+
+	sqlSelectTradingID = "SELECT num FROM trading_id WHERE date=?"
+	sqlInsertTradingID = "INSERT INTO trading_id" +
+		"(date,num) VALUES(?,1)"
+	sqlUpdateTradingID = "UPDATE trading_id " +
+		"SET num=? WHERE date=?"
+
+	tradingItemTableName      = "trading_item"
+	sqlSelectTradingItemsByID = "SELECT id,sort_order,subject,unit_price,amount," +
+		"degree,tax_type,memo " +
+		"FROM " + tradingItemTableName + " " +
+		"WHERE trading_id=? AND deleted <> 1 ORDER BY sort_order ASC"
+	sqlInsertTradingItem = "INSERT INTO " + tradingItemTableName +
+		"(id,trading_id,sort_order,subject," +
+		"unit_price,amount,degree," +
+		"tax_type,memo," +
+		"created_time,modified_time,deleted)" +
+		"VALUES(?,?,?,?," +
+		"?,?,?," +
+		"?,?," +
+		"unix_timestamp(),unix_timestamp(),0)"
+	sqlUpdateTradingItem = "UPDATE " + tradingItemTableName + " " +
+		"SET sort_order=?,subject=?," +
+		"unit_price=?,amount=?,degree=?," +
+		"tax_type=?,memo=?," +
+		"modified_time=unix_timestamp() " +
+		"WHERE id=? AND trading_id=? AND deleted <> 1"
+	sqlSoftDeleteItem = "UPDATE " + tradingItemTableName + " " +
+		"SET deleted=1 " +
+		"WHERE id=? AND trading_id=? AND deleted <> 1"
+	sqlSoftDeleteAllItem = "UPDATE " + tradingItemTableName + " " +
+		"SET deleted=1 " +
+		"WHERE trading_id=? AND deleted <> 1"
 )
 
 type tradingDAO struct {
@@ -29,17 +97,16 @@ type tradingDAO struct {
 }
 
 // New creates instance
-func New(connection *db.Connection, logger logger.Logger) *tradingDAO {
+func New(connection *db.Connection, logger logger.Logger) trading.DAO {
 	return &tradingDAO{
 		connection: connection,
 		logger:     logger,
 	}
 }
 
-func (o *tradingDAO) GetList() ([]*trading.Trading, error) {
-	db := o.connection.Connect()
-	st, err := db.Prepare(select_trading +
-		" WHERE deleted <> 1 ORDER BY modified_time DESC")
+func (d *tradingDAO) GetList() ([]*trading.Trading, error) {
+	db := d.connection.Connect()
+	st, err := db.Prepare(sqlSelectTradingList)
 	if err != nil {
 		return nil, err
 	}
@@ -53,7 +120,7 @@ func (o *tradingDAO) GetList() ([]*trading.Trading, error) {
 
 	var list []*trading.Trading
 	for rows.Next() {
-		item := o.scanTrading(rows)
+		item := d.scanTrading(rows)
 		list = append(list, &item)
 	}
 	return list, nil
@@ -61,8 +128,7 @@ func (o *tradingDAO) GetList() ([]*trading.Trading, error) {
 
 func (d *tradingDAO) GetListByUser(userId string) ([]*trading.Trading, error) {
 	db := d.connection.Connect()
-	st, err := db.Prepare(select_trading +
-		" WHERE assignee=? AND deleted <> 1 ORDER BY id ASC")
+	st, err := db.Prepare(sqlSelectTradingsByUser)
 	if err != nil {
 		return nil, err
 	}
@@ -85,8 +151,7 @@ func (d *tradingDAO) GetListByUser(userId string) ([]*trading.Trading, error) {
 
 func (d *tradingDAO) GetById(id string) (*trading.Trading, error) {
 	db := d.connection.Connect()
-	st, err := db.Prepare(select_trading +
-		" WHERE id=? AND deleted <> 1 LIMIT 1")
+	st, err := db.Prepare(sqlSelectTradingByID)
 	if err != nil {
 		return nil, err
 	}
@@ -113,21 +178,7 @@ func (d *tradingDAO) Create(companyId, subject string, titleType int, workFrom, 
 	}
 	defer tr.Rollback()
 
-	st, err := tr.Prepare("INSERT INTO trading(" +
-		"id,company_id,subject,title_type," +
-		"work_from,work_to,total," +
-		"quotation_date,quotation_number," +
-		"bill_date,bill_number," +
-		"delivery_date,delivery_number," +
-		"tax_rate,assignee,product,memo," +
-		"created_time,modified_time,deleted)" +
-		"VALUES(?,?,?,?," +
-		"?,?,?," +
-		"?,''," +
-		"?,''," +
-		"?,''," +
-		"?,?,?,?," +
-		"unix_timestamp(now()),unix_timestamp(now()),0)")
+	st, err := tr.Prepare(sqlInsertTrading)
 	if err != nil {
 		return nil, err
 	}
@@ -170,15 +221,7 @@ func (d *tradingDAO) Update(trading trading.Trading) (*trading.Trading, error) {
 	}
 	defer tr.Rollback()
 
-	st, err := tr.Prepare("UPDATE trading SET " +
-		"company_id=?,title_type=?,subject=?," +
-		"work_from=?,work_to=?,total=?," +
-		"quotation_date=?,quotation_number=?," +
-		"bill_date=?,bill_number=?," +
-		"delivery_date=?,delivery_number=?," +
-		"tax_rate=?,assignee=?,product=?,memo=?," +
-		"modified_time=unix_timestamp(now()) " +
-		"WHERE id=? AND deleted <> 1")
+	st, err := tr.Prepare(sqlUpdateTrading)
 	if err != nil {
 		return nil, err
 	}
@@ -222,9 +265,7 @@ func (d *tradingDAO) Delete(id string) error {
 
 func (d *tradingDAO) GetItemsById(tradingId string) ([]*trading.TradingItem, error) {
 	db := d.connection.Connect()
-	st, err := db.Prepare("SELECT id,sort_order,subject,unit_price,amount," +
-		"degree,tax_type,memo FROM trading_item " +
-		"WHERE trading_id=? AND deleted <> 1 ORDER BY sort_order ASC")
+	st, err := db.Prepare(sqlSelectTradingItemsByID)
 	if err != nil {
 		return nil, err
 	}
@@ -267,15 +308,7 @@ func (d *tradingDAO) CreateItem(tradingId, subject, degree, memo string, sortOrd
 	}
 	defer tr.Rollback()
 
-	st, err := tr.Prepare("INSERT INTO trading_item(" +
-		"id,trading_id,sort_order,subject," +
-		"unit_price,amount,degree," +
-		"tax_type,memo," +
-		"created_time,modified_time,deleted)" +
-		"VALUES(?,?,?,?," +
-		"?,?,?," +
-		"?,?," +
-		"unix_timestamp(now()),unix_timestamp(now()),0)")
+	st, err := tr.Prepare(sqlInsertTradingItem)
 	if err != nil {
 		return nil, err
 	}
@@ -325,12 +358,7 @@ func (d *tradingDAO) UpdateItem(id, tradingId, subject, degree, memo string, sor
 	}
 	defer tr.Rollback()
 
-	st, err := tr.Prepare("UPDATE trading_item SET " +
-		"sort_order=?,subject=?," +
-		"unit_price=?,amount=?,degree=?," +
-		"tax_type=?,memo=?," +
-		"modified_time=unix_timestamp(now()) " +
-		"WHERE id=? AND trading_id=? AND deleted <> 1")
+	st, err := tr.Prepare(sqlUpdateTradingItem)
 	if err != nil {
 		return nil, err
 	}
@@ -365,9 +393,7 @@ func (d *tradingDAO) SoftDeleteItem(id, tradingId string) error {
 	}
 	defer tr.Rollback()
 
-	st, err := tr.Prepare("UPDATE trading_item SET " +
-		"deleted=1 " +
-		"WHERE id=? AND trading_id=? AND deleted <> 1")
+	st, err := tr.Prepare(sqlSoftDeleteItem)
 	if err != nil {
 		return err
 	}
@@ -406,7 +432,7 @@ func (d *tradingDAO) generateNextId(tr *sql.Tx, date string) (string, error) {
 }
 
 func (d *tradingDAO) getId(tr *sql.Tx, date string) (int, error) {
-	st, err := tr.Prepare("SELECT num FROM trading_id WHERE date=?")
+	st, err := tr.Prepare(sqlSelectTradingID)
 	if err != nil {
 		return -1, err
 	}
@@ -428,8 +454,7 @@ func (d *tradingDAO) getId(tr *sql.Tx, date string) (int, error) {
 }
 
 func (d *tradingDAO) insertId(tr *sql.Tx, date string) error {
-	st, err := tr.Prepare("INSERT INTO trading_id" +
-		"(date,num) VALUES(?,1)")
+	st, err := tr.Prepare(sqlInsertTradingID)
 	if err != nil {
 		return err
 	}
@@ -440,8 +465,7 @@ func (d *tradingDAO) insertId(tr *sql.Tx, date string) error {
 }
 
 func (d *tradingDAO) updateId(tr *sql.Tx, date string, num int) error {
-	st, err := tr.Prepare("UPDATe trading_id " +
-		"SET num=? WHERE date=?")
+	st, err := tr.Prepare(sqlUpdateTradingID)
 	if err != nil {
 		return err
 	}
@@ -493,9 +517,7 @@ func (d *tradingDAO) scanTrading(rows *sql.Rows) trading.Trading {
 }
 
 func (d *tradingDAO) softDelete(tr *sql.Tx, tradingId string) error {
-	st, err := tr.Prepare("UPDATE trading SET " +
-		"deleted=1 " +
-		"WHERE id=? AND deleted <> 1")
+	st, err := tr.Prepare(sqlSoftDeleteTrading)
 	if err != nil {
 		return err
 	}
@@ -510,9 +532,7 @@ func (d *tradingDAO) softDelete(tr *sql.Tx, tradingId string) error {
 }
 
 func (d *tradingDAO) softAllDeleteItem(tr *sql.Tx, tradingId string) error {
-	st, err := tr.Prepare("UPDATE trading_item SET " +
-		"deleted=1 " +
-		"WHERE trading_id=? AND deleted <> 1")
+	st, err := tr.Prepare(sqlSoftDeleteAllItem)
 	if err != nil {
 		return err
 	}
