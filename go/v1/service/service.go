@@ -1,15 +1,20 @@
 package service
 
 import (
+	"github.com/fkmhrk/OpenInvoice/v1/model"
+	"github.com/fkmhrk/OpenInvoice/v1/rest/service"
 	"github.com/fkmhrk/OpenInvoice/v1/service/admin"
 	"github.com/fkmhrk/OpenInvoice/v1/service/company"
 	"github.com/fkmhrk/OpenInvoice/v1/service/trading"
 	"github.com/fkmhrk/OpenInvoice/v1/service/user"
 )
 
-type Services struct {
-	Admin   admin.Service
-	User    user.Service
-	Trading trading.Service
-	Company company.Service
+// New creates service instances
+func New(models *model.Models) service.Services {
+	return service.Services{
+		Admin:   admin.New(models),
+		User:    user.New(models.User, models.Session, models),
+		Trading: trading.New(models.Session, models.Trading, models),
+		Company: company.New(models),
+	}
 }

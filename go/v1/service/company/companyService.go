@@ -1,4 +1,4 @@
-package impl
+package company
 
 import (
 	"net/http"
@@ -7,7 +7,7 @@ import (
 	"github.com/fkmhrk/OpenInvoice/v1/model/company"
 	"github.com/fkmhrk/OpenInvoice/v1/model/response"
 	"github.com/fkmhrk/OpenInvoice/v1/model/session"
-	s "github.com/fkmhrk/OpenInvoice/v1/service/company"
+	"github.com/fkmhrk/OpenInvoice/v1/rest/service"
 	"github.com/mokelab-go/server/entity"
 )
 
@@ -17,7 +17,7 @@ type companyService struct {
 }
 
 // New creates instance
-func New(models *m.Models) s.Service {
+func New(models *m.Models) service.Company {
 	return &companyService{
 		sessionDAO: models.Session,
 		companyDAO: models.Company,

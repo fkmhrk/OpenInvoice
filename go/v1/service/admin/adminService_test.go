@@ -1,4 +1,4 @@
-package impl
+package admin
 
 import (
 	"testing"
