@@ -11,7 +11,7 @@ import (
 	"github.com/fkmhrk/OpenInvoice/v1/model/seq"
 	"github.com/fkmhrk/OpenInvoice/v1/model/session"
 	"github.com/fkmhrk/OpenInvoice/v1/model/trading"
-	ss "github.com/fkmhrk/OpenInvoice/v1/service/trading"
+	ss "github.com/fkmhrk/OpenInvoice/v1/rest/service"
 	"github.com/mokelab-go/server/entity"
 )
 
@@ -87,7 +87,7 @@ func (s *tradingService) Create(session *session.Session, companyId, subject, pr
 	}
 }
 
-func (s *tradingService) Update(trading ss.Trading) entity.Response {
+func (s *tradingService) Update(trading ss.TradingData) entity.Response {
 	// input check
 	if len(trading.Id) == 0 {
 		return response.Error(http.StatusBadRequest, response.MSG_ERR_ID_EMPTY)

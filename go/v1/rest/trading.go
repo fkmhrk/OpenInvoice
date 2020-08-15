@@ -5,19 +5,18 @@ import (
 
 	rj "github.com/fkmhrk-go/rawjson"
 	t "github.com/fkmhrk/OpenInvoice/v1/model/trading"
-	s "github.com/fkmhrk/OpenInvoice/v1/service"
-	"github.com/fkmhrk/OpenInvoice/v1/service/trading"
+	"github.com/fkmhrk/OpenInvoice/v1/rest/service"
 	"github.com/mokelab-go/hop"
 )
 
-func getTradings(trading trading.Service) http.HandlerFunc {
+func getTradings(trading service.Trading) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
 		resp := trading.GetListByUser()
 		resp.Write(w)
 	}
 }
 
-func getTrading(trading trading.Service) http.HandlerFunc {
+func getTrading(trading service.Trading) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
 		c := req.Context()
 		tradingId := hop.PathString(c, "tradingId")
@@ -26,14 +25,14 @@ func getTrading(trading trading.Service) http.HandlerFunc {
 	}
 }
 
-func createTrading(trading trading.Service) http.HandlerFunc {
+func createTrading(trading service.Trading) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
 		// read input
 		c := req.Context()
 		session := session(c)
 		json := rj.RawJsonObject(hop.BodyJSON(c))
 
-		companyId, _ := json.String("company_id")
+		companyID, _ := json.String("company_id")
 		titleType, _ := json.Int("title_type")
 		subject, _ := json.String("subject")
 		workFrom, _ := json.Long("work_from")
@@ -46,7 +45,7 @@ func createTrading(trading trading.Service) http.HandlerFunc {
 		product, _ := json.String("product")
 		memo, _ := json.String("memo")
 
-		resp := trading.Create(session, companyId,
+		resp := trading.Create(session, companyID,
 			subject, product, memo, titleType, workFrom, workTo,
 			total, quotationDate, billDate, deliveryDate, float32(taxRate))
 		resp.Write(w)
@@ -54,16 +53,16 @@ func createTrading(trading trading.Service) http.HandlerFunc {
 	}
 }
 
-func updateTrading(tradingService trading.Service) http.HandlerFunc {
+func updateTrading(tradingService service.Trading) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
 		c := req.Context()
-		tradingId := hop.PathString(c, "tradingId")
+		tradingID := hop.PathString(c, "tradingId")
 
 		// to json
 		json := rj.RawJsonObject(hop.BodyJSON(c))
 
 		// read input
-		companyId, _ := json.String("company_id")
+		companyID, _ := json.String("company_id")
 		subject, _ := json.String("subject")
 		titleType, _ := json.Int("title_type")
 		workFrom, _ := json.Long("work_from")
@@ -80,10 +79,10 @@ func updateTrading(tradingService trading.Service) http.HandlerFunc {
 		product, _ := json.String("product")
 		memo, _ := json.String("memo")
 
-		resp := tradingService.Update(trading.Trading{
+		resp := tradingService.Update(service.TradingData{
 			t.Trading{
-				Id:              tradingId,
-				CompanyId:       companyId,
+				Id:              tradingID,
+				CompanyId:       companyID,
 				Subject:         subject,
 				TitleType:       titleType,
 				WorkFrom:        workFrom,
@@ -106,30 +105,30 @@ func updateTrading(tradingService trading.Service) http.HandlerFunc {
 
 }
 
-func deleteTrading(services s.Services) http.HandlerFunc {
+func deleteTrading(services service.Services) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
 		// read path param
-		tradingId := hop.PathString(req.Context(), "tradingId")
+		tradingID := hop.PathString(req.Context(), "tradingId")
 
-		resp := services.Trading.Delete(tradingId)
+		resp := services.Trading.Delete(tradingID)
 		resp.Write(w)
 	}
 }
 
-func getTradingItems(trading trading.Service) http.HandlerFunc {
+func getTradingItems(trading service.Trading) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
 		// read path param
-		tradingId := hop.PathString(req.Context(), "tradingId")
+		tradingID := hop.PathString(req.Context(), "tradingId")
 
-		resp := trading.GetItemListByTradingId(tradingId)
+		resp := trading.GetItemListByTradingId(tradingID)
 		resp.Write(w)
 	}
 }
 
-func createTradingItem(trading trading.Service) http.HandlerFunc {
+func createTradingItem(trading service.Trading) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
 		c := req.Context()
-		tradingId := hop.PathString(c, "tradingId")
+		tradingID := hop.PathString(c, "tradingId")
 
 		// to json
 		json := rj.RawJsonObject(hop.BodyJSON(c))
@@ -143,16 +142,16 @@ func createTradingItem(trading trading.Service) http.HandlerFunc {
 		taxType, _ := json.Int("tax_type")
 		memo, _ := json.String("memo")
 
-		resp := trading.CreateItem(tradingId, subject, degree, memo, sortOrder, unitPrice, amount, taxType)
+		resp := trading.CreateItem(tradingID, subject, degree, memo, sortOrder, unitPrice, amount, taxType)
 		resp.Write(w)
 	}
 }
 
-func updateTradingItem(trading trading.Service) http.HandlerFunc {
+func updateTradingItem(trading service.Trading) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
 		// read path param
 		c := req.Context()
-		tradingId := hop.PathString(c, "tradingId")
+		tradingID := hop.PathString(c, "tradingId")
 		id := hop.PathString(c, "itemId")
 
 		// to json
@@ -167,19 +166,19 @@ func updateTradingItem(trading trading.Service) http.HandlerFunc {
 		taxType, _ := json.Int("tax_type")
 		memo, _ := json.String("memo")
 
-		resp := trading.UpdateItem(id, tradingId, subject, degree, memo, sortOrder, unitPrice, amount, taxType)
+		resp := trading.UpdateItem(id, tradingID, subject, degree, memo, sortOrder, unitPrice, amount, taxType)
 		resp.Write(w)
 	}
 }
 
-func deleteTradingItem(trading trading.Service) http.HandlerFunc {
+func deleteTradingItem(trading service.Trading) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
 		// read path param
 		c := req.Context()
-		tradingId := hop.PathString(c, "tradingId")
+		tradingID := hop.PathString(c, "tradingId")
 		id := hop.PathString(c, "itemId")
 
-		resp := trading.DeleteItem(id, tradingId)
+		resp := trading.DeleteItem(id, tradingID)
 		resp.Write(w)
 	}
 }
