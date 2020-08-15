@@ -5,17 +5,19 @@ import (
 
 	rj "github.com/fkmhrk-go/rawjson"
 	s "github.com/fkmhrk/OpenInvoice/v1/service"
+	"github.com/fkmhrk/OpenInvoice/v1/service/user"
 	"github.com/mokelab-go/hop"
 )
 
-func getUsers(user s.UserService) http.HandlerFunc {
-	return makeBaseHandler(func(req *http.Request) s.Result {
-		return user.GetUsers()
-	})
+func getUsers(user user.Service) http.HandlerFunc {
+	return func(w http.ResponseWriter, req *http.Request) {
+		resp := user.GetUsers()
+		resp.Write(w)
+	}
 }
 
 func createUser(services s.Services) http.HandlerFunc {
-	return makeBaseHandler(func(req *http.Request) s.Result {
+	return func(w http.ResponseWriter, req *http.Request) {
 		// read input
 		c := req.Context()
 		session := session(c)
@@ -26,12 +28,13 @@ func createUser(services s.Services) http.HandlerFunc {
 		tel, _ := json.String("tel")
 		password, _ := json.String("password")
 
-		return services.User.Create(session, loginName, displayName, tel, password)
-	})
+		resp := services.User.Create(session, loginName, displayName, tel, password)
+		resp.Write(w)
+	}
 }
 
 func updateUser(services s.Services) http.HandlerFunc {
-	return makeBaseHandler(func(req *http.Request) s.Result {
+	return func(w http.ResponseWriter, req *http.Request) {
 		c := req.Context()
 		id := hop.PathString(c, "id")
 		session := session(c)
@@ -43,16 +46,20 @@ func updateUser(services s.Services) http.HandlerFunc {
 		tel, _ := json.String("tel")
 		password, _ := json.String("password")
 
-		return services.User.Update(session, id, loginName, displayName, tel, password)
-	})
+		resp := services.User.Update(session, id, loginName, displayName, tel, password)
+		resp.Write(w)
+
+	}
 }
 
 func deleteUser(services s.Services) http.HandlerFunc {
-	return makeBaseHandler(func(req *http.Request) s.Result {
+	return func(w http.ResponseWriter, req *http.Request) {
 		c := req.Context()
 		id := hop.PathString(c, "id")
 		session := session(c)
 
-		return services.User.Delete(session, id)
-	})
+		resp := services.User.Delete(session, id)
+		resp.Write(w)
+
+	}
 }

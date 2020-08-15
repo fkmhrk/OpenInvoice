@@ -19,6 +19,7 @@ services:
             - pdf:pdf
         volumes:
             - ./go/web/dist:/srv/web
+            - ./go/build:/srv/api
     pdf:
         build: ./php
         image: fkmhrk/oiv_pdf:latest

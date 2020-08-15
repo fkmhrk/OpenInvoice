@@ -17,7 +17,7 @@ func generateUUID(length int) string {
 	return id[:length]
 }
 
-func insertWithUUID(l int, f func(id string) error) (string, error) {
+func InsertWithUUID(l int, f func(id string) error) (string, error) {
 	for i := 0; i < 10; i++ {
 		id := generateUUID(l)
 		err := f(id)

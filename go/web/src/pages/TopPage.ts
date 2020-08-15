@@ -59,6 +59,13 @@ export class TopPage implements IPage {
     async onCreate() {
         this.environment = await this.app.models.environment.get();
         const tradings = await this.app.models.trading.getAll();
+        const companies = (await this.app.models.company.getAll()).reduce(
+            (v: { [key: string]: ICompany }, c: ICompany) => {
+                v[c.id] = c;
+                return v;
+            },
+            {}
+        );
 
         this.ractive = new Ractive({
             el: "#container",
@@ -73,6 +80,7 @@ export class TopPage implements IPage {
                 toDateStr: toDateStr,
                 sortIndex: 1,
                 sortDesc: true,
+                company: companies,
                 showSortMark: (
                     index: number,
                     sortIndex: number,
