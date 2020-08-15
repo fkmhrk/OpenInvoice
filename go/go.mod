@@ -1,6 +1,6 @@
 module github.com/fkmhrk/OpenInvoice
 
-go 1.12
+go 1.14
 
 require (
 	github.com/fkmhrk-go/rawjson v0.0.0-20150202185032-857fafa0503d
@@ -10,4 +10,5 @@ require (
 	github.com/mokelab-go/hop v0.0.0-20161016031025-3f57d8333436
 	github.com/mokelab-go/server v0.0.0-20190823082941-c34045379e65
 	github.com/pborman/uuid v1.2.0
+	google.golang.org/appengine v1.6.6 // indirect
 )
