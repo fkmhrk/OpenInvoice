@@ -1,17 +1,16 @@
 package v1
 
 import (
-	m "github.com/fkmhrk/OpenInvoice/v1/model"
+	mi "github.com/fkmhrk/OpenInvoice/v1/model"
 	modeldb "github.com/fkmhrk/OpenInvoice/v1/model/db"
-	mi "github.com/fkmhrk/OpenInvoice/v1/model/impl"
 	"github.com/fkmhrk/OpenInvoice/v1/rest"
-	s "github.com/fkmhrk/OpenInvoice/v1/service"
-	si "github.com/fkmhrk/OpenInvoice/v1/service/impl"
-	user "github.com/fkmhrk/OpenInvoice/v1/service/user"
-	userImpl "github.com/fkmhrk/OpenInvoice/v1/service/user/impl"
+	s "github.com/fkmhrk/OpenInvoice/v1/rest/service"
+	"github.com/fkmhrk/OpenInvoice/v1/service"
+	"github.com/fkmhrk/OpenInvoice/v1/service/model"
 
 	"database/sql"
 
+	// used for driver
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/gorilla/mux"
 )
@@ -22,15 +21,14 @@ func InitRouter(r *mux.Router) error {
 		return err
 	}
 	c := modeldb.NewConnection(db)
-	models := mi.NewModels(c)
-	services := si.NewServices(models)
+	models := mi.New(c)
+	services := service.New(models)
 
-	userService := userImpl.New(models.User, models.Session, models)
-	initRouter(r, services, userService, models)
+	initRouter(r, services, models)
 	return nil
 }
 
-func initRouter(r *mux.Router, services s.Services, u user.Service, models *m.Models) {
+func initRouter(r *mux.Router, services s.Services, models *model.Models) {
 	r1 := r.PathPrefix("/api/v1").Subrouter()
-	rest.SetHandlers(r1, services, u, services.Trading, services.Company, models)
+	rest.SetHandlers(r1, services, services.User, services.Trading, services.Company, models)
 }

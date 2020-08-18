@@ -4,19 +4,18 @@ import (
 	"net/http"
 
 	rj "github.com/fkmhrk-go/rawjson"
-	s "github.com/fkmhrk/OpenInvoice/v1/service"
-	"github.com/fkmhrk/OpenInvoice/v1/service/company"
+	"github.com/fkmhrk/OpenInvoice/v1/rest/service"
 	"github.com/mokelab-go/hop"
 )
 
-func getCompanies(company company.Service) http.HandlerFunc {
+func getCompanies(company service.Company) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
 		resp := company.GetList()
 		resp.Write(w)
 	}
 }
 
-func createCompany(company company.Service) http.HandlerFunc {
+func createCompany(company service.Company) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
 		// read input
 		json := rj.RawJsonObject(hop.BodyJSON(req.Context()))
@@ -32,7 +31,7 @@ func createCompany(company company.Service) http.HandlerFunc {
 	}
 }
 
-func updateCompany(company company.Service) http.HandlerFunc {
+func updateCompany(company service.Company) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
 		c := req.Context()
 		id := hop.PathString(c, "companyId")
@@ -52,7 +51,7 @@ func updateCompany(company company.Service) http.HandlerFunc {
 	}
 }
 
-func deleteCompany(services s.Services) http.HandlerFunc {
+func deleteCompany(services service.Services) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
 		id := hop.PathString(req.Context(), "companyId")
 
@@ -61,7 +60,7 @@ func deleteCompany(services s.Services) http.HandlerFunc {
 	}
 }
 
-func getNextNumber(services s.Services) http.HandlerFunc {
+func getNextNumber(services service.Services) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
 		c := req.Context()
 		seqType := hop.PathString(c, "seqType")

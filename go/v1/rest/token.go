@@ -4,12 +4,11 @@ import (
 	"net/http"
 
 	rj "github.com/fkmhrk-go/rawjson"
-	s "github.com/fkmhrk/OpenInvoice/v1/service"
-	"github.com/fkmhrk/OpenInvoice/v1/service/user"
+	"github.com/fkmhrk/OpenInvoice/v1/rest/service"
 	"github.com/mokelab-go/hop"
 )
 
-func getToken(user user.Service) http.HandlerFunc {
+func getToken(user service.User) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
 		var username, password string
 		contentType := hop.ContentType(req.Context())
@@ -30,7 +29,7 @@ func getToken(user user.Service) http.HandlerFunc {
 	}
 }
 
-func refreshToken(services s.Services) http.HandlerFunc {
+func refreshToken(services service.Services) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
 		// read input
 		json := rj.RawJsonObject(hop.BodyJSON(req.Context()))

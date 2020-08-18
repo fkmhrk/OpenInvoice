@@ -1,36 +1,36 @@
 package mock
 
 import (
-	m "github.com/fkmhrk/OpenInvoice/v1/model"
+	"github.com/fkmhrk/OpenInvoice/v1/entity"
 )
 
 type SeqDAO struct {
-	CreateResult m.Seq
-	GetResult    m.Seq
-	UpdateResult m.Seq
-	NextResult   m.Seq
-	NextSeqType  m.SeqType
-	DeleteResult m.Seq
+	CreateResult entity.Seq
+	GetResult    entity.Seq
+	UpdateResult entity.Seq
+	NextResult   entity.Seq
+	NextSeqType  entity.SeqType
+	DeleteResult entity.Seq
 }
 
-func (d *SeqDAO) Create(seqType m.SeqType, year, value int) (m.Seq, error) {
+func (d *SeqDAO) Create(seqType entity.SeqType, year, value int) (entity.Seq, error) {
 	return d.CreateResult, nil
 }
 
-func (d *SeqDAO) Get(seqType m.SeqType, year int) (m.Seq, error) {
+func (d *SeqDAO) Get(seqType entity.SeqType, year int) (entity.Seq, error) {
 	return d.GetResult, nil
 }
 
-func (d *SeqDAO) Update(seqType m.SeqType, year, value int) (m.Seq, error) {
+func (d *SeqDAO) Update(seqType entity.SeqType, year, value int) (entity.Seq, error) {
 	return d.UpdateResult, nil
 }
 
-func (d *SeqDAO) Next(seqType m.SeqType, year int) (m.Seq, error) {
+func (d *SeqDAO) Next(seqType entity.SeqType, year int) (entity.Seq, error) {
 	// set args
 	d.NextSeqType = seqType
 	return d.NextResult, nil
 }
 
-func (d *SeqDAO) Delete(seqType m.SeqType, year int) (m.Seq, error) {
+func (d *SeqDAO) Delete(seqType entity.SeqType, year int) (entity.Seq, error) {
 	return d.DeleteResult, nil
 }

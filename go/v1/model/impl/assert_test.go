@@ -1,15 +1,16 @@
 package impl
 
 import (
-	m "../"
 	"fmt"
 	"math"
 	"runtime"
 	"strings"
 	"testing"
+
+	"github.com/fkmhrk/OpenInvoice/v1/entity"
 )
 
-func assertUser(t *testing.T, item *m.User, id, loginName, displayName, role, tel string) {
+func assertUser(t *testing.T, item *entity.User, id, loginName, displayName, role, tel string) {
 	caller := getCaller()
 	if item.Id != id {
 		t.Errorf("%s Id must be %s but %s", caller, id, item.Id)
@@ -30,7 +31,7 @@ func assertUser(t *testing.T, item *m.User, id, loginName, displayName, role, te
 	}
 }
 
-func assertCompany(t *testing.T, item *m.Company,
+func assertCompany(t *testing.T, item *entity.Company,
 	id, name, zip, address, phone, unit string) {
 	caller := getCaller()
 	if item.Id != id {
@@ -53,7 +54,7 @@ func assertCompany(t *testing.T, item *m.Company,
 	}
 }
 
-func assertTrading(t *testing.T, item *m.Trading,
+func assertTrading(t *testing.T, item *entity.Trading,
 	id, companyId, subject string, titleType int,
 	workFrom, workTo, quotationDate, billDate int64,
 	taxRate float32, assignee, product string) {
@@ -94,7 +95,7 @@ func assertTrading(t *testing.T, item *m.Trading,
 
 }
 
-func assertTradingItem(t *testing.T, item *m.TradingItem,
+func assertTradingItem(t *testing.T, item *entity.TradingItem,
 	id, tradingId, subject string, sortOrder, unitPrice int, amount float64,
 	degree string, taxType int, memo string) {
 	caller := getCaller()

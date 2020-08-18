@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"net/http"
 
-	ses "github.com/fkmhrk/OpenInvoice/v1/model/session"
+	"github.com/fkmhrk/OpenInvoice/v1/service/model"
 	"github.com/mokelab-go/hop"
 )
 
-func getSession(sessionDAO ses.SessionDAO) hop.Op {
+func getSession(sessionDAO model.Session) hop.Op {
 	return func(next http.HandlerFunc) http.HandlerFunc {
 		return func(w http.ResponseWriter, r *http.Request) {
 			c := r.Context()

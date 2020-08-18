@@ -4,19 +4,18 @@ import (
 	"net/http"
 
 	rj "github.com/fkmhrk-go/rawjson"
-	s "github.com/fkmhrk/OpenInvoice/v1/service"
-	"github.com/fkmhrk/OpenInvoice/v1/service/user"
+	"github.com/fkmhrk/OpenInvoice/v1/rest/service"
 	"github.com/mokelab-go/hop"
 )
 
-func getUsers(user user.Service) http.HandlerFunc {
+func getUsers(user service.User) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
 		resp := user.GetUsers()
 		resp.Write(w)
 	}
 }
 
-func createUser(services s.Services) http.HandlerFunc {
+func createUser(services service.Services) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
 		// read input
 		c := req.Context()
@@ -33,7 +32,7 @@ func createUser(services s.Services) http.HandlerFunc {
 	}
 }
 
-func updateUser(services s.Services) http.HandlerFunc {
+func updateUser(services service.Services) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
 		c := req.Context()
 		id := hop.PathString(c, "id")
@@ -52,7 +51,7 @@ func updateUser(services s.Services) http.HandlerFunc {
 	}
 }
 
-func deleteUser(services s.Services) http.HandlerFunc {
+func deleteUser(services service.Services) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
 		c := req.Context()
 		id := hop.PathString(c, "id")
