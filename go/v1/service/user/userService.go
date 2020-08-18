@@ -3,28 +3,27 @@ package user
 import (
 	"net/http"
 
-	m "github.com/fkmhrk/OpenInvoice/v1/model"
+	e "github.com/fkmhrk/OpenInvoice/v1/entity"
 	"github.com/fkmhrk/OpenInvoice/v1/model/response"
-	"github.com/fkmhrk/OpenInvoice/v1/model/session"
-	"github.com/fkmhrk/OpenInvoice/v1/model/user"
 	"github.com/fkmhrk/OpenInvoice/v1/rest/service"
+	"github.com/fkmhrk/OpenInvoice/v1/service/model"
 	"github.com/mokelab-go/server/entity"
 )
 
 type userService struct {
-	userDAO           user.DAO
-	sessionDAO        session.SessionDAO
-	sessionRefreshDAO session.SessionRefreshDAO
+	userDAO           model.User
+	sessionDAO        model.Session
+	sessionRefreshDAO model.SessionRefresh
 }
 
 const (
 	TIME_30MIN = 30 * 60
 )
 
-func New(u user.DAO, s session.SessionDAO, models *m.Models) service.User {
+func New(models *model.Models) service.User {
 	return &userService{
-		userDAO:           u,
-		sessionDAO:        s,
+		userDAO:           models.User,
+		sessionDAO:        models.Session,
 		sessionRefreshDAO: models.SessionRefresh,
 	}
 }
@@ -121,7 +120,7 @@ func (s *userService) GetUsers() entity.Response {
 	}
 }
 
-func (s *userService) Create(session *session.Session, loginName, displayName, tel, password string) entity.Response {
+func (s *userService) Create(session *e.Session, loginName, displayName, tel, password string) entity.Response {
 	if !session.Role.IsAdmin() {
 		return response.Error(http.StatusForbidden, response.MSG_NOT_AUTHORIZED)
 	}
@@ -143,7 +142,7 @@ func (s *userService) Create(session *session.Session, loginName, displayName, t
 	}
 }
 
-func (s *userService) Update(session *session.Session, id, loginName, displayName, tel, password string) entity.Response {
+func (s *userService) Update(session *e.Session, id, loginName, displayName, tel, password string) entity.Response {
 	if !session.Role.IsAdmin() {
 		if session.UserId != id {
 			return response.Error(http.StatusForbidden, response.MSG_NOT_AUTHORIZED)
@@ -167,7 +166,7 @@ func (s *userService) Update(session *session.Session, id, loginName, displayNam
 	}
 }
 
-func (o *userService) Delete(session *session.Session, id string) entity.Response {
+func (o *userService) Delete(session *e.Session, id string) entity.Response {
 	if !session.Role.IsAdmin() {
 		return response.Error(http.StatusForbidden, response.MSG_NOT_AUTHORIZED)
 	}

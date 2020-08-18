@@ -5,27 +5,24 @@ import (
 	"strconv"
 	"time"
 
-	m "github.com/fkmhrk/OpenInvoice/v1/model"
-	"github.com/fkmhrk/OpenInvoice/v1/model/env"
+	e "github.com/fkmhrk/OpenInvoice/v1/entity"
 	"github.com/fkmhrk/OpenInvoice/v1/model/response"
-	"github.com/fkmhrk/OpenInvoice/v1/model/seq"
-	"github.com/fkmhrk/OpenInvoice/v1/model/session"
-	"github.com/fkmhrk/OpenInvoice/v1/model/trading"
 	ss "github.com/fkmhrk/OpenInvoice/v1/rest/service"
+	"github.com/fkmhrk/OpenInvoice/v1/service/model"
 	"github.com/mokelab-go/server/entity"
 )
 
 type tradingService struct {
-	sessionDAO session.SessionDAO
-	tradingDAO trading.DAO
-	envDAO     env.DAO
-	seqDAO     seq.DAO
+	sessionDAO model.Session
+	tradingDAO model.Trading
+	envDAO     model.Env
+	seqDAO     model.Seq
 }
 
-func New(s session.SessionDAO, t trading.DAO, models *m.Models) *tradingService {
+func New(models *model.Models) *tradingService {
 	return &tradingService{
-		sessionDAO: s,
-		tradingDAO: t,
+		sessionDAO: models.Session,
+		tradingDAO: models.Trading,
 		envDAO:     models.Env,
 		seqDAO:     models.Seq,
 	}
@@ -63,7 +60,7 @@ func (s *tradingService) GetTradingByID(id string) entity.Response {
 	}
 }
 
-func (s *tradingService) Create(session *session.Session, companyId, subject, product, memo string, titleType int, workFrom, workTo, total, quotationDate, billDate, deliveryDate int64, taxRate float32) entity.Response {
+func (s *tradingService) Create(session *e.Session, companyId, subject, product, memo string, titleType int, workFrom, workTo, total, quotationDate, billDate, deliveryDate int64, taxRate float32) entity.Response {
 	// input check
 	if len(companyId) == 0 {
 		return response.Error(http.StatusBadRequest, response.MSG_ERR_COMPANY_ID_EMPTY)
@@ -209,16 +206,16 @@ func (s *tradingService) DeleteItem(id, tradingId string) entity.Response {
 }
 
 func (o *tradingService) GetNextNumber(seqType string, date int64) entity.Response {
-	var seqTypeInt seq.SeqType
+	var seqTypeInt e.SeqType
 	switch seqType {
 	case "quotation":
-		seqTypeInt = seq.SeqType_Quotation
+		seqTypeInt = e.SeqType_Quotation
 		break
 	case "delivery":
-		seqTypeInt = seq.SeqType_Delivery
+		seqTypeInt = e.SeqType_Delivery
 		break
 	case "bill":
-		seqTypeInt = seq.SeqType_Bill
+		seqTypeInt = e.SeqType_Bill
 		break
 	default:
 		return response.Error(http.StatusBadRequest, response.MSG_INVALID_SEQUENCE_TYPE)
@@ -250,7 +247,7 @@ func (o *tradingService) GetNextNumber(seqType string, date int64) entity.Respon
 	}
 }
 
-func (s *tradingService) toJson(t *trading.Trading) map[string]interface{} {
+func (s *tradingService) toJson(t *e.Trading) map[string]interface{} {
 	return map[string]interface{}{
 		"id":               t.Id,
 		"company_id":       t.CompanyId,

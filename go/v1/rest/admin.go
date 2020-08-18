@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	rj "github.com/fkmhrk-go/rawjson"
-	"github.com/fkmhrk/OpenInvoice/v1/model/env"
+	"github.com/fkmhrk/OpenInvoice/v1/entity"
 	"github.com/fkmhrk/OpenInvoice/v1/rest/service"
 	"github.com/mokelab-go/hop"
 )
@@ -24,11 +24,11 @@ func saveEnvironment(services service.Services) http.HandlerFunc {
 	}
 }
 
-func toEnvList(json rj.RawJsonObject) []*env.Env {
-	list := make([]*env.Env, 0, len(json))
+func toEnvList(json rj.RawJsonObject) []*entity.Env {
+	list := make([]*entity.Env, 0, len(json))
 	for key, value := range json {
 		if strValue, ok := value.(string); ok {
-			list = append(list, &env.Env{
+			list = append(list, &entity.Env{
 				Key:   key,
 				Value: strValue,
 			})

@@ -3,8 +3,8 @@ package rest
 import (
 	"net/http"
 
-	m "github.com/fkmhrk/OpenInvoice/v1/model"
 	"github.com/fkmhrk/OpenInvoice/v1/rest/service"
+	"github.com/fkmhrk/OpenInvoice/v1/service/model"
 	"github.com/gorilla/mux"
 	"github.com/mokelab-go/hop"
 )
@@ -16,7 +16,7 @@ const (
 	method_DELETE = "DELETE"
 )
 
-func SetHandlers(r *mux.Router, services service.Services, u service.User, t service.Trading, c service.Company, models *m.Models) {
+func SetHandlers(r *mux.Router, services service.Services, u service.User, t service.Trading, c service.Company, models *model.Models) {
 	auth := hop.Operations(
 		hop.GetPathParams,
 		hop.GetCredential,

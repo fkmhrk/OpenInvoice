@@ -1,4 +1,4 @@
-package impl
+package model
 
 import (
 	company "github.com/fkmhrk/OpenInvoice/v1/model/company/mysql"
@@ -12,8 +12,8 @@ import (
 	"github.com/fkmhrk/OpenInvoice/v1/service/model"
 )
 
-// NewModels creates instance
-func NewModels(connection *db.Connection) *model.Models {
+// New creates model instances
+func New(connection *db.Connection) *model.Models {
 	logger := logger.New()
 	return &model.Models{
 		User:           user.New(connection),

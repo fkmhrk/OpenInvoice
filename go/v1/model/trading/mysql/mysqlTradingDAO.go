@@ -6,9 +6,10 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/fkmhrk/OpenInvoice/v1/entity"
 	"github.com/fkmhrk/OpenInvoice/v1/model/db"
 	"github.com/fkmhrk/OpenInvoice/v1/model/logger"
-	"github.com/fkmhrk/OpenInvoice/v1/model/trading"
+	"github.com/fkmhrk/OpenInvoice/v1/service/model"
 	"github.com/go-sql-driver/mysql"
 	"github.com/google/uuid"
 )
@@ -97,14 +98,14 @@ type tradingDAO struct {
 }
 
 // New creates instance
-func New(connection *db.Connection, logger logger.Logger) trading.DAO {
+func New(connection *db.Connection, logger logger.Logger) model.Trading {
 	return &tradingDAO{
 		connection: connection,
 		logger:     logger,
 	}
 }
 
-func (d *tradingDAO) GetList() ([]*trading.Trading, error) {
+func (d *tradingDAO) GetList() ([]*entity.Trading, error) {
 	db := d.connection.Connect()
 	st, err := db.Prepare(sqlSelectTradingList)
 	if err != nil {
@@ -118,7 +119,7 @@ func (d *tradingDAO) GetList() ([]*trading.Trading, error) {
 	}
 	defer rows.Close()
 
-	var list []*trading.Trading
+	var list []*entity.Trading
 	for rows.Next() {
 		item := d.scanTrading(rows)
 		list = append(list, &item)
@@ -126,7 +127,7 @@ func (d *tradingDAO) GetList() ([]*trading.Trading, error) {
 	return list, nil
 }
 
-func (d *tradingDAO) GetListByUser(userId string) ([]*trading.Trading, error) {
+func (d *tradingDAO) GetListByUser(userId string) ([]*entity.Trading, error) {
 	db := d.connection.Connect()
 	st, err := db.Prepare(sqlSelectTradingsByUser)
 	if err != nil {
@@ -140,7 +141,7 @@ func (d *tradingDAO) GetListByUser(userId string) ([]*trading.Trading, error) {
 	}
 	defer rows.Close()
 
-	var list []*trading.Trading
+	var list []*entity.Trading
 	for rows.Next() {
 		item := d.scanTrading(rows)
 		list = append(list, &item)
@@ -149,7 +150,7 @@ func (d *tradingDAO) GetListByUser(userId string) ([]*trading.Trading, error) {
 
 }
 
-func (d *tradingDAO) GetById(id string) (*trading.Trading, error) {
+func (d *tradingDAO) GetById(id string) (*entity.Trading, error) {
 	db := d.connection.Connect()
 	st, err := db.Prepare(sqlSelectTradingByID)
 	if err != nil {
@@ -171,7 +172,7 @@ func (d *tradingDAO) GetById(id string) (*trading.Trading, error) {
 	return &item, nil
 }
 
-func (d *tradingDAO) Create(companyId, subject string, titleType int, workFrom, workTo, total, quotationDate, billDate, deliveryDate int64, taxRate float32, assignee, product, memo string) (*trading.Trading, error) {
+func (d *tradingDAO) Create(companyId, subject string, titleType int, workFrom, workTo, total, quotationDate, billDate, deliveryDate int64, taxRate float32, assignee, product, memo string) (*entity.Trading, error) {
 	tr, err := d.connection.Begin()
 	if err != nil {
 		return nil, err
@@ -199,7 +200,7 @@ func (d *tradingDAO) Create(companyId, subject string, titleType int, workFrom, 
 
 	tr.Commit()
 
-	return &trading.Trading{
+	return &entity.Trading{
 		Id:            id,
 		CompanyId:     companyId,
 		Subject:       subject,
@@ -214,7 +215,7 @@ func (d *tradingDAO) Create(companyId, subject string, titleType int, workFrom, 
 	}, nil
 }
 
-func (d *tradingDAO) Update(trading trading.Trading) (*trading.Trading, error) {
+func (d *tradingDAO) Update(trading entity.Trading) (*entity.Trading, error) {
 	tr, err := d.connection.Begin()
 	if err != nil {
 		return nil, err
@@ -263,7 +264,7 @@ func (d *tradingDAO) Delete(id string) error {
 	return nil
 }
 
-func (d *tradingDAO) GetItemsById(tradingId string) ([]*trading.TradingItem, error) {
+func (d *tradingDAO) GetItemsById(tradingId string) ([]*entity.TradingItem, error) {
 	db := d.connection.Connect()
 	st, err := db.Prepare(sqlSelectTradingItemsByID)
 	if err != nil {
@@ -277,7 +278,7 @@ func (d *tradingDAO) GetItemsById(tradingId string) ([]*trading.TradingItem, err
 	}
 	defer rows.Close()
 
-	var list []*trading.TradingItem
+	var list []*entity.TradingItem
 	var id, subject, degree, memo string
 	var sortOrder, unitPrice, taxType int
 	var amount float64
@@ -285,7 +286,7 @@ func (d *tradingDAO) GetItemsById(tradingId string) ([]*trading.TradingItem, err
 		rows.Scan(&id, &sortOrder, &subject, &unitPrice, &amount,
 			&degree, &taxType, &memo)
 
-		list = append(list, &trading.TradingItem{
+		list = append(list, &entity.TradingItem{
 			Id:        id,
 			TradingId: tradingId,
 			SortOrder: sortOrder,
@@ -301,7 +302,7 @@ func (d *tradingDAO) GetItemsById(tradingId string) ([]*trading.TradingItem, err
 
 }
 
-func (d *tradingDAO) CreateItem(tradingId, subject, degree, memo string, sortOrder, unitPrice int, amount float64, taxType int) (*trading.TradingItem, error) {
+func (d *tradingDAO) CreateItem(tradingId, subject, degree, memo string, sortOrder, unitPrice int, amount float64, taxType int) (*entity.TradingItem, error) {
 	tr, err := d.connection.Begin()
 	if err != nil {
 		return nil, err
@@ -338,7 +339,7 @@ func (d *tradingDAO) CreateItem(tradingId, subject, degree, memo string, sortOrd
 
 	tr.Commit()
 
-	return &trading.TradingItem{
+	return &entity.TradingItem{
 		Id:        id,
 		TradingId: tradingId,
 		SortOrder: sortOrder,
@@ -351,7 +352,7 @@ func (d *tradingDAO) CreateItem(tradingId, subject, degree, memo string, sortOrd
 	}, nil
 }
 
-func (d *tradingDAO) UpdateItem(id, tradingId, subject, degree, memo string, sortOrder, unitPrice int, amount float64, taxType int) (*trading.TradingItem, error) {
+func (d *tradingDAO) UpdateItem(id, tradingId, subject, degree, memo string, sortOrder, unitPrice int, amount float64, taxType int) (*entity.TradingItem, error) {
 	tr, err := d.connection.Begin()
 	if err != nil {
 		return nil, err
@@ -373,7 +374,7 @@ func (d *tradingDAO) UpdateItem(id, tradingId, subject, degree, memo string, sor
 
 	tr.Commit()
 
-	return &trading.TradingItem{
+	return &entity.TradingItem{
 		Id:        id,
 		TradingId: tradingId,
 		SortOrder: sortOrder,
@@ -475,7 +476,7 @@ func (d *tradingDAO) updateId(tr *sql.Tx, date string, num int) error {
 	return err
 }
 
-func (d *tradingDAO) scanTrading(rows *sql.Rows) trading.Trading {
+func (d *tradingDAO) scanTrading(rows *sql.Rows) entity.Trading {
 	var id, companyId, subject, product string
 	var titleType int
 	var taxRate float32
@@ -493,7 +494,7 @@ func (d *tradingDAO) scanTrading(rows *sql.Rows) trading.Trading {
 		d.logger.Errorf("Failed to scan trading :%s", err)
 	}
 
-	return trading.Trading{
+	return entity.Trading{
 		Id:              id,
 		CompanyId:       companyId,
 		TitleType:       titleType,

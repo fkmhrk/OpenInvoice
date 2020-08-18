@@ -3,9 +3,10 @@ package mysql
 import (
 	"database/sql"
 
+	"github.com/fkmhrk/OpenInvoice/v1/entity"
 	"github.com/fkmhrk/OpenInvoice/v1/model/db"
 	util "github.com/fkmhrk/OpenInvoice/v1/model/db/mysql"
-	"github.com/fkmhrk/OpenInvoice/v1/model/user"
+	"github.com/fkmhrk/OpenInvoice/v1/service/model"
 )
 
 const (
@@ -42,13 +43,13 @@ type userDAO struct {
 	connection *db.Connection
 }
 
-func New(connection *db.Connection) *userDAO {
+func New(connection *db.Connection) model.User {
 	return &userDAO{
 		connection: connection,
 	}
 }
 
-func (d *userDAO) GetByNamePassword(name, password string) (*user.User, error) {
+func (d *userDAO) GetByNamePassword(name, password string) (*entity.User, error) {
 	db := d.connection.Connect()
 	st, err := db.Prepare(sqlSelectByNamePassword)
 	if err != nil {
@@ -77,7 +78,7 @@ func (d *userDAO) GetByNamePassword(name, password string) (*user.User, error) {
 	return user, nil
 }
 
-func (d *userDAO) GetList() ([]*user.User, error) {
+func (d *userDAO) GetList() ([]*entity.User, error) {
 	db := d.connection.Connect()
 	st, err := db.Prepare(sqlSelectList)
 	if err != nil {
@@ -91,7 +92,7 @@ func (d *userDAO) GetList() ([]*user.User, error) {
 	}
 	defer rows.Close()
 
-	list := make([]*user.User, 0)
+	list := make([]*entity.User, 0)
 	for rows.Next() {
 		item, _, err := d.scan(rows)
 		if err != nil {
@@ -102,7 +103,7 @@ func (d *userDAO) GetList() ([]*user.User, error) {
 	return list, nil
 }
 
-func (d *userDAO) GetById(id string) (*user.User, error) {
+func (d *userDAO) GetById(id string) (*entity.User, error) {
 	db := d.connection.Connect()
 	st, err := db.Prepare(sqlSelectByID)
 	if err != nil {
@@ -124,7 +125,7 @@ func (d *userDAO) GetById(id string) (*user.User, error) {
 	return user, err
 }
 
-func (d *userDAO) Create(loginName, displayName, role, tel, password string) (*user.User, error) {
+func (d *userDAO) Create(loginName, displayName, role, tel, password string) (*entity.User, error) {
 	tr, err := d.connection.Begin()
 	if err != nil {
 		return nil, err
@@ -148,17 +149,17 @@ func (d *userDAO) Create(loginName, displayName, role, tel, password string) (*u
 
 	tr.Commit()
 
-	return &user.User{
+	return &entity.User{
 		Id:          id,
 		LoginName:   loginName,
 		DisplayName: displayName,
-		Role:        user.Role(role),
+		Role:        entity.Role(role),
 		Tel:         tel,
 	}, nil
 
 }
 
-func (o *userDAO) Update(id, loginName, displayName, role, tel, password string) (*user.User, error) {
+func (o *userDAO) Update(id, loginName, displayName, role, tel, password string) (*entity.User, error) {
 	if len(password) == 0 {
 		return o.updateWithoutPassword(id, loginName, displayName, role, tel)
 	} else {
@@ -187,7 +188,7 @@ func (o *userDAO) Delete(id string) error {
 	return nil
 }
 
-func (o *userDAO) updateWithoutPassword(id, loginName, displayName, role, tel string) (*user.User, error) {
+func (o *userDAO) updateWithoutPassword(id, loginName, displayName, role, tel string) (*entity.User, error) {
 	tr, err := o.connection.Begin()
 	if err != nil {
 		return nil, err
@@ -207,16 +208,16 @@ func (o *userDAO) updateWithoutPassword(id, loginName, displayName, role, tel st
 
 	tr.Commit()
 
-	return &user.User{
+	return &entity.User{
 		Id:          id,
 		LoginName:   loginName,
 		DisplayName: displayName,
-		Role:        user.Role(role),
+		Role:        entity.Role(role),
 		Tel:         tel,
 	}, nil
 }
 
-func (o *userDAO) updateWithPassword(id, loginName, displayName, role, tel, password string) (*user.User, error) {
+func (o *userDAO) updateWithPassword(id, loginName, displayName, role, tel, password string) (*entity.User, error) {
 	tr, err := o.connection.Begin()
 	if err != nil {
 		return nil, err
@@ -237,11 +238,11 @@ func (o *userDAO) updateWithPassword(id, loginName, displayName, role, tel, pass
 
 	tr.Commit()
 
-	return &user.User{
+	return &entity.User{
 		Id:          id,
 		LoginName:   loginName,
 		DisplayName: displayName,
-		Role:        user.Role(role),
+		Role:        entity.Role(role),
 		Tel:         tel,
 	}, nil
 }
@@ -268,7 +269,7 @@ func (o *userDAO) deleteUser(tr *sql.Tx, id string) error {
 	return err
 }
 
-func (o *userDAO) scan(rows *sql.Rows) (*user.User, string, error) {
+func (o *userDAO) scan(rows *sql.Rows) (*entity.User, string, error) {
 	var id, loginName, displayName, role, tel, password string
 	var createTime, modifiedTime int64
 	err := rows.Scan(&id, &loginName, &displayName, &role, &tel,
@@ -276,11 +277,11 @@ func (o *userDAO) scan(rows *sql.Rows) (*user.User, string, error) {
 	if err != nil {
 		return nil, "", err
 	}
-	return &user.User{
+	return &entity.User{
 		Id:           id,
 		LoginName:    loginName,
 		DisplayName:  displayName,
-		Role:         user.Role(role),
+		Role:         entity.Role(role),
 		Tel:          tel,
 		CreatedTime:  createTime,
 		ModifiedTime: modifiedTime,

@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	rj "github.com/fkmhrk-go/rawjson"
-	t "github.com/fkmhrk/OpenInvoice/v1/model/trading"
+	"github.com/fkmhrk/OpenInvoice/v1/entity"
 	"github.com/fkmhrk/OpenInvoice/v1/rest/service"
 	"github.com/mokelab-go/hop"
 )
@@ -80,7 +80,7 @@ func updateTrading(tradingService service.Trading) http.HandlerFunc {
 		memo, _ := json.String("memo")
 
 		resp := tradingService.Update(service.TradingData{
-			t.Trading{
+			entity.Trading{
 				Id:              tradingID,
 				CompanyId:       companyID,
 				Subject:         subject,

@@ -4,9 +4,9 @@ import (
 	"errors"
 	"strings"
 
+	"github.com/fkmhrk/OpenInvoice/v1/entity"
 	"github.com/fkmhrk/OpenInvoice/v1/model/db"
-	"github.com/fkmhrk/OpenInvoice/v1/model/session"
-	"github.com/fkmhrk/OpenInvoice/v1/model/user"
+	"github.com/fkmhrk/OpenInvoice/v1/service/model"
 	"github.com/go-sql-driver/mysql"
 	"github.com/google/uuid"
 )
@@ -30,13 +30,13 @@ type sessionDAO struct {
 }
 
 // NewSessionDAO creates instance
-func NewSessionDAO(connection *db.Connection) session.SessionDAO {
+func NewSessionDAO(connection *db.Connection) model.Session {
 	return &sessionDAO{
 		connection: connection,
 	}
 }
 
-func (d *sessionDAO) GetByToken(token string) (*session.Session, error) {
+func (d *sessionDAO) GetByToken(token string) (*entity.Session, error) {
 	db := d.connection.Connect()
 	st, err := db.Prepare(sqlSelectSessionByToken)
 	if err != nil {
@@ -57,15 +57,15 @@ func (d *sessionDAO) GetByToken(token string) (*session.Session, error) {
 	var userId, role string
 	var expire int64
 	rows.Scan(&userId, &role, &expire)
-	return &session.Session{
+	return &entity.Session{
 		Token:      token,
-		Role:       user.Role(role),
+		Role:       entity.Role(role),
 		UserId:     userId,
 		ExpireTime: expire,
 	}, nil
 }
 
-func (d *sessionDAO) Create(userId, role string, expireIn int64) (*session.Session, error) {
+func (d *sessionDAO) Create(userId, role string, expireIn int64) (*entity.Session, error) {
 	tr, err := d.connection.Begin()
 	if err != nil {
 		return nil, err
@@ -98,10 +98,10 @@ func (d *sessionDAO) Create(userId, role string, expireIn int64) (*session.Sessi
 	if len(token) == 0 {
 		return nil, errors.New("Failed to create session")
 	}
-	return &session.Session{
+	return &entity.Session{
 		Token:  token,
 		UserId: userId,
-		Role:   user.Role(role),
+		Role:   entity.Role(role),
 	}, nil
 }
 

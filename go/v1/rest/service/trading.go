@@ -1,15 +1,15 @@
 package service
 
 import (
-	"github.com/fkmhrk/OpenInvoice/v1/model/session"
-	"github.com/fkmhrk/OpenInvoice/v1/model/trading"
+	e "github.com/fkmhrk/OpenInvoice/v1/entity"
 	"github.com/mokelab-go/server/entity"
 )
 
 type Trading interface {
 	GetListByUser() entity.Response
 	GetTradingByID(id string) entity.Response
-	Create(session *session.Session, companyId, subject, product, memo string, titleType int, workFrom, workTo, total, quotationDate, billDate, deliveryDate int64, taxRate float32) entity.Response
+	Create(session *e.Session, companyId, subject, product, memo string, titleType int, workFrom, workTo, total, quotationDate, billDate, deliveryDate int64, taxRate float32) entity.Response
+
 	Update(trading TradingData) entity.Response
 
 	// Deletes trading and child items
@@ -29,5 +29,5 @@ type Trading interface {
 }
 
 type TradingData struct {
-	trading.Trading
+	e.Trading
 }

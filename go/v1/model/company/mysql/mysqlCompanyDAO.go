@@ -6,8 +6,9 @@ import (
 	_ "fmt"
 	"strings"
 
-	"github.com/fkmhrk/OpenInvoice/v1/model/company"
+	"github.com/fkmhrk/OpenInvoice/v1/entity"
 	"github.com/fkmhrk/OpenInvoice/v1/model/db"
+	"github.com/fkmhrk/OpenInvoice/v1/service/model"
 	"github.com/go-sql-driver/mysql"
 	"github.com/google/uuid"
 )
@@ -17,13 +18,13 @@ type companyDAO struct {
 }
 
 // New creates instance
-func New(connection *db.Connection) company.DAO {
+func New(connection *db.Connection) model.Company {
 	return &companyDAO{
 		connection: connection,
 	}
 }
 
-func (d *companyDAO) GetList() ([]*company.Company, error) {
+func (d *companyDAO) GetList() ([]*entity.Company, error) {
 	db := d.connection.Connect()
 	st, err := db.Prepare("SELECT id,name,zip,address," +
 		"phone,unit FROM company " +
@@ -39,14 +40,14 @@ func (d *companyDAO) GetList() ([]*company.Company, error) {
 	}
 	defer rows.Close()
 
-	var list []*company.Company
+	var list []*entity.Company
 	for rows.Next() {
 		list = append(list, d.readRow(rows))
 	}
 	return list, nil
 }
 
-func (d *companyDAO) GetById(id string) (*company.Company, error) {
+func (d *companyDAO) GetById(id string) (*entity.Company, error) {
 	db := d.connection.Connect()
 	st, err := db.Prepare("SELECT id,name,zip,address," +
 		"phone,unit FROM company " +
@@ -68,7 +69,7 @@ func (d *companyDAO) GetById(id string) (*company.Company, error) {
 	return d.readRow(rows), nil
 }
 
-func (d *companyDAO) Create(name, zip, address, phone, unit string) (*company.Company, error) {
+func (d *companyDAO) Create(name, zip, address, phone, unit string) (*entity.Company, error) {
 	tr, err := d.connection.Begin()
 	if err != nil {
 		return nil, err
@@ -108,7 +109,7 @@ func (d *companyDAO) Create(name, zip, address, phone, unit string) (*company.Co
 
 	tr.Commit()
 
-	return &company.Company{
+	return &entity.Company{
 		Id:      id,
 		Name:    name,
 		Zip:     zip,
@@ -118,7 +119,7 @@ func (d *companyDAO) Create(name, zip, address, phone, unit string) (*company.Co
 	}, nil
 }
 
-func (d *companyDAO) Update(id, name, zip, address, phone, unit string) (*company.Company, error) {
+func (d *companyDAO) Update(id, name, zip, address, phone, unit string) (*entity.Company, error) {
 	db := d.connection.Connect()
 
 	st, err := db.Prepare("UPDATE company SET " +
@@ -136,7 +137,7 @@ func (d *companyDAO) Update(id, name, zip, address, phone, unit string) (*compan
 		return nil, err
 	}
 
-	return &company.Company{
+	return &entity.Company{
 		Id:      id,
 		Name:    name,
 		Zip:     zip,
@@ -188,10 +189,10 @@ func (d *companyDAO) execDelete(tr *sql.Tx, id string) error {
 	return err
 }
 
-func (d *companyDAO) readRow(rows *sql.Rows) *company.Company {
+func (d *companyDAO) readRow(rows *sql.Rows) *entity.Company {
 	var id, name, zip, address, phone, unit string
 	rows.Scan(&id, &name, &zip, &address, &phone, &unit)
-	return &company.Company{
+	return &entity.Company{
 		Id:      id,
 		Name:    name,
 		Zip:     zip,

@@ -3,10 +3,10 @@ package mysql
 import (
 	"database/sql"
 
+	"github.com/fkmhrk/OpenInvoice/v1/entity"
 	"github.com/fkmhrk/OpenInvoice/v1/model/db"
 	util "github.com/fkmhrk/OpenInvoice/v1/model/db/mysql"
-	"github.com/fkmhrk/OpenInvoice/v1/model/session"
-	"github.com/fkmhrk/OpenInvoice/v1/model/user"
+	"github.com/fkmhrk/OpenInvoice/v1/service/model"
 )
 
 const (
@@ -30,22 +30,22 @@ type session_refreshDAO struct {
 	connection *db.Connection
 }
 
-func NewSessionRefreshDAO(connection *db.Connection) *session_refreshDAO {
+func NewSessionRefreshDAO(connection *db.Connection) model.SessionRefresh {
 	return &session_refreshDAO{
 		connection: connection,
 	}
 }
 
-func (d *session_refreshDAO) Create(userId, role string) (session.SessionRefresh, error) {
+func (d *session_refreshDAO) Create(userId, role string) (entity.SessionRefresh, error) {
 	tr, err := d.connection.Begin()
 	if err != nil {
-		return session.SessionRefresh{}, err
+		return entity.SessionRefresh{}, err
 	}
 	defer tr.Rollback()
 
 	st, err := tr.Prepare(sqlInsertRefresh)
 	if err != nil {
-		return session.SessionRefresh{}, err
+		return entity.SessionRefresh{}, err
 	}
 	defer st.Close()
 
@@ -54,87 +54,87 @@ func (d *session_refreshDAO) Create(userId, role string) (session.SessionRefresh
 		return err
 	})
 	if err != nil {
-		return session.SessionRefresh{}, err
+		return entity.SessionRefresh{}, err
 	}
 
 	tr.Commit()
 
-	return session.SessionRefresh{
+	return entity.SessionRefresh{
 		Token:      token,
 		UserId:     userId,
-		Role:       user.Role(role),
+		Role:       entity.Role(role),
 		ExpireTime: 0,
 	}, nil
 }
 
-func (d *session_refreshDAO) Get(token string) (session.SessionRefresh, error) {
+func (d *session_refreshDAO) Get(token string) (entity.SessionRefresh, error) {
 	db := d.connection.Connect()
 	st, err := db.Prepare(sqlSelectRefreshByToken)
 	if err != nil {
-		return session.SessionRefresh{}, err
+		return entity.SessionRefresh{}, err
 	}
 	defer st.Close()
 
 	rows, err := st.Query(token)
 	if err != nil {
-		return session.SessionRefresh{}, err
+		return entity.SessionRefresh{}, err
 	}
 	defer rows.Close()
 
 	if !rows.Next() {
-		return session.SessionRefresh{}, nil
+		return entity.SessionRefresh{}, nil
 	}
 
 	return d.scan(rows), nil
 }
 
-func (d *session_refreshDAO) Update(token, userId, role string) (session.SessionRefresh, error) {
+func (d *session_refreshDAO) Update(token, userId, role string) (entity.SessionRefresh, error) {
 	db := d.connection.Connect()
 	st, err := db.Prepare(sqlUpdateRefresh)
 	if err != nil {
-		return session.SessionRefresh{}, err
+		return entity.SessionRefresh{}, err
 	}
 	defer st.Close()
 
 	_, err = st.Exec(token, userId, role, token)
 	if err != nil {
-		return session.SessionRefresh{}, err
+		return entity.SessionRefresh{}, err
 	}
 
-	return session.SessionRefresh{
+	return entity.SessionRefresh{
 		Token:      token,
 		UserId:     userId,
-		Role:       user.Role(role),
+		Role:       entity.Role(role),
 		ExpireTime: 0,
 	}, nil
 }
 
-func (d *session_refreshDAO) Delete(token string) (session.SessionRefresh, error) {
+func (d *session_refreshDAO) Delete(token string) (entity.SessionRefresh, error) {
 	db := d.connection.Connect()
 	st, err := db.Prepare(sqlSoftDeleteRefresh)
 	if err != nil {
-		return session.SessionRefresh{}, err
+		return entity.SessionRefresh{}, err
 	}
 	defer st.Close()
 
 	_, err = st.Exec(token)
 	if err != nil {
-		return session.SessionRefresh{}, err
+		return entity.SessionRefresh{}, err
 	}
 
-	return session.SessionRefresh{}, nil
+	return entity.SessionRefresh{}, nil
 }
 
-func (d *session_refreshDAO) scan(rows *sql.Rows) session.SessionRefresh {
+func (d *session_refreshDAO) scan(rows *sql.Rows) entity.SessionRefresh {
 	var token string
 	var userID string
 	var role string
 	var expireTime int64
 	rows.Scan(&token, &userID, &role, &expireTime)
-	return session.SessionRefresh{
+	return entity.SessionRefresh{
 		Token:      token,
 		UserId:     userID,
-		Role:       user.Role(role),
+		Role:       entity.Role(role),
 		ExpireTime: expireTime,
 	}
 }

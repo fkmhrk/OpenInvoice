@@ -1,7 +1,7 @@
 package service
 
 import (
-	"github.com/fkmhrk/OpenInvoice/v1/model/env"
+	e "github.com/fkmhrk/OpenInvoice/v1/entity"
 	"github.com/mokelab-go/server/entity"
 )
 
@@ -10,7 +10,7 @@ type Admin interface {
 	// Gets Environment
 	GetEnvironment() entity.Response
 	// Saves Environment. If key exists, api updates it.
-	SaveEnvironment(list []*env.Env) entity.Response
+	SaveEnvironment(list []*e.Env) entity.Response
 	// Gets My comanpy name
 	GetMyCompanyname() entity.Response
 }

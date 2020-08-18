@@ -3,21 +3,20 @@ package company
 import (
 	"net/http"
 
-	m "github.com/fkmhrk/OpenInvoice/v1/model"
-	"github.com/fkmhrk/OpenInvoice/v1/model/company"
+	e "github.com/fkmhrk/OpenInvoice/v1/entity"
 	"github.com/fkmhrk/OpenInvoice/v1/model/response"
-	"github.com/fkmhrk/OpenInvoice/v1/model/session"
 	"github.com/fkmhrk/OpenInvoice/v1/rest/service"
+	"github.com/fkmhrk/OpenInvoice/v1/service/model"
 	"github.com/mokelab-go/server/entity"
 )
 
 type companyService struct {
-	sessionDAO session.SessionDAO
-	companyDAO company.DAO
+	sessionDAO model.Session
+	companyDAO model.Company
 }
 
 // New creates instance
-func New(models *m.Models) service.Company {
+func New(models *model.Models) service.Company {
 	return &companyService{
 		sessionDAO: models.Session,
 		companyDAO: models.Company,
@@ -84,7 +83,7 @@ func (o *companyService) Delete(id string) entity.Response {
 	}
 }
 
-func (s *companyService) toJson(c *company.Company) map[string]interface{} {
+func (s *companyService) toJson(c *e.Company) map[string]interface{} {
 	return map[string]interface{}{
 		"id":      c.Id,
 		"name":    c.Name,

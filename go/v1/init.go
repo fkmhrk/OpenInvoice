@@ -1,12 +1,12 @@
 package v1
 
 import (
-	m "github.com/fkmhrk/OpenInvoice/v1/model"
 	modeldb "github.com/fkmhrk/OpenInvoice/v1/model/db"
 	mi "github.com/fkmhrk/OpenInvoice/v1/model/impl"
 	"github.com/fkmhrk/OpenInvoice/v1/rest"
 	s "github.com/fkmhrk/OpenInvoice/v1/rest/service"
 	"github.com/fkmhrk/OpenInvoice/v1/service"
+	"github.com/fkmhrk/OpenInvoice/v1/service/model"
 
 	"database/sql"
 
@@ -27,7 +27,7 @@ func InitRouter(r *mux.Router) error {
 	return nil
 }
 
-func initRouter(r *mux.Router, services s.Services, models *m.Models) {
+func initRouter(r *mux.Router, services s.Services, models *model.Models) {
 	r1 := r.PathPrefix("/api/v1").Subrouter()
 	rest.SetHandlers(r1, services, services.User, services.Trading, services.Company, models)
 }

@@ -3,8 +3,9 @@ package mysql
 import (
 	"database/sql"
 
+	"github.com/fkmhrk/OpenInvoice/v1/entity"
 	"github.com/fkmhrk/OpenInvoice/v1/model/db"
-	"github.com/fkmhrk/OpenInvoice/v1/model/env"
+	"github.com/fkmhrk/OpenInvoice/v1/service/model"
 )
 
 const (
@@ -28,60 +29,60 @@ type envDAO struct {
 }
 
 // New creates instance
-func New(connection *db.Connection) env.DAO {
+func New(connection *db.Connection) model.Env {
 	return &envDAO{
 		connection: connection,
 	}
 }
 
-func (d *envDAO) Create(key, value string) (env.Env, error) {
+func (d *envDAO) Create(key, value string) (entity.Env, error) {
 	tr, err := d.connection.Begin()
 	if err != nil {
-		return env.Env{}, err
+		return entity.Env{}, err
 	}
 	defer tr.Rollback()
 
 	st, err := tr.Prepare(sqlInsert)
 	if err != nil {
-		return env.Env{}, err
+		return entity.Env{}, err
 	}
 	defer st.Close()
 
 	_, err = st.Exec(key, value)
 	if err != nil {
-		return env.Env{}, err
+		return entity.Env{}, err
 	}
 
 	tr.Commit()
 
-	return env.Env{
+	return entity.Env{
 		Key:   key,
 		Value: value,
 	}, nil
 }
 
-func (d *envDAO) Get(key string) (env.Env, error) {
+func (d *envDAO) Get(key string) (entity.Env, error) {
 	db := d.connection.Connect()
 	st, err := db.Prepare(sqlSelectByID)
 	if err != nil {
-		return env.Env{}, err
+		return entity.Env{}, err
 	}
 	defer st.Close()
 
 	rows, err := st.Query(key)
 	if err != nil {
-		return env.Env{}, err
+		return entity.Env{}, err
 	}
 	defer rows.Close()
 
 	if !rows.Next() {
-		return env.Env{}, nil
+		return entity.Env{}, nil
 	}
 
 	return d.scan(rows), nil
 }
 
-func (d *envDAO) GetList() ([]*env.Env, error) {
+func (d *envDAO) GetList() ([]*entity.Env, error) {
 	db := d.connection.Connect()
 	st, err := db.Prepare(sqlSelectList)
 	if err != nil {
@@ -95,7 +96,7 @@ func (d *envDAO) GetList() ([]*env.Env, error) {
 	}
 	defer rows.Close()
 
-	list := make([]*env.Env, 0)
+	list := make([]*entity.Env, 0)
 	for rows.Next() {
 		item := d.scan(rows)
 		list = append(list, &item)
@@ -104,7 +105,7 @@ func (d *envDAO) GetList() ([]*env.Env, error) {
 	return list, nil
 }
 
-func (d *envDAO) Save(list []*env.Env) error {
+func (d *envDAO) Save(list []*entity.Env) error {
 	tr, err := d.connection.Begin()
 	if err != nil {
 		return err
@@ -144,46 +145,46 @@ func (d *envDAO) Save(list []*env.Env) error {
 	return nil
 }
 
-func (d *envDAO) Update(key, value string) (env.Env, error) {
+func (d *envDAO) Update(key, value string) (entity.Env, error) {
 	db := d.connection.Connect()
 	st, err := db.Prepare(sqlUpdate)
 	if err != nil {
-		return env.Env{}, err
+		return entity.Env{}, err
 	}
 	defer st.Close()
 
 	_, err = st.Exec(value, key)
 	if err != nil {
-		return env.Env{}, err
+		return entity.Env{}, err
 	}
 
-	return env.Env{
+	return entity.Env{
 		Key:   key,
 		Value: value,
 	}, nil
 }
 
-func (d *envDAO) Delete(key string) (env.Env, error) {
+func (d *envDAO) Delete(key string) (entity.Env, error) {
 	db := d.connection.Connect()
 	st, err := db.Prepare(sqlSoftDelete)
 	if err != nil {
-		return env.Env{}, err
+		return entity.Env{}, err
 	}
 	defer st.Close()
 
 	_, err = st.Exec(key)
 	if err != nil {
-		return env.Env{}, err
+		return entity.Env{}, err
 	}
 
-	return env.Env{}, nil
+	return entity.Env{}, nil
 }
 
-func (d *envDAO) scan(rows *sql.Rows) env.Env {
+func (d *envDAO) scan(rows *sql.Rows) entity.Env {
 	var key string
 	var value string
 	rows.Scan(&key, &value)
-	return env.Env{
+	return entity.Env{
 		Key:   key,
 		Value: value,
 	}

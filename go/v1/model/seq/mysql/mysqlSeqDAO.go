@@ -3,8 +3,9 @@ package mysql
 import (
 	"database/sql"
 
+	"github.com/fkmhrk/OpenInvoice/v1/entity"
 	"github.com/fkmhrk/OpenInvoice/v1/model/db"
-	"github.com/fkmhrk/OpenInvoice/v1/model/seq"
+	"github.com/fkmhrk/OpenInvoice/v1/service/model"
 )
 
 const (
@@ -32,84 +33,84 @@ type seqDAO struct {
 }
 
 // New creates instance
-func New(connection *db.Connection) seq.DAO {
+func New(connection *db.Connection) model.Seq {
 	return &seqDAO{
 		connection: connection,
 	}
 }
 
-func (d *seqDAO) Create(seqType seq.SeqType, year, value int) (seq.Seq, error) {
+func (d *seqDAO) Create(seqType entity.SeqType, year, value int) (entity.Seq, error) {
 	tr, err := d.connection.Begin()
 	if err != nil {
-		return seq.Seq{}, err
+		return entity.Seq{}, err
 	}
 	defer tr.Rollback()
 
 	st, err := tr.Prepare(sqlInsert)
 	if err != nil {
-		return seq.Seq{}, err
+		return entity.Seq{}, err
 	}
 	defer st.Close()
 
 	_, err = st.Exec(seqType, year, value)
 	if err != nil {
-		return seq.Seq{}, err
+		return entity.Seq{}, err
 	}
 
 	tr.Commit()
 
-	return seq.Seq{
+	return entity.Seq{
 		SeqType: seqType,
 		Year:    year,
 		Value:   value,
 	}, nil
 }
 
-func (d *seqDAO) Get(seqType seq.SeqType, year int) (seq.Seq, error) {
+func (d *seqDAO) Get(seqType entity.SeqType, year int) (entity.Seq, error) {
 	db := d.connection.Connect()
 	st, err := db.Prepare(sqlSelectByTypeAndYear)
 	if err != nil {
-		return seq.Seq{}, err
+		return entity.Seq{}, err
 	}
 	defer st.Close()
 
 	rows, err := st.Query(seqType, year)
 	if err != nil {
-		return seq.Seq{}, err
+		return entity.Seq{}, err
 	}
 	defer rows.Close()
 
 	if !rows.Next() {
-		return seq.Seq{}, nil
+		return entity.Seq{}, nil
 	}
 
 	return d.scan(rows), nil
 }
 
-func (d *seqDAO) Update(seqType seq.SeqType, year, value int) (seq.Seq, error) {
+func (d *seqDAO) Update(seqType entity.SeqType, year, value int) (entity.Seq, error) {
 	db := d.connection.Connect()
 	st, err := db.Prepare(sqlUpdate)
 	if err != nil {
-		return seq.Seq{}, err
+		return entity.Seq{}, err
 	}
 	defer st.Close()
 
 	_, err = st.Exec(seqType, year, value, seqType, year)
 	if err != nil {
-		return seq.Seq{}, err
+		return entity.Seq{}, err
 	}
 
-	return seq.Seq{
+	return entity.Seq{
 		SeqType: seqType,
 		Year:    year,
 		Value:   value,
 	}, nil
 }
 
-func (d *seqDAO) Next(seqType seq.SeqType, year int) (seq.Seq, error) {
+func (d *seqDAO) Next(seqType entity.SeqType, year int) (entity.Seq, error) {
 	tx, err := d.connection.Begin()
 	if err != nil {
-		return seq.Seq{}, err
+		return entity.Seq{}, err
 	}
 	defer tx.Rollback()
 
@@ -118,39 +119,39 @@ func (d *seqDAO) Next(seqType seq.SeqType, year int) (seq.Seq, error) {
 		tx.Commit()
 		return seqEntity, nil
 	} else {
-		return seq.Seq{}, err
+		return entity.Seq{}, err
 	}
 }
 
-func (d *seqDAO) doNext(tx *sql.Tx, seqType seq.SeqType, year int) (seq.Seq, error) {
+func (d *seqDAO) doNext(tx *sql.Tx, seqType entity.SeqType, year int) (entity.Seq, error) {
 	// update
 	st, err := tx.Prepare(sqlNext)
 	if err != nil {
-		return seq.Seq{}, err
+		return entity.Seq{}, err
 	}
 	defer st.Close()
 
 	result, err := st.Exec(seqType, year)
 	if err != nil {
-		return seq.Seq{}, err
+		return entity.Seq{}, err
 	}
 	rowCount, err := result.RowsAffected()
 	if err != nil {
-		return seq.Seq{}, err
+		return entity.Seq{}, err
 	}
 	if rowCount == 0 {
 		// create
 		st2, err := tx.Prepare(sqlInsert)
 		if err != nil {
-			return seq.Seq{}, err
+			return entity.Seq{}, err
 		}
 		defer st2.Close()
 
 		_, err = st2.Exec(seqType, year, 1)
 		if err != nil {
-			return seq.Seq{}, err
+			return entity.Seq{}, err
 		}
-		return seq.Seq{
+		return entity.Seq{
 			SeqType: seqType,
 			Year:    year,
 			Value:   1,
@@ -160,45 +161,45 @@ func (d *seqDAO) doNext(tx *sql.Tx, seqType seq.SeqType, year int) (seq.Seq, err
 	// get
 	st2, err := tx.Prepare(sqlSelectByTypeAndYear)
 	if err != nil {
-		return seq.Seq{}, err
+		return entity.Seq{}, err
 	}
 	defer st2.Close()
 
 	rows, err := st2.Query(seqType, year)
 	if err != nil {
-		return seq.Seq{}, err
+		return entity.Seq{}, err
 	}
 	defer rows.Close()
 
 	if !rows.Next() {
-		return seq.Seq{}, err
+		return entity.Seq{}, err
 	}
 	return d.scan(rows), nil
 }
 
-func (d *seqDAO) Delete(seqType seq.SeqType, year int) (seq.Seq, error) {
+func (d *seqDAO) Delete(seqType entity.SeqType, year int) (entity.Seq, error) {
 	db := d.connection.Connect()
 	st, err := db.Prepare(sqlSoftDelete)
 	if err != nil {
-		return seq.Seq{}, err
+		return entity.Seq{}, err
 	}
 	defer st.Close()
 
 	_, err = st.Exec(seqType, year)
 	if err != nil {
-		return seq.Seq{}, err
+		return entity.Seq{}, err
 	}
 
-	return seq.Seq{}, nil
+	return entity.Seq{}, nil
 }
 
-func (d *seqDAO) scan(rows *sql.Rows) seq.Seq {
+func (d *seqDAO) scan(rows *sql.Rows) entity.Seq {
 	var seqType int
 	var year int
 	var value int
 	rows.Scan(&seqType, &year, &value)
-	return seq.Seq{
-		SeqType: seq.SeqType(seqType),
+	return entity.Seq{
+		SeqType: entity.SeqType(seqType),
 		Year:    year,
 		Value:   value,
 	}
