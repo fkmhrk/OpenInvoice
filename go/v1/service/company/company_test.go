@@ -4,16 +4,16 @@ import (
 	"fmt"
 	"testing"
 
-	m "github.com/fkmhrk/OpenInvoice/v1/model"
+	"github.com/fkmhrk/OpenInvoice/v1/entity"
 	"github.com/fkmhrk/OpenInvoice/v1/model/mock"
 	"github.com/fkmhrk/OpenInvoice/v1/model/test"
 )
 
 func TestCompany0000_GetList(t *testing.T) {
 	models := mock.NewMock()
-	var list []*m.Company
+	var list []*entity.Company
 	for i := 0; i < 3; i++ {
-		list = append(list, &m.Company{
+		list = append(list, &entity.Company{
 			Id:      fmt.Sprintf("company%d", i),
 			Name:    fmt.Sprintf("Name%d", i),
 			Zip:     fmt.Sprintf("Zip%d", i),
@@ -49,7 +49,7 @@ func TestCompany0000_GetList(t *testing.T) {
 func TestCompany0100_Create(t *testing.T) {
 	models := mock.NewMock()
 	companyDAO, _ := models.Company.(*mock.CompanyDAO)
-	companyDAO.CreateResult = &m.Company{
+	companyDAO.CreateResult = &entity.Company{
 		Id:      "company",
 		Name:    "Name",
 		Zip:     "Zip",
@@ -74,7 +74,7 @@ func TestCompany0100_Create(t *testing.T) {
 func TestCompany0200_Update(t *testing.T) {
 	models := mock.NewMock()
 	companyDAO, _ := models.Company.(*mock.CompanyDAO)
-	companyDAO.UpdateResult = &m.Company{
+	companyDAO.UpdateResult = &entity.Company{
 		Id:      "company",
 		Name:    "Name",
 		Zip:     "Zip",

@@ -1,14 +1,14 @@
 package model
 
 import (
-	company "github.com/fkmhrk/OpenInvoice/v1/model/company/mysql"
+	"github.com/fkmhrk/OpenInvoice/v1/model/company"
 	"github.com/fkmhrk/OpenInvoice/v1/model/db"
-	env "github.com/fkmhrk/OpenInvoice/v1/model/env/mysql"
+	"github.com/fkmhrk/OpenInvoice/v1/model/env"
 	"github.com/fkmhrk/OpenInvoice/v1/model/logger"
-	seq "github.com/fkmhrk/OpenInvoice/v1/model/seq/mysql"
-	session "github.com/fkmhrk/OpenInvoice/v1/model/session/mysql"
-	trading "github.com/fkmhrk/OpenInvoice/v1/model/trading/mysql"
-	user "github.com/fkmhrk/OpenInvoice/v1/model/user/mysql"
+	"github.com/fkmhrk/OpenInvoice/v1/model/seq"
+	"github.com/fkmhrk/OpenInvoice/v1/model/session"
+	"github.com/fkmhrk/OpenInvoice/v1/model/trading"
+	"github.com/fkmhrk/OpenInvoice/v1/model/user"
 	"github.com/fkmhrk/OpenInvoice/v1/service/model"
 )
 

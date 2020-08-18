@@ -1,4 +1,4 @@
-package mysql
+package seq
 
 import (
 	"database/sql"
@@ -7,16 +7,17 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/fkmhrk/OpenInvoice/v1/entity"
 	"github.com/fkmhrk/OpenInvoice/v1/model/db"
 	testdb "github.com/fkmhrk/OpenInvoice/v1/model/db/test"
-	"github.com/fkmhrk/OpenInvoice/v1/model/seq"
+	"github.com/fkmhrk/OpenInvoice/v1/service/model"
 )
 
-func createSeqDAO(sqlDB *sql.DB) seq.DAO {
+func createSeqDAO(sqlDB *sql.DB) model.Seq {
 	return New(db.NewConnection(sqlDB))
 }
 
-func assertSeq(t *testing.T, item *seq.Seq, seqType seq.SeqType, year, value int) {
+func assertSeq(t *testing.T, item *entity.Seq, seqType entity.SeqType, year, value int) {
 	caller := getCaller()
 	if item.SeqType != seqType {
 		t.Errorf("[%s] seqType must be %d but %d", caller, seqType, item.SeqType)
@@ -29,7 +30,7 @@ func assertSeq(t *testing.T, item *seq.Seq, seqType seq.SeqType, year, value int
 	}
 }
 
-func hardDeleteSeq(db *sql.DB, seqType seq.SeqType, year int) {
+func hardDeleteSeq(db *sql.DB, seqType entity.SeqType, year int) {
 	s, _ := db.Prepare("DELETE FROM seq WHERE seq_type=? AND year=?")
 	defer s.Close()
 	s.Exec(seqType, year)
@@ -45,7 +46,7 @@ func TestSeq_All(t *testing.T) {
 
 	dao := createSeqDAO(db)
 
-	var seqType seq.SeqType = 10
+	var seqType entity.SeqType = 10
 	var year int = 100
 	var value int = 100
 	hardDeleteSeq(db, seqType, year)
@@ -108,7 +109,7 @@ func TestSeq_Next(t *testing.T) {
 
 	dao := createSeqDAO(db)
 
-	var seqType seq.SeqType = 11
+	var seqType entity.SeqType = 11
 	var year int = 100
 	hardDeleteSeq(db, seqType, year)
 	item, err := dao.Next(seqType, year)

@@ -1,27 +1,27 @@
-package mysql
+package session
 
 import (
 	"database/sql"
 	"testing"
 
+	"github.com/fkmhrk/OpenInvoice/v1/entity"
 	"github.com/fkmhrk/OpenInvoice/v1/model/db"
 	testdb "github.com/fkmhrk/OpenInvoice/v1/model/db/test"
-	"github.com/fkmhrk/OpenInvoice/v1/model/session"
-	"github.com/fkmhrk/OpenInvoice/v1/model/user"
+	"github.com/fkmhrk/OpenInvoice/v1/service/model"
 )
 
-func createSessionRefreshDAO(sqlDB *sql.DB) *session_refreshDAO {
+func createSessionRefreshDAO(sqlDB *sql.DB) model.SessionRefresh {
 	return NewSessionRefreshDAO(db.NewConnection(sqlDB))
 }
 
-func assertSessionRefresh(t *testing.T, item *session.SessionRefresh, token, userId, role string, expireTime int64) {
+func assertSessionRefresh(t *testing.T, item *entity.SessionRefresh, token, userId, role string, expireTime int64) {
 	if item.Token != token {
 		t.Errorf("token must be %s but %s", token, item.Token)
 	}
 	if item.UserId != userId {
 		t.Errorf("userId must be %s but %s", userId, item.UserId)
 	}
-	if item.Role != user.Role(role) {
+	if item.Role != entity.Role(role) {
 		t.Errorf("role must be %s but %s", role, item.Role)
 	}
 	if item.ExpireTime != expireTime {

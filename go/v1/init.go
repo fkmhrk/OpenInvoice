@@ -1,8 +1,8 @@
 package v1
 
 import (
+	mi "github.com/fkmhrk/OpenInvoice/v1/model"
 	modeldb "github.com/fkmhrk/OpenInvoice/v1/model/db"
-	mi "github.com/fkmhrk/OpenInvoice/v1/model/impl"
 	"github.com/fkmhrk/OpenInvoice/v1/rest"
 	s "github.com/fkmhrk/OpenInvoice/v1/rest/service"
 	"github.com/fkmhrk/OpenInvoice/v1/service"
@@ -10,6 +10,7 @@ import (
 
 	"database/sql"
 
+	// used for driver
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/gorilla/mux"
 )
@@ -20,7 +21,7 @@ func InitRouter(r *mux.Router) error {
 		return err
 	}
 	c := modeldb.NewConnection(db)
-	models := mi.NewModels(c)
+	models := mi.New(c)
 	services := service.New(models)
 
 	initRouter(r, services, models)

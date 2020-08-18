@@ -1,4 +1,4 @@
-package mysql
+package trading
 
 import (
 	"database/sql"
@@ -8,14 +8,15 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/fkmhrk/OpenInvoice/v1/entity"
 	"github.com/fkmhrk/OpenInvoice/v1/model/db"
 	testdb "github.com/fkmhrk/OpenInvoice/v1/model/db/test"
 	"github.com/fkmhrk/OpenInvoice/v1/model/logger"
-	"github.com/fkmhrk/OpenInvoice/v1/model/trading"
+	"github.com/fkmhrk/OpenInvoice/v1/service/model"
 	_ "github.com/go-sql-driver/mysql"
 )
 
-func createTradingDAO(sqlDB *sql.DB) trading.DAO {
+func createTradingDAO(sqlDB *sql.DB) model.Trading {
 	c := db.NewConnection(sqlDB)
 	return New(c, logger.New())
 }
@@ -244,7 +245,7 @@ func TestTrading0300_Update(t *testing.T) {
 
 	// update
 	var total int64 = 3333
-	item2, err := dao.Update(trading.Trading{
+	item2, err := dao.Update(entity.Trading{
 		Id:            item.Id,
 		CompanyId:     "company2222",
 		Subject:       "subject3333",
@@ -362,7 +363,7 @@ func TestTrading0400_Delete(t *testing.T) {
 	}
 }
 
-func assertTrading(t *testing.T, item *trading.Trading,
+func assertTrading(t *testing.T, item *entity.Trading,
 	id, companyId, subject string, titleType int,
 	workFrom, workTo, quotationDate, billDate int64,
 	taxRate float32, assignee, product string) {

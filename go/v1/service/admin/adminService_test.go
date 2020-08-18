@@ -3,27 +3,27 @@ package admin
 import (
 	"testing"
 
-	m "github.com/fkmhrk/OpenInvoice/v1/model"
+	"github.com/fkmhrk/OpenInvoice/v1/entity"
 	"github.com/fkmhrk/OpenInvoice/v1/model/mock"
 	"github.com/fkmhrk/OpenInvoice/v1/model/test"
-	"github.com/fkmhrk/OpenInvoice/v1/service/admin"
+	"github.com/fkmhrk/OpenInvoice/v1/rest/service"
 )
 
 func TestAdmin_0000_GetEnvironment(t *testing.T) {
 	models := mock.NewMock()
 	envDAO, _ := models.Env.(*mock.EnvDAO)
-	envDAO.GetListResult = []*m.Env{
-		&m.Env{
+	envDAO.GetListResult = []*entity.Env{
+		&entity.Env{
 			Key:   "company_name",
 			Value: "MyCompany1",
 		},
-		&m.Env{
+		&entity.Env{
 			Key:   "company_tel",
 			Value: "080-1111-2222",
 		},
 	}
 
-	var service admin.Service = New(models)
+	var service service.Admin = New(models)
 	r := service.GetEnvironment()
 
 	// Assertion
@@ -44,14 +44,14 @@ func TestAdmin_0200_SavetEnvironment(t *testing.T) {
 	envDAO, _ := models.Env.(*mock.EnvDAO)
 	envDAO.SaveResult = nil
 
-	list := []*m.Env{
-		&m.Env{
+	list := []*entity.Env{
+		&entity.Env{
 			Key:   "company_name",
 			Value: "mokelab inc",
 		},
 	}
 
-	var service admin.Service = New(models)
+	var service service.Admin = New(models)
 	r := service.SaveEnvironment(list)
 
 	// Assertion
@@ -65,12 +65,12 @@ func TestAdmin_0200_SavetEnvironment(t *testing.T) {
 func TestAdmin_0400_GetMyCompanyname(t *testing.T) {
 	models := mock.NewMock()
 	envDAO, _ := models.Env.(*mock.EnvDAO)
-	envDAO.GetResult = m.Env{
+	envDAO.GetResult = entity.Env{
 		Key:   "company_name",
 		Value: "mokelab inc",
 	}
 
-	var service admin.Service = New(models)
+	var service service.Admin = New(models)
 	r := service.GetMyCompanyname()
 
 	// Assertion

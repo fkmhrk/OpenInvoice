@@ -1,4 +1,4 @@
-package mysql
+package trading
 
 import (
 	"database/sql"

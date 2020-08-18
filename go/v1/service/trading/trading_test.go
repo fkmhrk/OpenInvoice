@@ -4,19 +4,18 @@ import (
 	"fmt"
 	"testing"
 
-	m "github.com/fkmhrk/OpenInvoice/v1/model"
+	"github.com/fkmhrk/OpenInvoice/v1/entity"
 	mock "github.com/fkmhrk/OpenInvoice/v1/model/mock"
-	"github.com/fkmhrk/OpenInvoice/v1/model/session"
 	"github.com/fkmhrk/OpenInvoice/v1/model/test"
-	s "github.com/fkmhrk/OpenInvoice/v1/service/trading"
+
+	s "github.com/fkmhrk/OpenInvoice/v1/rest/service"
 )
 
 func TestTrading0000_GetListByUser(t *testing.T) {
 	models := mock.NewMock()
-	sessionDAO, _ := models.Session.(*mock.SessionDAO)
 
-	var list []*m.Trading
-	list = append(list, &m.Trading{
+	var list []*entity.Trading
+	list = append(list, &entity.Trading{
 		Id:              "trade1111",
 		CompanyId:       "company2233",
 		TitleType:       1,
@@ -35,13 +34,13 @@ func TestTrading0000_GetListByUser(t *testing.T) {
 		Product:         "product",
 		Memo:            "memo",
 	})
-	list = append(list, &m.Trading{
+	list = append(list, &entity.Trading{
 		Id: "trade2222",
 	})
 	tradingDAO, _ := models.Trading.(*mock.TradingDAO)
 	tradingDAO.GetListResult = list
 
-	service := New(sessionDAO, tradingDAO, models)
+	service := New(models)
 
 	r := service.GetListByUser()
 	if r.Status != 200 {
@@ -66,11 +65,11 @@ func TestTrading0000_GetListByUser(t *testing.T) {
 func TestTrading0100_Create(t *testing.T) {
 	models := mock.NewMock()
 	sessionDAO, _ := models.Session.(*mock.SessionDAO)
-	sessionDAO.GetByTokenResult = &session.Session{
+	sessionDAO.GetByTokenResult = &entity.Session{
 		Token: "testToken",
 	}
 	tradingDAO, _ := models.Trading.(*mock.TradingDAO)
-	tradingDAO.CreateResult = &m.Trading{
+	tradingDAO.CreateResult = &entity.Trading{
 		Id:         "trade1111",
 		CompanyId:  "company2233",
 		Subject:    "subject3344",
@@ -80,10 +79,10 @@ func TestTrading0100_Create(t *testing.T) {
 		Product:    "product",
 	}
 
-	service := New(sessionDAO, tradingDAO, models)
+	service := New(models)
 
 	// params
-	session := &session.Session{
+	session := &entity.Session{
 		Token:  "testToken",
 		UserId: "user2233",
 	}
@@ -114,9 +113,8 @@ func TestTrading0100_Create(t *testing.T) {
 
 func TestTrading0200_Update(t *testing.T) {
 	models := mock.NewMock()
-	sessionDAO, _ := models.Session.(*mock.SessionDAO)
 	tradingDAO, _ := models.Trading.(*mock.TradingDAO)
-	tradingDAO.GetByIdResult = &m.Trading{
+	tradingDAO.GetByIdResult = &entity.Trading{
 		Id:         "trade1111",
 		CompanyId:  "company2233",
 		Subject:    "subject3344",
@@ -126,7 +124,7 @@ func TestTrading0200_Update(t *testing.T) {
 		Product:    "product",
 	}
 
-	tradingDAO.UpdateResult = &m.Trading{
+	tradingDAO.UpdateResult = &entity.Trading{
 		Id:         "trade1111",
 		CompanyId:  "company2233",
 		Subject:    "subject3344",
@@ -136,7 +134,7 @@ func TestTrading0200_Update(t *testing.T) {
 		Product:    "product",
 	}
 
-	service := New(sessionDAO, tradingDAO, models)
+	service := New(models)
 
 	// params
 	id := "20150203"
@@ -151,8 +149,8 @@ func TestTrading0200_Update(t *testing.T) {
 	billDate := int64(400)
 	taxRate := float32(8)
 
-	r := service.Update(s.Trading{
-		m.Trading{
+	r := service.Update(s.TradingData{
+		entity.Trading{
 			Id:            id,
 			CompanyId:     companyId,
 			Subject:       subject,
@@ -178,10 +176,9 @@ func TestTrading0200_Update(t *testing.T) {
 
 func TestTrading0200_GetItemsByTradingId(t *testing.T) {
 	models := mock.NewMock()
-	sessionDAO, _ := models.Session.(*mock.SessionDAO)
-	var list []*m.TradingItem
+	var list []*entity.TradingItem
 	for i := 0; i < 2; i++ {
-		list = append(list, &m.TradingItem{
+		list = append(list, &entity.TradingItem{
 			Id:        fmt.Sprintf("trade%d", i),
 			Subject:   fmt.Sprintf("subject%d", i),
 			UnitPrice: i*100 + 100,
@@ -194,7 +191,7 @@ func TestTrading0200_GetItemsByTradingId(t *testing.T) {
 	tradingDAO, _ := models.Trading.(*mock.TradingDAO)
 	tradingDAO.GetItemsByIdResult = list
 
-	s := New(sessionDAO, tradingDAO, models)
+	s := New(models)
 
 	tradingId := "tradingId1"
 	r := s.GetItemListByTradingId(tradingId)
@@ -234,13 +231,12 @@ func TestTrading0200_GetItemsByTradingId(t *testing.T) {
 
 func TestTrading0300_CreateItem(t *testing.T) {
 	models := mock.NewMock()
-	sessionDAO, _ := models.Session.(*mock.SessionDAO)
 	tradingDAO, _ := models.Trading.(*mock.TradingDAO)
-	tradingDAO.CreateItemResult = &m.TradingItem{
+	tradingDAO.CreateItemResult = &entity.TradingItem{
 		Id: "item2233",
 	}
 
-	s := New(sessionDAO, tradingDAO, models)
+	s := New(models)
 
 	tradingId := "tradingId1"
 	r := s.CreateItem(tradingId, "subject", "M/M", "Memo",
@@ -257,13 +253,12 @@ func TestTrading0300_CreateItem(t *testing.T) {
 
 func TestTrading0400_UpdateItem(t *testing.T) {
 	models := mock.NewMock()
-	sessionDAO, _ := models.Session.(*mock.SessionDAO)
 	tradingDAO, _ := models.Trading.(*mock.TradingDAO)
-	tradingDAO.UpdateItemResult = &m.TradingItem{
+	tradingDAO.UpdateItemResult = &entity.TradingItem{
 		Id: "item2233",
 	}
 
-	s := New(sessionDAO, tradingDAO, models)
+	s := New(models)
 
 	id := "item1122"
 	tradingId := "tradingId1"
@@ -281,11 +276,10 @@ func TestTrading0400_UpdateItem(t *testing.T) {
 
 func TestTrading0500_DeleteItem(t *testing.T) {
 	models := mock.NewMock()
-	sessionDAO, _ := models.Session.(*mock.SessionDAO)
 	tradingDAO, _ := models.Trading.(*mock.TradingDAO)
 	tradingDAO.SoftDeleteItemResult = nil
 
-	s := New(sessionDAO, tradingDAO, models)
+	s := New(models)
 
 	id := "item1122"
 	tradingId := "tradingId1"
@@ -299,28 +293,27 @@ func TestTrading0500_DeleteItem(t *testing.T) {
 func TestTrading0600_GetNextNumber(t *testing.T) {
 	models := mock.NewMock()
 	sessionDAO, _ := models.Session.(*mock.SessionDAO)
-	sessionDAO.GetByTokenResult = &session.Session{
+	sessionDAO.GetByTokenResult = &entity.Session{
 		Token: "testToken",
 	}
 	envDAO, _ := models.Env.(*mock.EnvDAO)
-	envDAO.GetResult = m.Env{
+	envDAO.GetResult = entity.Env{
 		Value: "3",
 	}
-	tradingDAO, _ := models.Trading.(*mock.TradingDAO)
 	seqDAO, _ := models.Seq.(*mock.SeqDAO)
-	seqDAO.NextResult = m.Seq{
+	seqDAO.NextResult = entity.Seq{
 		Value: 4,
 	}
-	s := New(sessionDAO, tradingDAO, models)
+	s := New(models)
 
 	table := []struct {
 		Arg      string
-		Expected m.SeqType
+		Expected entity.SeqType
 		Label    string
 	}{
-		{"quotation", m.SeqType_Quotation, "m.SeqType_Quotation"},
-		{"delivery", m.SeqType_Delivery, "m.SeqType_Delivery"},
-		{"bill", m.SeqType_Bill, "m.SeqType_Bill"},
+		{"quotation", entity.SeqType_Quotation, "m.SeqType_Quotation"},
+		{"delivery", entity.SeqType_Delivery, "m.SeqType_Delivery"},
+		{"bill", entity.SeqType_Bill, "m.SeqType_Bill"},
 	}
 
 	for _, item := range table {
@@ -340,11 +333,10 @@ func TestTrading0600_GetNextNumber(t *testing.T) {
 
 func TestTrading0700_Delete(t *testing.T) {
 	models := mock.NewMock()
-	sessionDAO, _ := models.Session.(*mock.SessionDAO)
 	tradingDAO, _ := models.Trading.(*mock.TradingDAO)
 	tradingDAO.DeleteResult = nil
 
-	s := New(sessionDAO, tradingDAO, models)
+	s := New(models)
 	r := s.Delete("trade1122")
 	if r.Status != 204 {
 		t.Errorf("Wrong status : %d", r.Status)

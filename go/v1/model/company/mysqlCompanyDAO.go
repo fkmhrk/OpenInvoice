@@ -1,4 +1,4 @@
-package impl
+package company
 
 import (
 	"database/sql"

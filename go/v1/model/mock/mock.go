@@ -1,11 +1,11 @@
 package mock
 
 import (
-	m "github.com/fkmhrk/OpenInvoice/v1/model"
+	"github.com/fkmhrk/OpenInvoice/v1/service/model"
 )
 
-func NewMock() *m.Models {
-	return &m.Models{
+func NewMock() *model.Models {
+	return &model.Models{
 		User:           &UserDAO{},
 		Session:        &SessionDAO{},
 		SessionRefresh: &SessionRefreshDAO{},

@@ -1,19 +1,20 @@
-package mysql
+package env
 
 import (
 	"database/sql"
 	"testing"
 
+	"github.com/fkmhrk/OpenInvoice/v1/entity"
 	"github.com/fkmhrk/OpenInvoice/v1/model/db"
 	testdb "github.com/fkmhrk/OpenInvoice/v1/model/db/test"
-	"github.com/fkmhrk/OpenInvoice/v1/model/env"
+	"github.com/fkmhrk/OpenInvoice/v1/service/model"
 )
 
-func createEnvDAO(sqlDB *sql.DB) env.DAO {
+func createEnvDAO(sqlDB *sql.DB) model.Env {
 	return New(db.NewConnection(sqlDB))
 }
 
-func assertEnv(t *testing.T, item *env.Env, key, value string) {
+func assertEnv(t *testing.T, item *entity.Env, key, value string) {
 	if item.Key != key {
 		t.Errorf("key must be %s but %s", key, item.Key)
 	}
@@ -158,12 +159,12 @@ func TestEnv_Save(t *testing.T) {
 	hardDeleteEnv(db, "key2")
 	hardDeleteEnv(db, "key3")
 
-	list := []*env.Env{
-		&env.Env{
+	list := []*entity.Env{
+		{
 			Key:   "key1",
 			Value: "value1",
 		},
-		&env.Env{
+		{
 			Key:   "key2",
 			Value: "value2",
 		},
@@ -186,12 +187,12 @@ func TestEnv_Save(t *testing.T) {
 		return
 	}
 
-	list = []*env.Env{
-		&env.Env{
+	list = []*entity.Env{
+		{
 			Key:   "key1",
 			Value: "value3",
 		},
-		&env.Env{
+		{
 			Key:   "key3",
 			Value: "value4",
 		},

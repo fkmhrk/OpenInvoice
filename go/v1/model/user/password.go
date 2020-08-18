@@ -1,4 +1,4 @@
-package mysql
+package user
 
 import (
 	"crypto/sha1"

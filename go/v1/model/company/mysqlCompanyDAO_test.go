@@ -1,4 +1,4 @@
-package impl
+package company
 
 import (
 	"database/sql"
@@ -7,9 +7,10 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/fkmhrk/OpenInvoice/v1/model/company"
+	"github.com/fkmhrk/OpenInvoice/v1/entity"
 	"github.com/fkmhrk/OpenInvoice/v1/model/db"
 	testdb "github.com/fkmhrk/OpenInvoice/v1/model/db/test"
+	"github.com/fkmhrk/OpenInvoice/v1/service/model"
 	_ "github.com/go-sql-driver/mysql"
 )
 
@@ -20,7 +21,7 @@ func createTradingDAO(sqlDB *sql.DB) *tradingDAO {
 }
 */
 
-func createCompanyDAO(sqlDB *sql.DB) company.DAO {
+func createCompanyDAO(sqlDB *sql.DB) model.Company {
 	c := db.NewConnection(sqlDB)
 	return New(c)
 }
@@ -229,7 +230,7 @@ func TestCompany0400_Delete(t *testing.T) {
 }
 */
 
-func assertCompany(t *testing.T, item *company.Company,
+func assertCompany(t *testing.T, item *entity.Company,
 	id, name, zip, address, phone, unit string) {
 	caller := getCaller()
 	if item.Id != id {

@@ -1,4 +1,4 @@
-package mysql
+package session
 
 import (
 	"database/sql"
@@ -7,11 +7,11 @@ import (
 
 	"github.com/fkmhrk/OpenInvoice/v1/model/db"
 	testdb "github.com/fkmhrk/OpenInvoice/v1/model/db/test"
-	"github.com/fkmhrk/OpenInvoice/v1/model/session"
+	"github.com/fkmhrk/OpenInvoice/v1/service/model"
 	_ "github.com/go-sql-driver/mysql"
 )
 
-func createSessionDAO(sqlDB *sql.DB) session.SessionDAO {
+func createSessionDAO(sqlDB *sql.DB) model.Session {
 	c := db.NewConnection(sqlDB)
 	return NewSessionDAO(c)
 }

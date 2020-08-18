@@ -1,11 +1,11 @@
-package mysql
+package trading
 
 import (
 	"database/sql"
 	"testing"
 
+	"github.com/fkmhrk/OpenInvoice/v1/entity"
 	testdb "github.com/fkmhrk/OpenInvoice/v1/model/db/test"
-	"github.com/fkmhrk/OpenInvoice/v1/model/trading"
 	_ "github.com/go-sql-driver/mysql"
 )
 
@@ -248,7 +248,7 @@ func TestTradingItem0300_DeleteItem(t *testing.T) {
 		return
 	}
 }
-func assertTradingItem(t *testing.T, item *trading.TradingItem,
+func assertTradingItem(t *testing.T, item *entity.TradingItem,
 	id, tradingId, subject string, sortOrder, unitPrice int, amount float64,
 	degree string, taxType int, memo string) {
 	caller := getCaller()

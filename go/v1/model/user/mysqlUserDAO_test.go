@@ -1,4 +1,4 @@
-package mysql
+package user
 
 import (
 	"database/sql"
@@ -7,12 +7,13 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/fkmhrk/OpenInvoice/v1/entity"
 	"github.com/fkmhrk/OpenInvoice/v1/model/db"
 	testdb "github.com/fkmhrk/OpenInvoice/v1/model/db/test"
-	"github.com/fkmhrk/OpenInvoice/v1/model/user"
+	"github.com/fkmhrk/OpenInvoice/v1/service/model"
 )
 
-func createUserDAO(sqlDB *sql.DB) *userDAO {
+func createUserDAO(sqlDB *sql.DB) model.User {
 	c := db.NewConnection(sqlDB)
 	return New(c)
 }
@@ -293,7 +294,7 @@ func TestUserDAO_0400_Delete(t *testing.T) {
 	}
 }
 
-func assertUser(t *testing.T, item *user.User, id, loginName, displayName, role, tel string) {
+func assertUser(t *testing.T, item *entity.User, id, loginName, displayName, role, tel string) {
 	caller := getCaller()
 	if item.Id != id {
 		t.Errorf("%s Id must be %s but %s", caller, id, item.Id)
