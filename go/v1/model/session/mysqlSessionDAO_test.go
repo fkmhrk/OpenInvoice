@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/fkmhrk/OpenInvoice/v1/model"
 	"github.com/fkmhrk/OpenInvoice/v1/model/db"
 	testdb "github.com/fkmhrk/OpenInvoice/v1/model/db/test"
-	"github.com/fkmhrk/OpenInvoice/v1/service/model"
 	_ "github.com/go-sql-driver/mysql"
 )
 

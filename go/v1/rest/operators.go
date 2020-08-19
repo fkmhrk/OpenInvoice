@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/fkmhrk/OpenInvoice/v1/service/model"
+	"github.com/fkmhrk/OpenInvoice/v1/model"
 	"github.com/mokelab-go/hop"
 )
 
