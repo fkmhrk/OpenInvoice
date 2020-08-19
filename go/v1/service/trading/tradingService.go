@@ -6,9 +6,9 @@ import (
 	"time"
 
 	e "github.com/fkmhrk/OpenInvoice/v1/entity"
+	"github.com/fkmhrk/OpenInvoice/v1/model"
 	"github.com/fkmhrk/OpenInvoice/v1/model/response"
-	ss "github.com/fkmhrk/OpenInvoice/v1/rest/service"
-	"github.com/fkmhrk/OpenInvoice/v1/service/model"
+	ss "github.com/fkmhrk/OpenInvoice/v1/service"
 	"github.com/mokelab-go/server/entity"
 )
 

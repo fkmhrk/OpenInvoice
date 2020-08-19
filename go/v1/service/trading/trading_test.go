@@ -8,7 +8,7 @@ import (
 	mock "github.com/fkmhrk/OpenInvoice/v1/model/mock"
 	"github.com/fkmhrk/OpenInvoice/v1/model/test"
 
-	s "github.com/fkmhrk/OpenInvoice/v1/rest/service"
+	s "github.com/fkmhrk/OpenInvoice/v1/service"
 )
 
 func TestTrading0000_GetListByUser(t *testing.T) {

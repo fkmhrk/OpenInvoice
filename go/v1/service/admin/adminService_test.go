@@ -6,7 +6,7 @@ import (
 	"github.com/fkmhrk/OpenInvoice/v1/entity"
 	"github.com/fkmhrk/OpenInvoice/v1/model/mock"
 	"github.com/fkmhrk/OpenInvoice/v1/model/test"
-	"github.com/fkmhrk/OpenInvoice/v1/rest/service"
+	"github.com/fkmhrk/OpenInvoice/v1/service"
 )
 
 func TestAdmin_0000_GetEnvironment(t *testing.T) {

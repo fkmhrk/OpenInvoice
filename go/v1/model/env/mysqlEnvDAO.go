@@ -4,8 +4,8 @@ import (
 	"database/sql"
 
 	"github.com/fkmhrk/OpenInvoice/v1/entity"
+	"github.com/fkmhrk/OpenInvoice/v1/model"
 	"github.com/fkmhrk/OpenInvoice/v1/model/db"
-	"github.com/fkmhrk/OpenInvoice/v1/service/model"
 )
 
 const (

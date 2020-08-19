@@ -5,9 +5,9 @@ import (
 	"testing"
 
 	"github.com/fkmhrk/OpenInvoice/v1/entity"
+	"github.com/fkmhrk/OpenInvoice/v1/model"
 	"github.com/fkmhrk/OpenInvoice/v1/model/db"
 	testdb "github.com/fkmhrk/OpenInvoice/v1/model/db/test"
-	"github.com/fkmhrk/OpenInvoice/v1/service/model"
 )
 
 func createEnvDAO(sqlDB *sql.DB) model.Env {

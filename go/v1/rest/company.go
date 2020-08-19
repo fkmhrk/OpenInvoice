@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	rj "github.com/fkmhrk-go/rawjson"
-	"github.com/fkmhrk/OpenInvoice/v1/rest/service"
+	"github.com/fkmhrk/OpenInvoice/v1/service"
 	"github.com/mokelab-go/hop"
 )
 
