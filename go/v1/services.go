@@ -1,7 +1,8 @@
-package service
+package v1
 
 import (
-	"github.com/fkmhrk/OpenInvoice/v1/rest/service"
+	"github.com/fkmhrk/OpenInvoice/v1/service"
+	s "github.com/fkmhrk/OpenInvoice/v1/service"
 	"github.com/fkmhrk/OpenInvoice/v1/service/admin"
 	"github.com/fkmhrk/OpenInvoice/v1/service/company"
 	"github.com/fkmhrk/OpenInvoice/v1/service/model"
@@ -9,8 +10,7 @@ import (
 	"github.com/fkmhrk/OpenInvoice/v1/service/user"
 )
 
-// New creates service instances
-func New(models *model.Models) service.Services {
+func newServices(models *model.Models) s.Services {
 	return service.Services{
 		Admin:   admin.New(models),
 		User:    user.New(models),

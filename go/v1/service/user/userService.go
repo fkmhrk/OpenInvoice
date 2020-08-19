@@ -5,7 +5,7 @@ import (
 
 	e "github.com/fkmhrk/OpenInvoice/v1/entity"
 	"github.com/fkmhrk/OpenInvoice/v1/model/response"
-	"github.com/fkmhrk/OpenInvoice/v1/rest/service"
+	"github.com/fkmhrk/OpenInvoice/v1/service"
 	"github.com/fkmhrk/OpenInvoice/v1/service/model"
 	"github.com/mokelab-go/server/entity"
 )

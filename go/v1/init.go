@@ -4,8 +4,7 @@ import (
 	mi "github.com/fkmhrk/OpenInvoice/v1/model"
 	modeldb "github.com/fkmhrk/OpenInvoice/v1/model/db"
 	"github.com/fkmhrk/OpenInvoice/v1/rest"
-	s "github.com/fkmhrk/OpenInvoice/v1/rest/service"
-	"github.com/fkmhrk/OpenInvoice/v1/service"
+	s "github.com/fkmhrk/OpenInvoice/v1/service"
 	"github.com/fkmhrk/OpenInvoice/v1/service/model"
 
 	"database/sql"
@@ -22,7 +21,7 @@ func InitRouter(r *mux.Router) error {
 	}
 	c := modeldb.NewConnection(db)
 	models := mi.New(c)
-	services := service.New(models)
+	services := newServices(models)
 
 	initRouter(r, services, models)
 	return nil
